@@ -116,18 +116,32 @@ export function marketOpen(ms = Date.now()) {
   return mins >= 9 * 60 + 30 && mins < 16 * 60;
 }
 
-/** How far into the dark hours we are, and which session they belong to. */
+/**
+ * The dark hours we are in, or the ones we most recently came out of.
+ *
+ * The rule is the close, not the bell: a night begins when a session ends at
+ * 16:00, so until today's close has happened the night in question is still
+ * the previous session's. Anchoring on the bell instead looks right at 3am and
+ * silently points at a close in the future once the market opens, which yields
+ * a null move and an empty chart on a page that is meant to be reading.
+ */
 export function currentDarkHours(ms = Date.now()) {
   const t = inNewYork(ms);
-  // Before today's bell, the dark hours belong to the previous session.
-  const beforeBell = t.hour * 60 + t.minute < 9 * 60 + 30;
   let date = t.date;
-  if (beforeBell || !isSessionDay(date)) {
+  const closedToday = isSessionDay(date) && t.hour * 60 + t.minute >= 16 * 60;
+  if (!closedToday) {
     for (let i = 1; i <= 10; i++) {
       const back = shiftDate(t.date, -i);
       if (isSessionDay(back)) { date = back; break; }
     }
   }
   const w = darkHours(date);
-  return { ...w, elapsedHours: (ms - w.close) / 3600000, sinceBell: ms >= w.bell };
+  return {
+    ...w,
+    elapsedHours: (ms - w.close) / 3600000,
+    sinceBell: ms >= w.bell,
+    // True once the bell has rung on this night: the reading is now a record
+    // of how it resolved, not a live question.
+    settled: ms >= w.plus60,
+  };
 }

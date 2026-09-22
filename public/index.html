@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Almanac — is that overnight move real?</title>
+<meta name="description" content="What history says about a tokenised stock's move while its home market is shut. Measured on 1,659 nights of Bitget data, and graded against itself.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'><circle cx='9' cy='9' r='7.5' fill='none' stroke='%232dd4bf' stroke-width='1.8'/><path d='M9 1.5A7.5 7.5 0 019 16.5Z' fill='%232dd4bf' opacity='.55'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="/">
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5" fill="none" stroke="var(--teal-up)" stroke-width="1.6"></circle><path d="M9 1.5 A7.5 7.5 0 0 1 9 16.5 Z" fill="var(--teal-up)" opacity="0.55"></path></svg>
+    <span>Almanac</span>
+  </a>
+  <div class="navlinks">
+    <a href="#tonight" class="on">Tonight</a>
+    <a href="#bands">Bands</a>
+    <a href="#record">Record</a>
+    <a href="/method.html">Method</a>
+  </div>
+  <div class="grow"></div>
+  <div class="pill" id="clock"><span class="dot" style="background: var(--warn)"></span><span class="mono">reading the clock…</span></div>
+</nav>
+
+<main>
+
+  <!-- hero -->
+  <section class="hero" id="tonight">
+    <div class="hero-left">
+      <div class="hero-head">
+        <h1 id="sym">—</h1>
+        <span class="chip" id="symnote">tokenised perpetual · Bitget</span>
+        <span class="chip warn" id="darkfor"></span>
+      </div>
+      <p class="verdict" id="verdict">Reading the night…</p>
+      <form class="ask" id="askform" autocomplete="off">
+        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.6"></circle><path d="M11 11 L14.5 14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg>
+        <label class="sr" for="q">Ask about a name</label>
+        <input id="q" name="q" type="text" placeholder="is MSTR's drop real?" value="is MSTR's drop real?">
+        <button type="submit" class="chip teal">Ask</button>
+      </form>
+      <p class="answer" id="answer" hidden></p>
+    </div>
+
+    <div class="hero-right">
+      <div class="sparkhead">
+        <span class="mono muted">SINCE THE 16:00 CLOSE</span>
+        <span class="mono" id="sparkmove">—</span>
+      </div>
+      <div id="spark" class="spark"></div>
+      <div class="sparkfoot mono"><span id="sparkclose">—</span><span id="sparknow">—</span></div>
+    </div>
+  </section>
+
+  <!-- three cards -->
+  <section class="cards">
+    <article class="card">
+      <header><h2>Tonight's reading</h2><span class="mono faint" id="livetag">LIVE</span></header>
+      <div class="figs">
+        <div><div class="fig" id="f-move">—</div><div class="mono muted">MOVED</div></div>
+        <div><div class="fig" id="f-normal">—</div><div class="mono muted">NORMAL DAY</div></div>
+        <div><div class="fig teal" id="f-ratio">—</div><div class="mono muted">RATIO</div></div>
+      </div>
+      <div class="rule"></div>
+      <dl class="kv" id="kv"></dl>
+      <p class="note">Ratio is the move divided by what this name covers in an ordinary session — the only thing that predicted survival.</p>
+    </article>
+
+    <article class="card" id="bands">
+      <header><h2>How often a move that size is undone</h2><span class="mono faint" id="nightstag">—</span></header>
+      <div id="bandchart"></div>
+    </article>
+
+    <article class="card" id="record">
+      <header><h2>Has it kept its word?</h2><span class="mono faint" id="gradedtag">—</span></header>
+      <div id="relchart"></div>
+      <div class="chips" id="scorechips"></div>
+    </article>
+  </section>
+
+  <!-- the board -->
+  <section class="panel">
+    <div class="tabs">
+      <span class="tab on">Tonight</span>
+      <a class="tab" href="#bands">Every band</a>
+      <a class="tab" href="#record">The record</a>
+      <a class="tab" href="/method.html#failed">What did not work</a>
+      <a class="tab" href="/method.html">Method</a>
+      <div class="grow"></div>
+      <span class="chip" id="sortnote">sorted by ratio, not by move</span>
+    </div>
+
+    <div class="toolbar">
+      <span class="chip teal">Visualise</span>
+      <a class="chip" href="/api/board">Raw JSON</a>
+      <div class="grow"></div>
+      <label class="toggle"><input type="checkbox" id="hidesmall" checked><span class="track"></span><span class="tl">Hide moves under 0.5%</span></label>
+    </div>
+
+    <div class="thead mono">
+      <div>NAME</div><div class="r">SINCE CLOSE</div><div class="r">RATIO</div>
+      <div class="pl">BAND</div><div class="r">NIGHTS</div><div class="r">UNDONE</div><div class="pl" id="againsthead">AGAINST A RANDOM NIGHT</div>
+    </div>
+    <div id="rows"><div class="empty">Asking Bitget…</div></div>
+  </section>
+
+  <footer class="foot mono" id="foot"></footer>
+</main>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>
