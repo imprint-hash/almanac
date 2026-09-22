@@ -1,0 +1,13 @@
+{
+  "name": "almanac",
+  "version": "0.1.0",
+  "description": "What history says about a tokenised stock's move while its home market is shut.",
+  "type": "module",
+  "license": "MIT",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "index": "node bin/build-index.mjs",
+    "grade": "node bin/grade.mjs",
+    "ask": "node bin/ask.mjs"
+  }
+}
