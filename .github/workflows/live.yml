@@ -1,0 +1,78 @@
+name: Live record
+
+# The site's main record is a walk-forward replay of nights that had already
+# happened. This is the other half: the desk states its odds for tonight before
+# the bell, in a committed file, and settles them after the open. Each night's
+# call carries a git timestamp, so nothing can be written in after the fact.
+#
+# Times are UTC. The US market opens at 09:30 ET, which is 13:30 UTC while
+# daylight saving is in force and 14:30 UTC once it ends, so the lock runs
+# early enough to be before the bell in either case, and the settle late enough
+# to be after 10:30 ET in either case.
+
+on:
+  schedule:
+    - cron: "5 13 * * 1-5"    # lock — about 25 minutes before the bell (EDT)
+    - cron: "10 15 * * 1-5"   # settle — comfortably after 10:30 ET (EDT)
+  workflow_dispatch:
+    inputs:
+      step:
+        description: Which step to run
+        type: choice
+        options: [lock, settle, both]
+        default: both
+
+permissions:
+  contents: write
+
+concurrency:
+  group: live-record
+  cancel-in-progress: false
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Decide which step this run is
+        id: step
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=${{ inputs.step }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "5 13 * * 1-5" ]; then
+            echo "run=lock" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=settle" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Each command refuses on its own terms — lock will not write after the
+      # bell, settle will not judge before the hour is up — so a mistimed run
+      # is a no-op rather than a bad row.
+      - name: Lock tonight's calls
+        if: steps.step.outputs.run == 'lock' || steps.step.outputs.run == 'both'
+        run: |
+          node bin/lock.mjs rtoken
+          node bin/lock.mjs perp
+
+      - name: Settle what the market answered
+        if: steps.step.outputs.run == 'settle' || steps.step.outputs.run == 'both'
+        run: |
+          node bin/settle.mjs rtoken
+          node bin/settle.mjs perp
+
+      - name: Commit the record
+        run: |
+          if [ -z "$(git status --porcelain data/live)" ]; then
+            echo "nothing changed"
+            exit 0
+          fi
+          git config user.name "almanac"
+          git config user.email "almanac@users.noreply.github.com"
+          git add data/live
+          git commit -m "Live record: ${{ steps.step.outputs.run }} $(date -u +%Y-%m-%d)"
+          git push

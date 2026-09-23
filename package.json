@@ -11,6 +11,8 @@
     "dev": "node --env-file-if-exists=.env bin/serve.mjs",
     "normal": "node --env-file-if-exists=.env bin/refresh-normal.mjs",
     "index": "node bin/build-index.mjs",
-    "ask": "node --env-file-if-exists=.env bin/ask.mjs"
+    "ask": "node --env-file-if-exists=.env bin/ask.mjs",
+    "lock": "node --env-file-if-exists=.env bin/lock.mjs",
+    "settle": "node --env-file-if-exists=.env bin/settle.mjs"
   }
 }

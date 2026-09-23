@@ -144,8 +144,23 @@
   </p>
 
   <h2 id="record">How it grades itself</h2>
+  <div class="box">
+    <h3>Two records, and they are not the same thing</h3>
+    <p>
+      The tables below are a <strong>replay</strong>: ninety days of real nights re-run in order, the
+      desk seeing only what had already happened at each step. That is how you test whether a set of
+      odds is honest — but every call in it was made after the fact, and this page will not pretend
+      otherwise.
+    </p>
+    <p>
+      Alongside it there is a <strong>live</strong> record. Each weekday before the bell, a scheduled
+      job locks tonight's calls into a committed file and settles them after the open, so each night's
+      call carries a git timestamp that cannot be moved. It is a small record and it will stay small.
+      It is on the front page, and at <code>/api/live</code>.
+    </p>
+  </div>
   <p>
-    Every night in the record is replayed in order. At each one the desk sees only the nights that had
+    Every night in the replay is taken in order. At each one the desk sees only the nights that had
     already happened, states the chance the move gets undone, and then the morning settles it. The
     table is rebuilt as history accrues — every 25 nights rather than every night, which can only make
     the desk look worse, since it is deciding on a table slightly out of date.

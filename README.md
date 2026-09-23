@@ -76,7 +76,14 @@ one click away, not asked to take our word.
 
 ## It grades its own odds
 
-Every night is replayed in order. At each one the desk sees only the nights that had already
+**Two records, and they are not the same thing.** The big one is a *replay*: ninety days of real
+nights re-run in order, the desk seeing only what had already happened at each step. It tests whether
+the odds are true, but every call in it was made after the fact. The second is *live*: each weekday
+before the bell a GitHub Action locks tonight's calls into `data/live/`, and settles them after the
+open. Those files carry a git timestamp, so nothing can be written in afterwards. It is a small
+record and it will stay small — four nights is four nights — but it is the honest kind.
+
+Every night in the replay is taken in order. At each one the desk sees only the nights that had already
 happened, states the chance the move gets undone, and the morning settles it. It is graded on
 whether its **odds are true**, not on how often it was "right".
 

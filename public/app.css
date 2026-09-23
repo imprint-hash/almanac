@@ -181,6 +181,9 @@ button.chip { cursor: pointer; }
 .against span:last-child { font-size: 11px; color: var(--faint); white-space: nowrap; }
 .empty { padding: 26px 16px; color: var(--muted); font-size: 13px; }
 
+.live .row, .live .thead { grid-template-columns: 150px 120px 1fr 120px 120px; }
+.live .note { padding: 12px 16px 16px; margin: 0; }
+
 .foot { display: flex; flex-wrap: wrap; gap: 18px; padding: 14px 0 26px; color: var(--faint); font-size: 9.5px; }
 
 /* charts */

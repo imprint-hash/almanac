@@ -207,6 +207,39 @@ function clock(d) {
     ${open ? "" : `<span class="faint">·</span><span class="mono teal">BELL IN ${h}H ${m}M</span>`}`;
 }
 
+/**
+ * The live record. Hidden until there is one, because an empty panel promising
+ * live calls is worse than no panel at all.
+ */
+async function loadLive() {
+  let d;
+  try { d = await fetch(`/api/live?market=${state.market}`).then((x) => x.json()); } catch { return; }
+  const panel = $("live");
+  if (!d.nights?.length) { panel.hidden = true; return; }
+  panel.hidden = false;
+
+  const head = `<div class="thead mono"><div>BELL</div><div class="r">CALLS</div>
+    <div class="pl">LOCKED</div><div class="r">IT SAID</div><div class="r">IT HAPPENED</div></div>`;
+
+  const rows = d.nights.map((n) => {
+    const s = n.settled;
+    return `<div class="row">
+      <div class="num">${n.reopens}</div>
+      <div class="num r">${n.calls}</div>
+      <div class="pl muted" style="font-size:12px">${n.lockedAtNewYork || "—"} · ${n.minutesBeforeBell}m before</div>
+      <div class="num r">${s ? pc(s.itSaid) : "—"}</div>
+      <div class="num r" style="color:${s ? "var(--ink)" : "var(--muted)"}">${s ? `${pc(s.itHappened)} (${s.undone}/${s.judged})` : "waiting for the bell"}</div>
+    </div>`;
+  }).join("");
+
+  const t = d.totals;
+  const total = t
+    ? `<p class="note">Across ${t.nights} settled night${t.nights === 1 ? "" : "s"} and ${t.calls} calls: it said <strong style="color:var(--ink)">${pc(t.itSaid)}</strong> would be undone, <strong style="color:var(--ink)">${pc(t.itHappened)}</strong> were. ${d.note}</p>`
+    : `<p class="note">${d.note}</p>`;
+
+  $("livebody").innerHTML = head + rows + total;
+}
+
 /* ---------- wiring ---------- */
 
 async function load(symbol) {
@@ -223,6 +256,7 @@ async function loadBoard() {
   renderMarkets(b.markets, state.market);
   state.board = b;
   renderBoard(b);
+  loadLive();
   // Land on whatever actually moved most for itself tonight, rather than a
   // name hard-coded months ago that may be sitting perfectly still.
   if (!state.picked && b.rows?.length) {
