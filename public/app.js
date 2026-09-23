@@ -339,11 +339,18 @@ async function ask(question, { quiet = false } = {}) {
   out.hidden = false;
   out.innerHTML = `<span class="muted">${quiet ? "Asking Qwen…" : "Thinking…"}</span>`;
   try {
-    const r = await fetch("/api/ask", {
+    // A killed serverless function answers with an HTML error page, so the body
+    // is read as text and parsed defensively — a JSON syntax error on screen
+    // tells a reader nothing and looks like the desk is broken.
+    const raw = await fetch("/api/ask", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ question, symbol: state.symbol, market: state.market }),
-    }).then((x) => x.json());
+    }).then((x) => x.text());
+
+    let r;
+    try { r = JSON.parse(raw); }
+    catch { r = { wrote: "the desk", answer: "The question box did not come back in time. The reading below is unaffected — it comes from a different request, and everything on it is live." }; }
 
     if (r.symbol && r.symbol !== state.symbol) { state.picked = true; await load(r.symbol); }
 

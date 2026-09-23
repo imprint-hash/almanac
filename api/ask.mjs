@@ -19,20 +19,28 @@ const ENDPOINT =
   "https://hackathon.bitgetops.com/v1/chat/completions";
 
 /**
- * qwen3.8-max reasons before it answers, so a reply costs about thirteen
- * seconds and sometimes rather more. One retry, because a single slow call is
- * usually just a slow call; beyond that the desk answers for itself rather
- * than leaving someone watching a spinner at three in the morning.
+ * The whole request must finish inside the platform's limit, or the caller gets
+ * a killed function and an HTML error page where JSON should be — which is
+ * exactly the kind of failure this desk is supposed to be honest about, not
+ * produce. So the budget is spent deliberately: whatever is left after reading
+ * the market goes to the model, and when it runs out the desk answers.
+ *
+ * qwen3.8-max reasons before replying, which costs about thirteen seconds and
+ * often more. One retry only if there is real time for it.
  */
-async function viaQwen(messages, { tries = 2 } = {}) {
+const BUDGET_MS = 20_000;
+
+async function viaQwen(messages, deadline) {
   let last;
-  for (let i = 0; i < tries; i++) {
+  while (true) {
+    const left = deadline - Date.now();
+    if (left < 5_000) throw last || new Error("no time left in the budget");
     try {
       const res = await fetch(ENDPOINT, {
         method: "POST",
         headers: { authorization: `Bearer ${KEY}`, "content-type": "application/json" },
         body: JSON.stringify({ model: MODEL, messages, temperature: 0.2, max_tokens: 260 }),
-        signal: AbortSignal.timeout(24_000),
+        signal: AbortSignal.timeout(Math.min(left, 16_000)),
       });
       if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 120)}`);
       const body = await res.json();
@@ -43,10 +51,10 @@ async function viaQwen(messages, { tries = 2 } = {}) {
       last = err;
     }
   }
-  throw last;
 }
 
 export default async function handler(req, res) {
+  const deadline = Date.now() + BUDGET_MS;
   const question = String(req.body?.question || "").slice(0, 300).trim();
   const m = pick({ market: req.body?.market });
   const known = Object.keys(m.normals);
@@ -65,7 +73,7 @@ export default async function handler(req, res) {
 
     if (KEY) {
       try {
-        const text = await viaQwen(prompt(question, f));
+        const text = await viaQwen(prompt(question, f), deadline);
         if (numbersAreOurs(text, f)) {
           answer = text;
           wrote = MODEL;
@@ -73,7 +81,9 @@ export default async function handler(req, res) {
           note = "The model returned a figure the desk did not give it, so its answer was discarded.";
         }
       } catch (err) {
-        note = `The model did not answer (${err.message}); this is the desk's own wording.`;
+        note = /time|abort/i.test(err.message)
+          ? "The model did not answer in time, so this is the desk's own wording."
+          : `The model could not be reached (${err.message}); this is the desk's own wording.`;
       }
     }
 
