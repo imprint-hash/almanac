@@ -201,14 +201,58 @@ function renderBoard(d) {
   ].map((t) => `<span>${t}</span>`).join("");
 }
 
+/**
+ * The countdown.
+ *
+ * The moment matters more than the state: "shut" is a fact, "opens in 3h 41m"
+ * is the thing that decides whether you act now or wait. It ticks in the
+ * browser against timestamps the server sent, and the offset between the two
+ * clocks is carried so a viewer whose laptop is a few minutes out still sees
+ * the right number.
+ */
+let ticker = null;
+
 function clock(d) {
   const el = $("clock");
-  if (!d || d.error) { el.innerHTML = `<span class="dot" style="background: var(--crit)"></span><span class="mono">exchange unreachable</span>`; return; }
-  const open = d.marketOpen;
-  const h = Math.floor(d.night.hoursToBell), m = Math.round((d.night.hoursToBell % 1) * 60);
-  el.innerHTML = `<span class="dot" style="background: ${open ? "var(--good)" : "var(--warn)"}"></span>
-    <span class="mono">${open ? "US MARKET OPEN" : "US MARKET SHUT"}</span>
-    ${open ? "" : `<span class="faint">·</span><span class="mono teal">BELL IN ${h}H ${m}M</span>`}`;
+  if (!d || d.error) {
+    el.innerHTML = `<span class="dot" style="background: var(--crit)"></span><span class="mono">exchange unreachable</span>`;
+    if (ticker) { clearInterval(ticker); ticker = null; }
+    return;
+  }
+
+  const c = d.clock;
+  const skew = c ? c.now - Date.now() : 0;
+  const open = () => {
+    const now = Date.now() + skew;
+    return c ? now >= c.bellAt && now < c.nextCloseAt : d.marketOpen;
+  };
+
+  const spell = (ms) => {
+    const s = Math.max(0, Math.floor(ms / 1000));
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+    return h ? `${h}h ${String(m).padStart(2, "0")}m ${String(sec).padStart(2, "0")}s`
+             : `${m}m ${String(sec).padStart(2, "0")}s`;
+  };
+
+  const tick = () => {
+    if (!c) return;
+    const now = Date.now() + skew;
+    const isOpen = open();
+    const target = isOpen ? c.nextCloseAt : c.bellAt;
+    // Past the moment we were given, stop counting and let the next refresh
+    // bring fresh timestamps rather than counting into a stale one.
+    const left = target - now;
+    el.innerHTML = `<span class="dot" style="background: ${isOpen ? "var(--good)" : "var(--warn)"}"></span>
+      <span class="mono">${isOpen ? "US MARKET OPEN" : "US MARKET SHUT"}</span>
+      <span class="faint">·</span>
+      <span class="mono count ${isOpen ? "" : "teal"}">${left > 0
+        ? `${isOpen ? "CLOSES" : "OPENS"} IN ${spell(left)}`
+        : "WAITING FOR THE NEXT BELL"}</span>`;
+  };
+
+  tick();
+  if (ticker) clearInterval(ticker);
+  ticker = setInterval(tick, 1000);
 }
 
 /**

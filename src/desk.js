@@ -59,6 +59,9 @@ export async function reading(symbol, normals, index, { marketId = DEFAULT_MARKE
     at: Date.now(),
     marketOpen: marketOpen(),
     night: { ...night, normalDay: normal, ratio },
+    // The exact moments, so the page can count down without re-deriving the
+    // New York calendar in the browser.
+    clock: { closeAt: w.close, bellAt: w.bell, nextCloseAt: w.nextClose, now: Date.now() },
     normalDaySource: source,
     sessionsBehindNormalDay: stored?.sessions ?? null,
     reading: read,

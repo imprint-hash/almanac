@@ -64,6 +64,9 @@ a:hover { color: #7ff0dc; }
   border-radius: 999px; padding: 6px 13px; color: var(--ink-2);
 }
 .pill .mono { font-size: 11px; letter-spacing: 0.04em; }
+/* Digits are the only thing moving on the page, so hold their width or the
+   whole pill twitches once a second. */
+.pill .count { font-variant-numeric: tabular-nums; }
 .seg { display: flex; background: var(--surf); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; }
 .seg button {
   font-family: var(--sans); font-size: 12px; padding: 5px 13px; border-radius: 999px;
@@ -208,9 +211,10 @@ svg text { font-family: var(--mono); }
   main { padding: 14px 14px 0; }
   .nav { padding: 0 14px; gap: 10px; height: auto; min-height: 54px; flex-wrap: wrap; row-gap: 0; }
   .navlinks { display: none; }
-  /* The clock is the first thing to lose: on a phone the hero already says
-     how long the market has been shut. */
-  .nav .pill { display: none; }
+  /* The countdown stays on a phone — it is the reason to look. The label goes,
+     since the dot already carries open or shut. */
+  .nav .pill { padding: 5px 10px; gap: 6px; }
+  .nav .pill .mono:not(.count), .nav .pill .faint { display: none; }
   .seg { margin-left: auto; }
   .tabs { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
   .tabs::-webkit-scrollbar { display: none; }
