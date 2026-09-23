@@ -1,12 +1,38 @@
 # Almanac
 
-**When a tokenised stock moves while its home market is shut, how often does that move survive the bell?**
+**You woke up, it moved, and the market is shut. Almanac tells you how often moves like that turned out to be real.**
 
 Built for the [Bitget AI Base Camp Hackathon S2](https://bitget-ai.gitbook.io/bitgetai_hackathons2) ·
 Track 3, **AI Trading Desk** · sub-theme **Review & Self-Evolution**.
 
-Almanac never predicts direction. It states how often moves like the one in front of you were undone,
-and it publishes how often those statements turned out to be true.
+---
+
+## What it does
+
+You open it at 3am. It has already checked about forty tokenised stocks on Bitget — where each one is
+trading now against where its real market closed last night — and ranked them by the only thing that
+turned out to matter: **is this a big move for this particular name?**
+
+Click one, or just ask it:
+
+> **rSOXL is down 2.32%.** That is 0.42× a normal day for it.
+> Moves that size, on names like this, were **undone by 10:30 in 40.1% of 337 nights** measured.
+> A night picked at random is undone 33.9% of the time.
+> So: slightly worse than ordinary, and no, I cannot tell you which way it goes next.
+
+That is the whole product. One question — *will this move still be there when the market opens?* —
+answered with a count of what actually happened, never with an opinion.
+
+**And it shows its own report card.** Every night for three months it made that same call before
+knowing the answer, then checked itself at the bell. When it says one in five, it has been one in
+five, within two points on most bands. The chart is on the front page, not buried.
+
+## What it refuses to do
+
+- **It does not predict direction.** It has no edge there and says so, every time.
+- **It does not trade.** No account, no keys, no orders. It cannot touch anyone's money.
+- **It does not advise.** Never buy, never sell, never hold.
+- **It goes quiet when it knows nothing.** Under half a percent: *"inside the noise, not worth a reading."*
 
 ---
 
