@@ -25,6 +25,7 @@
     <a href="/method.html">Method</a>
   </div>
   <div class="grow"></div>
+  <div class="seg" id="marketpick" role="group" aria-label="Which instrument to read"></div>
   <div class="pill" id="clock"><span class="dot" style="background: var(--warn)"></span><span class="mono">reading the clock…</span></div>
 </nav>
 
@@ -35,14 +36,14 @@
     <div class="hero-left">
       <div class="hero-head">
         <h1 id="sym">—</h1>
-        <span class="chip" id="symnote">tokenised perpetual · Bitget</span>
+        <span class="chip" id="symnote">Bitget</span>
         <span class="chip warn" id="darkfor"></span>
       </div>
       <p class="verdict" id="verdict">Reading the night…</p>
       <form class="ask" id="askform" autocomplete="off">
         <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.6"></circle><path d="M11 11 L14.5 14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg>
         <label class="sr" for="q">Ask about a name</label>
-        <input id="q" name="q" type="text" placeholder="is MSTR's drop real?" value="is MSTR's drop real?">
+        <input id="q" name="q" type="text" placeholder="is this move real?">
         <button type="submit" class="chip teal">Ask</button>
       </form>
       <p class="answer" id="answer" hidden></p>

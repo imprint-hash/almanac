@@ -1,0 +1,556 @@
+{
+ "bands": {
+  "under 0.3": {
+   "n": 346,
+   "stoodPct": 0.5173410404624278,
+   "undonePct": 0.4826589595375722,
+   "medianKept": 0.5746417116212572,
+   "medianMove": 0.010014431807136463
+  },
+  "0.3-0.5": {
+   "n": 334,
+   "stoodPct": 0.6497005988023952,
+   "undonePct": 0.35029940119760483,
+   "medianKept": 0.8662476556139551,
+   "medianMove": 0.01925000443568882
+  },
+  "0.5-0.8": {
+   "n": 376,
+   "stoodPct": 0.7632978723404256,
+   "undonePct": 0.23670212765957444,
+   "medianKept": 0.9993246283673178,
+   "medianMove": 0.024918889666130345
+  },
+  "0.8-1.3": {
+   "n": 322,
+   "stoodPct": 0.8913043478260869,
+   "undonePct": 0.10869565217391308,
+   "medianKept": 1.013075920536525,
+   "medianMove": 0.03950151148296048
+  },
+  "over 1.3": {
+   "n": 281,
+   "stoodPct": 0.9822064056939501,
+   "undonePct": 0.017793594306049876,
+   "medianKept": 0.9754010355163211,
+   "medianMove": 0.05464626302949668
+  }
+ },
+ "symbols": {
+  "SNDKUSDT": {
+   "all": {
+    "n": 51,
+    "stoodPct": 0.5098039215686274,
+    "undonePct": 0.4901960784313726,
+    "medianKept": 0.5878583071550555,
+    "medianMove": 0.03549079357211654
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.08836597213869796
+  },
+  "SOXLUSDT": {
+   "all": {
+    "n": 56,
+    "stoodPct": 0.6785714285714286,
+    "undonePct": 0.3214285714285714,
+    "medianKept": 0.9287495435657493,
+    "medianMove": 0.052134869466842586
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.10083521360431133
+  },
+  "XAUUSDT": {
+   "all": {
+    "n": 39,
+    "stoodPct": 0.9230769230769231,
+    "undonePct": 0.07692307692307687,
+    "medianKept": 0.9891136511425945,
+    "medianMove": 0.011915640280356618
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.011205324451708389
+  },
+  "MSTRUSDT": {
+   "all": {
+    "n": 43,
+    "stoodPct": 0.7906976744186046,
+    "undonePct": 0.2093023255813954,
+    "medianKept": 1.0490778452316933,
+    "medianMove": 0.028166008748533027
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.05089456527586849
+  },
+  "KORUUSDT": {
+   "all": {
+    "n": 54,
+    "stoodPct": 0.8333333333333334,
+    "undonePct": 0.16666666666666663,
+    "medianKept": 1.0609461545817895,
+    "medianMove": 0.06667288811937015
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.09928946329594704
+  },
+  "SPCXUSDT": {
+   "all": {
+    "n": 47,
+    "stoodPct": 0.6382978723404256,
+    "undonePct": 0.36170212765957444,
+    "medianKept": 0.9819527624466472,
+    "medianMove": 0.012636956375613332
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.06118198463781033
+  },
+  "CLUSDT": {
+   "all": {
+    "n": 46,
+    "stoodPct": 0.8913043478260869,
+    "undonePct": 0.10869565217391308,
+    "medianKept": 0.9742566303842332,
+    "medianMove": 0.01703473027913318
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.02457616177049332
+  },
+  "XAGUSDT": {
+   "all": {
+    "n": 49,
+    "stoodPct": 0.8775510204081632,
+    "undonePct": 0.12244897959183676,
+    "medianKept": 1.018167621030714,
+    "medianMove": 0.01887888469358114
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.01934640593870298
+  },
+  "MUUSDT": {
+   "all": {
+    "n": 47,
+    "stoodPct": 0.5531914893617021,
+    "undonePct": 0.44680851063829785,
+    "medianKept": 0.611318737152434,
+    "medianMove": 0.029762465830898283
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.05100931346984659
+  },
+  "SKHYNIXUSDT": {
+   "all": {
+    "n": 53,
+    "stoodPct": 0.7924528301886793,
+    "undonePct": 0.2075471698113207,
+    "medianKept": 0.9086395634647058,
+    "medianMove": 0.036717340891522725
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.04929441766373015
+  },
+  "SNXXUSDT": {
+   "all": {
+    "n": 37,
+    "stoodPct": 0.4594594594594595,
+    "undonePct": 0.5405405405405406,
+    "medianKept": 0.23679227328956376,
+    "medianMove": 0.04303381228107788
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.13487561351608013
+  },
+  "CRCLUSDT": {
+   "all": {
+    "n": 50,
+    "stoodPct": 0.8,
+    "undonePct": 0.19999999999999996,
+    "medianKept": 1.2305125480440604,
+    "medianMove": 0.021963539076349965
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.06452130585336371
+  },
+  "SKHYUSDT": {
+   "all": {
+    "n": 42,
+    "stoodPct": 0.7619047619047619,
+    "undonePct": 0.23809523809523814,
+    "medianKept": 0.8790407257164594,
+    "medianMove": 0.02826713112690972
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.05413777536696991
+  },
+  "INTCUSDT": {
+   "all": {
+    "n": 52,
+    "stoodPct": 0.7115384615384616,
+    "undonePct": 0.28846153846153844,
+    "medianKept": 1.0923392930126317,
+    "medianMove": 0.02388639123771577
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.04931399043119132
+  },
+  "BZUSDT": {
+   "all": {
+    "n": 47,
+    "stoodPct": 0.8723404255319149,
+    "undonePct": 0.12765957446808507,
+    "medianKept": 1.0131210930970675,
+    "medianMove": 0.01572543617998152
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.022328072205241016
+  },
+  "XAUTUSDT": {
+   "all": {
+    "n": 38,
+    "stoodPct": 0.9473684210526315,
+    "undonePct": 0.052631578947368474,
+    "medianKept": 0.992928427898855,
+    "medianMove": 0.0113381290421764
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.01075356227989915
+  },
+  "TSLAUSDT": {
+   "all": {
+    "n": 35,
+    "stoodPct": 0.6857142857142857,
+    "undonePct": 0.3142857142857143,
+    "medianKept": 1.191134129345739,
+    "medianMove": 0.011616650532429707
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.03453496067601487
+  },
+  "SOXSUSDT": {
+   "all": {
+    "n": 56,
+    "stoodPct": 0.6785714285714286,
+    "undonePct": 0.3214285714285714,
+    "medianKept": 0.9475819506532088,
+    "medianMove": 0.05485105804404797
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.09457710615599872
+  },
+  "MRVLUSDT": {
+   "all": {
+    "n": 52,
+    "stoodPct": 0.6538461538461539,
+    "undonePct": 0.34615384615384615,
+    "medianKept": 0.8617537838290787,
+    "medianMove": 0.029965659212322346
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.0620125597735581
+  },
+  "SAMSUNGUSDT": {
+   "all": {
+    "n": 54,
+    "stoodPct": 0.7777777777777778,
+    "undonePct": 0.2222222222222222,
+    "medianKept": 0.9506221041418327,
+    "medianMove": 0.03153554849602429
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.044568070101391154
+  },
+  "PAXGUSDT": {
+   "all": {
+    "n": 39,
+    "stoodPct": 0.9230769230769231,
+    "undonePct": 0.07692307692307687,
+    "medianKept": 0.9672241675273382,
+    "medianMove": 0.011754753966021785
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.011083726654235166
+  },
+  "AMDUSDT": {
+   "all": {
+    "n": 48,
+    "stoodPct": 0.6875,
+    "undonePct": 0.3125,
+    "medianKept": 1.0446563769993897,
+    "medianMove": 0.022357229318823994
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.047875480343260626
+  },
+  "NVDAUSDT": {
+   "all": {
+    "n": 43,
+    "stoodPct": 0.7441860465116279,
+    "undonePct": 0.2558139534883721,
+    "medianKept": 0.9457218750110509,
+    "medianMove": 0.011028019689511608
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.028193811374817405
+  },
+  "METAUSDT": {
+   "all": {
+    "n": 36,
+    "stoodPct": 0.5555555555555556,
+    "undonePct": 0.4444444444444444,
+    "medianKept": 0.7900707458109106,
+    "medianMove": 0.013261543110456095
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.029563890558257776
+  },
+  "MRNAUSDT": {
+   "all": {
+    "n": 8,
+    "stoodPct": 0.625,
+    "undonePct": 0.375,
+    "medianKept": 1.2738113284150576,
+    "medianMove": 0.014997086228796083
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.06016692243263245
+  },
+  "GOOGLUSDT": {
+   "all": {
+    "n": 29,
+    "stoodPct": 0.7931034482758621,
+    "undonePct": 0.2068965517241379,
+    "medianKept": 1.0900790512249898,
+    "medianMove": 0.009115582040238455
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.018654316635320883
+  },
+  "COINUSDT": {
+   "all": {
+    "n": 47,
+    "stoodPct": 0.7021276595744681,
+    "undonePct": 0.2978723404255319,
+    "medianKept": 0.7673348291177096,
+    "medianMove": 0.021030214295221596
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.048209378694998695
+  },
+  "HOODUSDT": {
+   "all": {
+    "n": 44,
+    "stoodPct": 0.6590909090909091,
+    "undonePct": 0.34090909090909094,
+    "medianKept": 1.0249083025959205,
+    "medianMove": 0.018644409284061178
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.04891230524115457
+  },
+  "RKLBUSDT": {
+   "all": {
+    "n": 51,
+    "stoodPct": 0.5882352941176471,
+    "undonePct": 0.4117647058823529,
+    "medianKept": 0.9861509713068328,
+    "medianMove": 0.019125277983691714
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.06439945775769408
+  },
+  "QQQUSDT": {
+   "all": {
+    "n": 34,
+    "stoodPct": 0.8529411764705882,
+    "undonePct": 0.1470588235294118,
+    "medianKept": 0.8275981235838756,
+    "medianMove": 0.01067530383061797
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.012600656557681382
+  },
+  "MUUUSDT": {
+   "all": {
+    "n": 51,
+    "stoodPct": 0.5686274509803921,
+    "undonePct": 0.43137254901960786,
+    "medianKept": 0.8007761015325666,
+    "medianMove": 0.058716171899506585
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.09496615174378506
+  },
+  "AMZNUSDT": {
+   "all": {
+    "n": 30,
+    "stoodPct": 0.7666666666666667,
+    "undonePct": 0.23333333333333328,
+    "medianKept": 1.2620785833911006,
+    "medianMove": 0.0112057715954553
+   },
+   "noHomeMarket": false,
+   "normalDay": 0.02209013582404334
+  },
+  "DRAMUSDT": {
+   "all": {
+    "n": 54,
+    "stoodPct": 0.6481481481481481,
+    "undonePct": 0.35185185185185186,
+    "medianKept": 0.83097526395114,
+    "medianMove": 0.028915219091070945
+   },
+   "noHomeMarket": true,
+   "normalDay": 0.04443205890421427
+  },
+  "MOONSHOTUSDT": {
+   "all": {
+    "n": 11,
+    "stoodPct": 1,
+    "undonePct": 0,
+    "medianKept": 0.944753086419764,
+    "medianMove": 0.010904515587865248
+   },
+   "noHomeMarket": true,
+   "normalDay": 0.007719985861565318
+  },
+  "ZHIPUUSDT": {
+   "all": {
+    "n": 53,
+    "stoodPct": 0.9245283018867925,
+    "undonePct": 0.07547169811320753,
+    "medianKept": 0.9744888979405072,
+    "medianMove": 0.045952757751597226
+   },
+   "noHomeMarket": true,
+   "normalDay": 0.03681924531292899
+  },
+  "OPENAIUSDT": {
+   "all": {
+    "n": 37,
+    "stoodPct": 0.918918918918919,
+    "undonePct": 0.08108108108108103,
+    "medianKept": 0.9103750015464734,
+    "medianMove": 0.016558403410712203
+   },
+   "noHomeMarket": true,
+   "normalDay": 0.018230254830221476
+  },
+  "ANTHROPICUSDT": {
+   "all": {
+    "n": 34,
+    "stoodPct": 1,
+    "undonePct": 0,
+    "medianKept": 0.9550375834372844,
+    "medianMove": 0.014116525334317155
+   },
+   "noHomeMarket": true,
+   "normalDay": 0.008606359464236747
+  },
+  "MINIMAXUSDT": {
+   "all": {
+    "n": 52,
+    "stoodPct": 0.9423076923076923,
+    "undonePct": 0.05769230769230771,
+    "medianKept": 0.9495052208874619,
+    "medianMove": 0.06034303165410869
+   },
+   "noHomeMarket": true,
+   "normalDay": 0.027538879893010827
+  },
+  "UNITREEUSDT": {
+   "all": {
+    "n": 10,
+    "stoodPct": 1,
+    "undonePct": 0,
+    "medianKept": 0.9894958275021383,
+    "medianMove": 0.02278608255389744
+   },
+   "noHomeMarket": true,
+   "normalDay": 0.010654867061484288
+  }
+ },
+ "cuts": {
+  "weekend": {
+   "n": 333,
+   "stoodPct": 0.7867867867867868,
+   "undonePct": 0.21321321321321318,
+   "medianKept": 0.9745064685159756,
+   "medianMove": 0.023388325713907115
+  },
+  "weeknight": {
+   "n": 1326,
+   "stoodPct": 0.7420814479638009,
+   "undonePct": 0.25791855203619907,
+   "medianKept": 0.9595858671341599,
+   "medianMove": 0.021983746108720077
+  },
+  "noHomeMarket": {
+   "n": 251,
+   "stoodPct": 0.8844621513944223,
+   "undonePct": 0.1155378486055777,
+   "medianKept": 0.9572886510418973,
+   "medianMove": 0.030657894736842082
+  },
+  "hasHomeMarket": {
+   "n": 1408,
+   "stoodPct": 0.7272727272727273,
+   "undonePct": 0.2727272727272727,
+   "medianKept": 0.9688158785478468,
+   "medianMove": 0.02096669938861414
+  }
+ },
+ "meta": {
+  "nights": 1659,
+  "symbols": 39,
+  "from": "2026-07-02",
+  "to": "2026-09-18",
+  "builtAt": "2026-09-23T12:56:59.466Z"
+ },
+ "all": {
+  "n": 1659,
+  "stoodPct": 0.7510548523206751,
+  "undonePct": 0.24894514767932485,
+  "medianKept": 0.964433036531883,
+  "medianMove": 0.02208365809301121
+ },
+ "market": "perp",
+ "record": {
+  "byBand": {
+   "under 0.3": {
+    "n": 287,
+    "said": 0.48057337832898406,
+    "happened": 0.49825783972125437,
+    "gap": 0.017684461392270312
+   },
+   "0.3-0.5": {
+    "n": 275,
+    "said": 0.34621298350894697,
+    "happened": 0.36727272727272725,
+    "gap": 0.02105974376378028
+   },
+   "0.5-0.8": {
+    "n": 310,
+    "said": 0.2330833798830971,
+    "happened": 0.25161290322580643,
+    "gap": 0.018529523342709325
+   },
+   "0.8-1.3": {
+    "n": 245,
+    "said": 0.12853593373657035,
+    "happened": 0.09795918367346938,
+    "gap": -0.03057675006310097
+   },
+   "over 1.3": {
+    "n": 242,
+    "said": 0.017416584402181634,
+    "happened": 0.01652892561983471,
+    "gap": -0.0008876587823469229
+   }
+  },
+  "brier": 0.16472438778035128,
+  "baseline": 0.19258538376730275,
+  "skill": 0.14466827877558652,
+  "quoted": 1359,
+  "worstGap": 0.03057675006310097,
+  "from": "2026-07-16",
+  "to": "2026-09-18"
+ }
+}

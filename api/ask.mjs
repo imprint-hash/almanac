@@ -8,27 +8,22 @@
  * sounds wooden.
  */
 
-import { readFileSync } from "node:fs";
 import { reading } from "../src/desk.js";
 import { facts, compose, prompt, symbolIn, numbersAreOurs } from "../src/answer.js";
-
-const read = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), "utf8"));
-const index = read("../data/index.json");
-const normals = read("../data/normal.json");
-const { card } = read("../data/scorecard.json");
+import { pick } from "./_data.mjs";
 
 const KEY = process.env.QWEN_API_KEY || process.env.DASHSCOPE_API_KEY || "";
-const MODEL = process.env.QWEN_MODEL || "qwen-max";
+const MODEL = process.env.QWEN_MODEL || "qwen3.8-max";
 const ENDPOINT =
   process.env.QWEN_ENDPOINT ||
-  "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions";
+  "https://hackathon.bitgetops.com/v1/chat/completions";
 
 async function viaQwen(messages) {
   const res = await fetch(ENDPOINT, {
     method: "POST",
     headers: { authorization: `Bearer ${KEY}`, "content-type": "application/json" },
     body: JSON.stringify({ model: MODEL, messages, temperature: 0.2, max_tokens: 260 }),
-    signal: AbortSignal.timeout(14_000),
+    signal: AbortSignal.timeout(26_000),
   });
   if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 120)}`);
   const body = await res.json();
@@ -39,14 +34,15 @@ async function viaQwen(messages) {
 
 export default async function handler(req, res) {
   const question = String(req.body?.question || "").slice(0, 300).trim();
-  const known = Object.keys(normals);
-  const asked = symbolIn(question, known);
-  const fallback = String(req.body?.symbol || "NVDAUSDT").toUpperCase();
+  const m = pick({ market: req.body?.market });
+  const known = Object.keys(m.normals);
+  const asked = symbolIn(question, known, m.normals);
+  const fallback = String(req.body?.symbol || "").toUpperCase();
   const symbol = asked || (known.includes(fallback) ? fallback : known[0]);
 
   try {
-    const r = await reading(symbol, normals, index);
-    const f = facts({ ...r, baseline: index.all.undonePct, record: { byBand: card.byBand, quoted: card.quoted, skill: card.skill } });
+    const r = await reading(symbol, m.normals, m.index, { marketId: m.id });
+    const f = facts({ ...r, baseline: m.index.all.undonePct, record: m.index.record });
     const ours = compose(f);
 
     let answer = ours;
@@ -67,8 +63,8 @@ export default async function handler(req, res) {
       }
     }
 
-    res.status(200).json({ symbol, question, answer, wrote, note, facts: f });
+    res.status(200).json({ symbol, market: m.id, question, answer, wrote, note, facts: f });
   } catch (err) {
-    res.status(200).json({ symbol, error: `Could not read ${symbol}: ${err.message}` });
+    res.status(200).json({ symbol, market: m.id, error: `Could not read ${symbol}: ${err.message}` });
   }
 }

@@ -10,10 +10,31 @@ const $ = (id) => document.getElementById(id);
 const pc = (v, d = 1) => (v == null ? "—" : `${(100 * v).toFixed(d)}%`);
 const sg = (v, d = 2) => (v == null ? "—" : `${v >= 0 ? "+" : ""}${(100 * v).toFixed(d)}%`);
 const clean = (s) => s.replace(/USDT$/, "");
+// rToken display names all start with a lower-case r, so the first letter would
+// label every row identically. Take the ticker's own initial instead.
+const initial = (s) => (/^r[A-Z0-9]/.test(s) ? s[1] : s[0]);
 
 const BAND_TONE = { "under 0.3": "var(--crit)", "0.3-0.5": "var(--serious)", "0.5-0.8": "var(--warn)", "0.8-1.3": "var(--good)", "over 1.3": "var(--good)" };
 
-let state = { symbol: "NVDAUSDT", board: null, reading: null, hideSmall: true, picked: false };
+let state = { market: "rtoken", symbol: null, board: null, reading: null, hideSmall: true, picked: false };
+
+/** The instrument switch. Both markets were measured the same way, so the page
+    offers the other one rather than asking anyone to take the first on trust. */
+function renderMarkets(list, current) {
+  const el = $("marketpick");
+  if (!list || el.dataset.done === String(list.length)) return;
+  el.dataset.done = String(list.length);
+  el.innerHTML = list.map((m) => `<button type="button" data-market="${m.id}" aria-pressed="${m.id === current}" title="${m.what} — ${m.nights} nights measured">${m.label}</button>`).join("");
+  el.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+    if (b.dataset.market === state.market) return;
+    state.market = b.dataset.market;
+    state.picked = false;
+    state.symbol = null;
+    el.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.market === state.market)));
+    $("rows").innerHTML = `<div class="empty">Asking Bitget…</div>`;
+    loadBoard();
+  }));
+}
 
 /* ---------- charts ---------- */
 
@@ -100,13 +121,17 @@ function renderReading(d) {
     return;
   }
   const n = d.night, r = d.reading;
-  $("sym").textContent = clean(d.symbol);
+  $("sym").textContent = d.display && d.display !== d.symbol ? d.display : clean(d.symbol);
+  $("symnote").textContent = `${d.label || "Bitget"} · Bitget`;
+  renderMarkets(d.markets, state.market);
   $("darkfor").textContent = d.marketOpen
     ? "US market open — this price is real"
     : `no home market for ${n.hoursSinceClose.toFixed(1)}h`;
   $("darkfor").className = d.marketOpen ? "chip" : "chip warn";
 
   const label = r.verdict?.label ?? "—";
+  const ph = $("q");
+  if (ph && !ph.dataset.touched) ph.placeholder = `is ${d.display || clean(d.symbol)} really moving?`;
   $("verdict").innerHTML = label.replace(/(almost never been undone|undone by 10:30|inside the noise)/, "<em>$1</em>");
 
   $("f-move").textContent = sg(n.move);
@@ -152,7 +177,7 @@ function renderBoard(d) {
     const tone = BAND_TONE[r.band] || "var(--muted)";
     const width = Math.max(4, ((s.undonePct || 0) / 0.55) * 100);
     return `<div class="row${r.symbol === state.symbol ? " on" : ""}" data-sym="${r.symbol}" role="button" tabindex="0">
-      <div class="name"><span class="tickerbox">${clean(r.symbol)[0]}</span><span class="num">${clean(r.symbol)}</span></div>
+      <div class="name"><span class="tickerbox">${initial(r.display || clean(r.symbol))}</span><span class="num">${r.display || clean(r.symbol)}</span></div>
       <div class="num r" style="color: ${r.move < 0 ? "var(--crit)" : "var(--good)"}">${sg(r.move)}</div>
       <div class="num r">${r.ratio.toFixed(2)}×</div>
       <div class="pl"><span class="chip" style="color: ${tone}">${r.band}×</span></div>
@@ -186,7 +211,7 @@ function clock(d) {
 
 async function load(symbol) {
   state.symbol = symbol;
-  const r = await fetch(`/api/reading?symbol=${encodeURIComponent(symbol)}`).then((x) => x.json());
+  const r = await fetch(`/api/reading?symbol=${encodeURIComponent(symbol)}&market=${state.market}`).then((x) => x.json());
   state.reading = r;
   renderReading(r);
   clock(r);
@@ -194,7 +219,8 @@ async function load(symbol) {
 }
 
 async function loadBoard() {
-  const b = await fetch("/api/board").then((x) => x.json());
+  const b = await fetch(`/api/board?market=${state.market}`).then((x) => x.json());
+  renderMarkets(b.markets, state.market);
   state.board = b;
   renderBoard(b);
   // Land on whatever actually moved most for itself tonight, rather than a
@@ -231,7 +257,7 @@ $("askform").addEventListener("submit", async (e) => {
     const r = await fetch("/api/ask", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ question: q, symbol: state.symbol }),
+      body: JSON.stringify({ question: q, symbol: state.symbol, market: state.market }),
     }).then((x) => x.json());
     if (r.symbol && r.symbol !== state.symbol) { state.picked = true; await load(r.symbol); }
     out.innerHTML = (r.answer || r.error || "No answer.") +
@@ -242,7 +268,6 @@ $("askform").addEventListener("submit", async (e) => {
   }
 });
 
-load(state.symbol);
 loadBoard();
-setInterval(() => load(state.symbol), 60_000);
+setInterval(() => { if (state.symbol) load(state.symbol); }, 60_000);
 setInterval(loadBoard, 180_000);

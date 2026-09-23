@@ -8,46 +8,34 @@
  * board is complete.
  */
 
-import { readFileSync } from "node:fs";
 import { board } from "../src/desk.js";
-
-const read = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), "utf8"));
-const index = read("../data/index.json");
-const normals = read("../data/normal.json");
+import { pick, markets } from "./_data.mjs";
 
 const TTL = 3 * 60_000;
-let cache = null;
+const cache = new Map();
 
 export default async function handler(req, res) {
+  const m = pick(req.query);
   try {
-    if (!cache || Date.now() - cache.at > TTL) {
-      const symbols = Object.keys(normals);
-      const result = await board(symbols, normals, index);
-      cache = { at: Date.now(), result };
+    let hit = cache.get(m.id);
+    if (!hit || Date.now() - hit.at > TTL) {
+      const result = await board(Object.keys(m.normals), m.normals, m.index, { marketId: m.id });
+      hit = { at: Date.now(), result };
+      cache.set(m.id, hit);
     }
     res.setHeader("cache-control", "public, max-age=60, stale-while-revalidate=240");
     res.status(200).json({
-      at: cache.at,
-      asked: cache.result.asked,
-      answered: cache.result.answered,
-      rows: cache.result.rows,
-      bands: index.bands,
-      baseline: index.all.undonePct,
-      meta: index.meta,
-      cuts: index.cuts,
+      market: m.id, label: m.label, markets,
+      at: hit.at, asked: hit.result.asked, answered: hit.result.answered, rows: hit.result.rows,
+      bands: m.index.bands, baseline: m.index.all.undonePct, meta: m.index.meta, cuts: m.index.cuts,
     });
   } catch (err) {
     // A dead exchange is a thing to say plainly, not a 500 with a stack trace.
     res.status(200).json({
-      at: Date.now(),
-      asked: 0,
-      answered: 0,
-      rows: [],
+      market: m.id, label: m.label, markets,
+      at: Date.now(), asked: 0, answered: 0, rows: [],
       error: `Bitget did not answer: ${err.message}`,
-      bands: index.bands,
-      baseline: index.all.undonePct,
-      meta: index.meta,
-      cuts: index.cuts,
+      bands: m.index.bands, baseline: m.index.all.undonePct, meta: m.index.meta, cuts: m.index.cuts,
     });
   }
 }

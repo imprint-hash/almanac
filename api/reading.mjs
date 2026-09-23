@@ -3,40 +3,35 @@
  * band it lands in, what history did there, and the price path since the close.
  */
 
-import { readFileSync } from "node:fs";
 import { reading } from "../src/desk.js";
-
-const read = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), "utf8"));
-const index = read("../data/index.json");
-const normals = read("../data/normal.json");
-const { card } = read("../data/scorecard.json");
+import { pick, markets } from "./_data.mjs";
 
 const TTL = 60_000;
 const cache = new Map();
 
 export default async function handler(req, res) {
-  const raw = String(req.query?.symbol || "NVDA").toUpperCase().replace(/[^A-Z0-9]/g, "");
-  const symbol = raw.endsWith("USDT") ? raw : raw + "USDT";
+  const m = pick(req.query);
+  const raw = String(req.query?.symbol || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const known = Object.keys(m.normals);
+  const symbol = known.includes(raw) ? raw : known.includes(raw + "USDT") ? raw + "USDT" : known[0];
+  const key = `${m.id}:${symbol}`;
 
   try {
-    const hit = cache.get(symbol);
-    let result = hit && Date.now() - hit.at < TTL ? hit.result : null;
-    if (!result) {
-      result = await reading(symbol, normals, index);
-      cache.set(symbol, { at: Date.now(), result });
+    let hit = cache.get(key);
+    if (!hit || Date.now() - hit.at > TTL) {
+      hit = { at: Date.now(), result: await reading(symbol, m.normals, m.index, { marketId: m.id }) };
+      cache.set(key, hit);
     }
-
     res.setHeader("cache-control", "public, max-age=30, stale-while-revalidate=120");
     res.status(200).json({
-      ...result,
-      bands: index.bands,
-      baseline: index.all.undonePct,
-      meta: index.meta,
-      // The desk's own record travels with every reading: a number is not
-      // worth much without how often that number has been true.
-      record: { byBand: card.byBand, brier: card.brier, baseline: card.brierBaseline, skill: card.skill, quoted: card.quoted },
+      ...hit.result,
+      label: m.label, markets,
+      bands: m.index.bands, baseline: m.index.all.undonePct, meta: m.index.meta, cuts: m.index.cuts,
+      // The desk's own record travels with every reading: a number is not worth
+      // much without how often that number has turned out to be true.
+      record: m.index.record,
     });
   } catch (err) {
-    res.status(200).json({ symbol, error: `Could not read ${symbol}: ${err.message}`, meta: index.meta });
+    res.status(200).json({ symbol, market: m.id, error: `Could not read ${symbol}: ${err.message}`, meta: m.index.meta });
   }
 }

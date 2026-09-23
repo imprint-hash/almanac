@@ -2,16 +2,52 @@
  * The only place Almanac talks to Bitget.
  *
  * Everything here is a public market endpoint: no key, no account, no order
- * ever leaves this process. Almanac reads prices and says what history did.
+ * ever leaves this process.
  *
- * `isRwa: "YES"` on a contract is Bitget's own flag for a tokenised real-world
- * asset — the 335 stock, index and commodity perpetuals this is about. It is
- * read from the exchange rather than kept as a list here, so a name listed
- * tomorrow is covered without a code change.
+ * Two markets carry the same stocks and they are not the same instrument:
+ *
+ *   rtoken — the tokenised share itself, spot, base coin `rNVDA`. This is what
+ *            the hackathon brief means by rToken, and what Almanac reads first.
+ *   perp   — the perpetual future on the stock, flagged `isRwa` by Bitget.
+ *            A bet on the price rather than a holding.
+ *
+ * The same measurement runs on both, from the same code, which is the point:
+ * a rule that only works on one of them is a rule about that venue, not about
+ * the dark hours.
  */
 
 const BASE = process.env.BITGET_API || "https://api.bitget.com";
 const PRODUCT = "USDT-FUTURES";
+
+export const MARKETS = {
+  rtoken: {
+    id: "rtoken",
+    label: "rTokens",
+    what: "the tokenised share itself, spot",
+    symbols: "/api/v2/spot/public/symbols",
+    tickers: "/api/v2/spot/market/tickers",
+    candles: (symbol, endTime) =>
+      `/api/v2/spot/market/history-candles?symbol=${symbol}&granularity=15min&limit=200&endTime=${endTime}`,
+    // Bitget marks a tokenised share by its base coin, rNVDA and friends.
+    isOurs: (c) => c.baseCoin?.startsWith("r") && c.quoteCoin === "USDT" && c.status === "online",
+    pretty: (c) => c.baseCoin,
+  },
+  perp: {
+    id: "perp",
+    label: "Perpetuals",
+    what: "the perpetual future on the stock",
+    symbols: `/api/v2/mix/market/contracts?productType=${PRODUCT}`,
+    tickers: `/api/v2/mix/market/tickers?productType=${PRODUCT}`,
+    candles: (symbol, endTime) =>
+      `/api/v2/mix/market/history-candles?symbol=${symbol}&productType=${PRODUCT}` +
+      `&granularity=15m&limit=200&endTime=${endTime}`,
+    isOurs: (c) => c.isRwa === "YES",
+    pretty: (c) => c.baseCoin,
+  },
+};
+
+export const DEFAULT_MARKET = "rtoken";
+export const market = (id) => MARKETS[id] || MARKETS[DEFAULT_MARKET];
 
 /** One page of candles is 200 rows; at 15m that is 50 hours. */
 export const PAGE_MS = 200 * 15 * 60 * 1000;
@@ -88,38 +124,33 @@ async function get(path, { tries = 3 } = {}) {
   throw last;
 }
 
-/** Every tokenised-asset perpetual Bitget lists, keyed by symbol. */
-export async function rwaContracts() {
-  const all = await get(`/api/v2/mix/market/contracts?productType=${PRODUCT}`);
+/** Every name in this market that carries a stock, keyed by trading symbol. */
+export async function universe(marketId = DEFAULT_MARKET) {
+  const m = market(marketId);
+  const all = await get(m.symbols);
   const out = {};
-  for (const c of all) if (c.isRwa === "YES") out[c.symbol] = c;
+  for (const c of all) if (m.isOurs(c)) out[c.symbol] = { ...c, display: m.pretty(c) };
   return out;
 }
 
 /** 24h turnover per symbol, used only to order a list for a human to read. */
-export async function turnover() {
-  const rows = await get(`/api/v2/mix/market/tickers?productType=${PRODUCT}`);
+export async function turnover(marketId = DEFAULT_MARKET) {
+  const rows = await get(market(marketId).tickers);
   return Object.fromEntries(rows.map((t) => [t.symbol, Number(t.usdtVolume || 0)]));
 }
 
-export async function lastPrice(symbol) {
-  const [t] = await get(`/api/v2/mix/market/ticker?symbol=${symbol}&productType=${PRODUCT}`);
-  return { price: Number(t.lastPr), at: Number(t.ts) };
-}
-
 /**
- * 15-minute candles, newest last: { t, close, volume, high, low }.
+ * 15-minute candles, newest last: { t, open, high, low, close, volume }.
  * `endTime` walks backwards a page at a time; Bitget returns the 200 candles
- * ending there, so page boundaries are arithmetic and need no cursor.
+ * ending there, so page boundaries are arithmetic and need no cursor. Both
+ * markets return the same row shape, so one parser serves them.
  */
-export async function candles(symbol, { endTime = Date.now(), pages = 1, granularity = "15m" } = {}) {
+export async function candles(symbol, { endTime = Date.now(), pages = 1, marketId = DEFAULT_MARKET } = {}) {
+  const m = market(marketId);
   const rows = new Map();
   let end = endTime;
   for (let p = 0; p < pages; p++) {
-    const page = await get(
-      `/api/v2/mix/market/history-candles?symbol=${symbol}&productType=${PRODUCT}` +
-        `&granularity=${granularity}&limit=200&endTime=${end}`,
-    );
+    const page = await get(m.candles(symbol, end));
     if (!page?.length) break;
     for (const r of page) {
       rows.set(Number(r[0]), {
@@ -134,13 +165,4 @@ export async function candles(symbol, { endTime = Date.now(), pages = 1, granula
     end = Number(page[0][0]) - 1;
   }
   return [...rows.values()].sort((a, b) => a.t - b.t);
-}
-
-/**
- * The live candles cover only the recent past, so a fresh read takes the
- * current session plus enough completed ones to know what a normal day looks
- * like for this name. Fifteen sessions of cover for ten sessions of history.
- */
-export async function recent(symbol) {
-  return candles(symbol, { pages: 12 });
 }

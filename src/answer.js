@@ -15,12 +15,24 @@ const pc = (v, d = 1) => (v == null ? "—" : `${(100 * v).toFixed(d)}%`);
 const sg = (v, d = 2) => (v == null ? "—" : `${v >= 0 ? "+" : ""}${(100 * v).toFixed(d)}%`);
 const clean = (s) => s.replace(/USDT$/, "");
 
-/** Which name a question is about, if it names one we carry. */
-export function symbolIn(question, known) {
+/**
+ * Which name a question is about, if it names one we carry.
+ *
+ * Someone types "NVDA", and depending on the market the symbol behind it is
+ * NVDAUSDT or RNVDAUSDT, so the display names are checked too rather than
+ * assuming one spelling and silently answering about the wrong thing.
+ */
+export function symbolIn(question, known, normals = {}) {
   const words = question.toUpperCase().match(/[A-Z]{2,12}/g) || [];
+  const byDisplay = new Map();
+  for (const [sym, v] of Object.entries(normals)) {
+    if (v?.display) byDisplay.set(String(v.display).toUpperCase(), sym);
+  }
   for (const w of words) {
-    const hit = w.endsWith("USDT") ? w : w + "USDT";
-    if (known.includes(hit)) return hit;
+    for (const candidate of [w, `${w}USDT`, `R${w}`, `R${w}USDT`]) {
+      if (known.includes(candidate)) return candidate;
+      if (byDisplay.has(candidate)) return byDisplay.get(candidate);
+    }
   }
   return null;
 }
@@ -101,24 +113,79 @@ export function compose(f) {
  * facts and forbids arithmetic; anything the model returns that contains a
  * percentage we did not give it is thrown away in favour of the composed text.
  */
+/**
+ * Figures as they should appear in a sentence.
+ *
+ * The model is handed these strings and not the raw fractions behind them. Sent
+ * a bare 0.0161 it will write "MSTR is at -0.0161", which reads like a price;
+ * sent "down 1.61%" it can only repeat it. Formatting is the desk's job, and
+ * doing it here also means the check afterwards is comparing like with like.
+ */
+export function forModel(f) {
+  const tooSmall = f.move != null && Math.abs(f.move) < 0.005;
+
+  // The keys are written as the phrases a person would use, because whatever a
+  // key is called will sooner or later appear in the answer verbatim.
+  const d = {
+    "the name": f.symbol,
+    "how far it has moved since the close":
+      f.move == null ? null : `${f.move < 0 ? "down" : "up"} ${Math.abs(100 * f.move).toFixed(2)}%`,
+    "what this name covers in an ordinary session":
+      f.normalDay == null ? null : `${(100 * f.normalDay).toFixed(2)}%`,
+    "so tonight's move is worth": f.ratio == null ? null : `${f.ratio.toFixed(2)} times a normal day for it`,
+    "the state of its home market": f.marketOpen
+      ? "open, so this price is being set by a real exchange"
+      : `shut, and has been for ${f.hoursSinceClose} hours`,
+  };
+
+  if (tooSmall) {
+    d["whether this is worth reading at all"] =
+      "no — it is under half a percent, which is inside the spread. Say that, and do not quote any other figure.";
+  } else if (f.undoneInBand != null) {
+    d["how often moves this size, for a name like this, were undone by 10:30"] = `${(100 * f.undoneInBand).toFixed(1)}%`;
+    d["how many measured nights that is based on"] = f.nightsInBand;
+    d["how often a night picked at random is undone"] = `${(100 * f.undoneAtRandom).toFixed(1)}%`;
+  } else {
+    d["what history says about a move this size"] =
+      "not enough measured nights to quote a figure. Say so plainly.";
+  }
+
+  if (f.noHomeMarket) {
+    d["a thing worth mentioning"] =
+      "this name has no home market at all — it is a private company, so no bell ever arrives to settle its price";
+  }
+
+  if (!tooSmall && f.statedBefore != null) {
+    d["what the desk has said before about moves like this"] = `${(100 * f.statedBefore).toFixed(1)}%`;
+    d["what actually happened those times"] = `${(100 * f.happenedBefore).toFixed(1)}%`;
+  }
+
+  for (const k of Object.keys(d)) if (d[k] == null) delete d[k];
+  return d;
+}
+
 export function prompt(question, f) {
   return [
     {
       role: "system",
       content:
-        "You are Almanac, a research desk for tokenised US stocks on Bitget. You answer in plain English, " +
-        "in at most four short sentences, in a calm voice — someone may be reading you at three in the morning " +
-        "while frightened about their position.\n\n" +
+        "You are Almanac, a research desk for tokenised US stocks on Bitget. Someone may be reading you at " +
+        "three in the morning, frightened about a position. Be calm, plain and brief.\n\n" +
+        "Answer in AT MOST four short sentences. No preamble, no bullet points, no headings.\n\n" +
         "Hard rules:\n" +
-        "- Use ONLY the figures in the FACTS block. Never compute, estimate, round differently, or introduce a number.\n" +
-        "- Never predict direction. Almanac states how often moves like this were undone; it does not say what happens next.\n" +
-        "- Never give financial advice or tell anyone to buy, sell or hold.\n" +
-        "- If a fact is null, say you do not have it rather than filling the gap.\n" +
-        "- Say the most important thing first.",
+        "- Every figure you use must be copied VERBATIM from the FACTS block, exactly as written there. " +
+        "Never convert, recompute, re-round or invent one, and never write a bare decimal as if it were a price.\n" +
+        "- Never predict direction. Almanac reports how often moves like this were undone. It does not say what happens next.\n" +
+        "- Never advise buying, selling or holding.\n" +
+        "- If something is not in the FACTS block, say you do not have it.\n" +
+        "- Lead with the answer to the question asked.\n" +
+        "- Do not think at length. Answer directly.\n" +
+        "- The FACTS block is written as plain phrases. Never quote a phrase from it as though it were a " +
+        "technical term, and never write one in snake_case or with underscores. Write like a person talking.",
     },
     {
       role: "user",
-      content: `FACTS (the only numbers you may use):\n${JSON.stringify(f, null, 1)}\n\nQUESTION: ${question}`,
+      content: `FACTS (copy these figures verbatim; they are the only ones you may use):\n${JSON.stringify(forModel(f), null, 1)}\n\nQUESTION: ${question}`,
     },
   ];
 }
