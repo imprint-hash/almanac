@@ -20,6 +20,9 @@ const BAND_TONE = { "under 0.3": "var(--crit)", "0.3-0.5": "var(--serious)", "0.
    most tonight as soon as the board answers. */
 const FIRST = "RNVDAUSDT";
 
+/* Only the newest question may write to the answer box. */
+let askSeq = 0;
+
 let state = { market: "rtoken", symbol: null, board: null, reading: null, hideSmall: true, picked: false };
 
 /** The instrument switch. Both markets were measured the same way, so the page
@@ -337,32 +340,39 @@ $("hidesmall").addEventListener("change", (e) => {
 async function ask(question, { quiet = false } = {}) {
   const out = $("answer");
   out.hidden = false;
-  out.innerHTML = `<span class="muted">${quiet ? "Asking Qwen…" : "Thinking…"}</span>`;
-  try {
-    // A killed serverless function answers with an HTML error page, so the body
-    // is read as text and parsed defensively — a JSON syntax error on screen
-    // tells a reader nothing and looks like the desk is broken.
-    const raw = await fetch("/api/ask", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ question, symbol: state.symbol, market: state.market }),
-    }).then((x) => x.text());
+  out.innerHTML = `<span class="muted">Reading the market…</span>`;
+  const mine = ++askSeq;
 
-    let r;
-    try { r = JSON.parse(raw); }
-    catch { r = { wrote: "the desk", answer: "The question box did not come back in time. The reading below is unaffected — it comes from a different request, and everything on it is live." }; }
-
-    if (r.symbol && r.symbol !== state.symbol) { state.picked = true; await load(r.symbol); }
-
+  // The desk answers first so there is something true on screen within a
+  // second; the model is then asked the same question and swapped in if it
+  // arrives, still checked, still labelled.
+  const render = (r, pending) => {
+    if (mine !== askSeq) return;
     const model = r.wrote && r.wrote !== "the desk";
     const badge = r.wrote
       ? `<span class="who ${model ? "model" : "fallback"}">${model ? "✦ written by " + r.wrote : "written by the desk"}</span>`
       : "";
-    out.innerHTML = `${badge}<span class="said">${r.answer || r.error || "No answer."}</span>` +
-      (r.note ? `<span class="mono muted why">${r.note}</span>` : "");
-  } catch (err) {
-    out.innerHTML = `<span class="who fallback">written by the desk</span><span class="said">Could not reach the model: ${err.message}</span>`;
-  }
+    out.innerHTML = `${badge}${pending ? `<span class="who pending">asking qwen…</span>` : ""}` +
+      `<span class="said">${r.answer || r.error || "No answer."}</span>` +
+      (r.note && !pending ? `<span class="mono muted why">${r.note}</span>` : "");
+  };
+
+  const post = async (body) => {
+    const raw = await fetch("/api/ask", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    }).then((x) => x.text());
+    try { return JSON.parse(raw); }
+    catch { return null; }
+  };
+
+  const base = { question, symbol: state.symbol, market: state.market };
+  const quick = await post({ ...base, fast: true });
+  if (quick) render(quick, true);
+  const full = await post(base);
+  if (full) render(full, false);
+  else if (!quick) render({ wrote: "the desk", answer: "The question box did not come back in time. Everything below is unaffected — it comes from a different request." }, false);
 }
 
 $("askform").addEventListener("submit", (e) => {

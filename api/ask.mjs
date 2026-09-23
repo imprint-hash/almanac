@@ -28,7 +28,7 @@ const ENDPOINT =
  * qwen3.8-max reasons before replying, which costs about thirteen seconds and
  * often more. One retry only if there is real time for it.
  */
-const BUDGET_MS = 20_000;
+const BUDGET_MS = Number(process.env.QWEN_BUDGET_MS || 45_000);
 
 async function viaQwen(messages, deadline) {
   let last;
@@ -62,6 +62,13 @@ export default async function handler(req, res) {
   const fallback = String(req.body?.symbol || "").toUpperCase();
   const symbol = asked || (known.includes(fallback) ? fallback : known[0]);
 
+  // Two ways to ask. `fast` skips the model entirely and returns the desk's own
+  // answer in about a second, so nobody watches a spinner; the page then asks
+  // again without it and swaps the model's wording in when it arrives. The
+  // model is slow enough — thirteen seconds on a good run — that making a
+  // reader wait for it would be the wrong trade.
+  const fast = req.body?.fast === true;
+
   try {
     const r = await reading(symbol, m.normals, m.index, { marketId: m.id });
     const f = facts({ ...r, baseline: m.index.all.undonePct, record: m.index.record });
@@ -71,7 +78,7 @@ export default async function handler(req, res) {
     let wrote = "the desk";
     let note = KEY ? null : "No model key configured, so this is the desk's own wording.";
 
-    if (KEY) {
+    if (KEY && !fast) {
       try {
         const text = await viaQwen(prompt(question, f), deadline);
         if (numbersAreOurs(text, f)) {
