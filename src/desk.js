@@ -15,6 +15,7 @@ import { candles, DEFAULT_MARKET } from "./bitget.js";
 import { nightSoFar, normalDay } from "./night.js";
 import { currentDarkHours, marketOpen } from "./session.js";
 import { lookup, bandOf } from "./measure.js";
+import { context } from "./underlying.js";
 
 /** A stored normal day older than this is not trusted. */
 export const STALE_DAYS = 5;
@@ -52,6 +53,15 @@ export async function reading(symbol, normals, index, { marketId = DEFAULT_MARKE
   const ratio = night.move != null && normal ? Math.abs(night.move) / normal : null;
   const read = lookup(index, { symbol, move: night.move, normalDay: normal });
 
+  // What was happening to the company while the token drifted. Never allowed
+  // to hold up or break a reading — the measurement stands without it.
+  let company = null;
+  try {
+    company = await context(symbol, stored?.display ?? symbol, w.reopens);
+  } catch {
+    company = null;
+  }
+
   return {
     symbol,
     display: stored?.display ?? symbol,
@@ -65,6 +75,7 @@ export async function reading(symbol, normals, index, { marketId = DEFAULT_MARKE
     normalDaySource: source,
     sessionsBehindNormalDay: stored?.sessions ?? null,
     reading: read,
+    company,
     path: rows.filter((c) => c.t >= w.close - 30 * 60_000).map((c) => [c.t, c.close]),
   };
 }
