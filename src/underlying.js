@@ -55,7 +55,10 @@ export async function quote(ticker) {
  * date, a split. Only events within a few days either side are worth showing —
  * the calendars run for years and almost all of it is irrelevant tonight.
  */
-export async function events(ticker, around, { window = 3 } = {}) {
+/** The calendar answers in Chinese; these are the four it ever returns. */
+const PERIOD = { "年报": "annual results", "一季报": "Q1 results", "二季报": "Q2 results", "三季报": "Q3 results" };
+
+export async function events(ticker, around, { window = 10 } = {}) {
   const out = { earnings: null, exDividend: null, split: null };
 
   const [cal, div] = await Promise.allSettled([
@@ -70,7 +73,12 @@ export async function events(ticker, around, { window = 3 } = {}) {
       const d = daysUntil(when, around);
       if (d == null || Math.abs(d) > window) continue;
       if (!best || Math.abs(d) < Math.abs(best.days)) {
-        best = { date: day(when), days: d, period: r.report_type_name || null, expected: !r.perf_report_dsclsr_date };
+        best = {
+          date: day(when),
+          days: d,
+          period: PERIOD[r.report_type_name] || r.report_type_name || null,
+          expected: !r.perf_report_dsclsr_date,
+        };
       }
     }
     out.earnings = best;
