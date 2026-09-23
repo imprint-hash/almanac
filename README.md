@@ -117,6 +117,25 @@ Two findings that survived and surprised us: **weekend gaps are calmer, not wild
 instruments; and names with **no home market at all** — OPENAI, ANTHROPIC, SHEIN — are undone just
 11.6% of the time, because no bell ever arrives to settle them.
 
+## The company behind the token
+
+Almanac measures the token. That leaves an obvious hole: it can say a move was
+unusual for that name, but never why. **Bitget's `bitget-mcp-server`** — free,
+no key, read-only — closes it:
+
+- the **real US share**, quoted from its own session
+- the **earnings calendar**, so a reading can say a report lands in six days, or
+  landed during those dark hours
+- **dividends and splits**, the corporate actions that explain gaps a
+  price-only view would call noise
+
+It is shown as a strip beside the reading and labelled
+**"context only — not part of the measurement."** None of it feeds the bands or
+the odds. An earnings date is an explanation a reader can weigh; it is not a
+number this desk has tested, and folding it quietly into the odds would undo
+the point of the method page. It runs as its own request, so a slow data server
+delays nothing and a dead one simply means no strip.
+
 ## What Qwen does, and does not do
 
 `qwen3.8-max` writes the answer in the question box. That is all it does.
@@ -152,7 +171,9 @@ Node 20+. **No dependencies.**
 | `src/measure.js` | The bands, and the reading |
 | `src/grade.js` | The walk-forward replay and the calibration scorecard |
 | `src/answer.js` | The facts the model may use, and the check on what it returns |
-| `api/` | `board`, `reading`, `ask` |
+| `src/mcp.js` | A small MCP client for Bitget's read-only data server |
+| `src/underlying.js` | The real share, its earnings calendar, its corporate actions |
+| `api/` | `board`, `reading`, `ask`, `company`, `live` |
 | `data/nights-*.json` | Every measured night, both instruments |
 
 ## Limits
