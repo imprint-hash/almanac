@@ -16,6 +16,10 @@ const initial = (s) => (/^r[A-Z0-9]/.test(s) ? s[1] : s[0]);
 
 const BAND_TONE = { "under 0.3": "var(--crit)", "0.3-0.5": "var(--serious)", "0.5-0.8": "var(--warn)", "0.8-1.3": "var(--good)", "over 1.3": "var(--good)" };
 
+/* Something to read while the sweep runs. Replaced by whatever actually moved
+   most tonight as soon as the board answers. */
+const FIRST = "RNVDAUSDT";
+
 let state = { market: "rtoken", symbol: null, board: null, reading: null, hideSmall: true, picked: false };
 
 /** The instrument switch. Both markets were measured the same way, so the page
@@ -242,13 +246,14 @@ async function loadLive() {
 
 /* ---------- wiring ---------- */
 
-async function load(symbol) {
+async function load(symbol, { thenAsk = false } = {}) {
   state.symbol = symbol;
   const r = await fetch(`/api/reading?symbol=${encodeURIComponent(symbol)}&market=${state.market}`).then((x) => x.json());
   state.reading = r;
   renderReading(r);
   clock(r);
   if (state.board) renderBoard(state.board);
+  if (thenAsk) ask(`Is ${r.display || clean(r.symbol)} really moving tonight?`, { quiet: true });
 }
 
 async function loadBoard() {
@@ -261,7 +266,7 @@ async function loadBoard() {
   // name hard-coded months ago that may be sitting perfectly still.
   if (!state.picked && b.rows?.length) {
     state.picked = true;
-    load(b.rows[0].symbol);
+    load(b.rows[0].symbol, { thenAsk: true });
   }
 }
 
@@ -280,28 +285,47 @@ $("hidesmall").addEventListener("change", (e) => {
   if (state.board) renderBoard(state.board);
 });
 
-$("askform").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const q = $("q").value.trim();
-  if (!q) return;
+/**
+ * Ask the desk. Whoever ends up writing the answer is named on it — the model
+ * when it answered in time and kept to the figures, the desk itself when it did
+ * not. That label is the point, not decoration.
+ */
+async function ask(question, { quiet = false } = {}) {
   const out = $("answer");
   out.hidden = false;
-  out.textContent = "Thinking…";
+  out.innerHTML = `<span class="muted">${quiet ? "Asking Qwen…" : "Thinking…"}</span>`;
   try {
     const r = await fetch("/api/ask", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ question: q, symbol: state.symbol, market: state.market }),
+      body: JSON.stringify({ question, symbol: state.symbol, market: state.market }),
     }).then((x) => x.json());
+
     if (r.symbol && r.symbol !== state.symbol) { state.picked = true; await load(r.symbol); }
-    out.innerHTML = (r.answer || r.error || "No answer.") +
-      (r.note ? `<br><span class="mono muted">${r.note}</span>` : "") +
-      (r.wrote ? `<br><span class="mono faint">WRITTEN BY ${r.wrote.toUpperCase()}</span>` : "");
+
+    const model = r.wrote && r.wrote !== "the desk";
+    const badge = r.wrote
+      ? `<span class="who ${model ? "model" : "fallback"}">${model ? "✦ written by " + r.wrote : "written by the desk"}</span>`
+      : "";
+    out.innerHTML = `${badge}<span class="said">${r.answer || r.error || "No answer."}</span>` +
+      (r.note ? `<span class="mono muted why">${r.note}</span>` : "");
   } catch (err) {
-    out.textContent = `Could not reach the model: ${err.message}`;
+    out.innerHTML = `<span class="who fallback">written by the desk</span><span class="said">Could not reach the model: ${err.message}</span>`;
   }
+}
+
+$("askform").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const q = $("q").value.trim();
+  $("q").dataset.touched = "1";
+  if (q) ask(q);
 });
 
+/* The board sweeps forty names and takes several seconds. The reading takes one
+   and carries the bands, the record and the baseline with it — so it paints the
+   charts first and the rail fills in behind it. Waiting for the sweep before
+   drawing anything made a working page look like a dead one. */
+load(FIRST);
 loadBoard();
 setInterval(() => { if (state.symbol) load(state.symbol); }, 60_000);
 setInterval(loadBoard, 180_000);
