@@ -1,22 +1,27 @@
 #!/usr/bin/env node
 /**
  * The desk question: is tonight's move on this name real?
- *   node bin/ask.mjs NVDA
+ *   node bin/ask.mjs NVDA [rtoken|perp]
  */
 import { readFileSync } from "node:fs";
-import { recent } from "../src/bitget.js";
-import { nightSoFar } from "../src/night.js";
-import { lookup } from "../src/measure.js";
+import { reading } from "../src/desk.js";
 
-const arg = (process.argv[2] || "NVDA").toUpperCase();
-const symbol = arg.endsWith("USDT") ? arg : arg + "USDT";
-const index = JSON.parse(readFileSync(new URL("../data/index.json", import.meta.url), "utf8"));
+const marketId = (process.argv[3] || "rtoken").toLowerCase();
+const index = JSON.parse(readFileSync(new URL(`../data/index-${marketId}.json`, import.meta.url), "utf8"));
+const normals = JSON.parse(readFileSync(new URL(`../data/normal-${marketId}.json`, import.meta.url), "utf8"));
 
-const candles = await recent(symbol);
-const night = nightSoFar(candles);
+const arg = (process.argv[2] || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+const known = Object.keys(normals);
+const symbol = known.includes(arg) ? arg : known.includes(arg + "USDT") ? arg + "USDT"
+  : known.find((s) => (normals[s].display || "").toUpperCase() === arg)
+  || known.find((s) => (normals[s].display || "").toUpperCase() === "R" + arg)
+  || known[0];
+
+const full = await reading(symbol, normals, index, { marketId });
+const night = full.night;
 const pc = (x, d = 1) => (x == null ? "—" : `${(100 * x).toFixed(d)}%`);
 
-console.log(`\n${symbol.replace("USDT", "")}  ·  session of ${night.session}, reopens ${night.reopens}`);
+console.log(`\n${normals[symbol]?.display || symbol}  ·  ${marketId}  ·  session of ${night.session}, reopens ${night.reopens}`);
 if (night.marketOpen) console.log("the US market is open right now — this is a live price, not a dark-hours one\n");
 else console.log(`${night.hoursSinceClose.toFixed(1)}h since the close, ${night.hoursToBell.toFixed(1)}h to the bell\n`);
 
@@ -28,7 +33,7 @@ console.log(`  moved       ${pc(night.move, 2)}  (${night.closePrice} → ${nigh
 console.log(`  normal day  ${pc(night.normalDay, 2)}  median of its last 10 sessions`);
 console.log(`  that is     ${night.ratio?.toFixed(2)}× a normal day for this name\n`);
 
-const r = lookup(index, { symbol, move: night.move, normalDay: night.normalDay });
+const r = full.reading;
 console.log(`  ${r.verdict.label}`);
 if (r.stat?.n) {
   console.log(`  band ${r.band} — ${r.gloss}`);

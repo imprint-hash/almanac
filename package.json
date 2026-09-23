@@ -4,10 +4,13 @@
   "description": "What history says about a tokenised stock's move while its home market is shut.",
   "type": "module",
   "license": "MIT",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
+    "dev": "node --env-file-if-exists=.env bin/serve.mjs",
+    "normal": "node --env-file-if-exists=.env bin/refresh-normal.mjs",
     "index": "node bin/build-index.mjs",
-    "grade": "node bin/grade.mjs",
-    "ask": "node bin/ask.mjs"
+    "ask": "node --env-file-if-exists=.env bin/ask.mjs"
   }
 }

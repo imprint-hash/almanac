@@ -18,18 +18,32 @@ const ENDPOINT =
   process.env.QWEN_ENDPOINT ||
   "https://hackathon.bitgetops.com/v1/chat/completions";
 
-async function viaQwen(messages) {
-  const res = await fetch(ENDPOINT, {
-    method: "POST",
-    headers: { authorization: `Bearer ${KEY}`, "content-type": "application/json" },
-    body: JSON.stringify({ model: MODEL, messages, temperature: 0.2, max_tokens: 260 }),
-    signal: AbortSignal.timeout(26_000),
-  });
-  if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 120)}`);
-  const body = await res.json();
-  const text = body.choices?.[0]?.message?.content?.trim();
-  if (!text) throw new Error("empty reply");
-  return text;
+/**
+ * qwen3.8-max reasons before it answers, so a reply costs about thirteen
+ * seconds and sometimes rather more. One retry, because a single slow call is
+ * usually just a slow call; beyond that the desk answers for itself rather
+ * than leaving someone watching a spinner at three in the morning.
+ */
+async function viaQwen(messages, { tries = 2 } = {}) {
+  let last;
+  for (let i = 0; i < tries; i++) {
+    try {
+      const res = await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { authorization: `Bearer ${KEY}`, "content-type": "application/json" },
+        body: JSON.stringify({ model: MODEL, messages, temperature: 0.2, max_tokens: 260 }),
+        signal: AbortSignal.timeout(24_000),
+      });
+      if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 120)}`);
+      const body = await res.json();
+      const text = body.choices?.[0]?.message?.content?.trim();
+      if (!text) throw new Error("empty reply");
+      return text;
+    } catch (err) {
+      last = err;
+    }
+  }
+  throw last;
 }
 
 export default async function handler(req, res) {

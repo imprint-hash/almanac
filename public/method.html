@@ -4,31 +4,35 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Almanac — method, and what did not work</title>
-<meta name="description" content="How Almanac measures a dark-hours move, how it grades its own odds, and the two approaches that failed before this one.">
+<meta name="description" content="How Almanac measures a dark-hours move, how it grades its own odds, the replication on a second instrument, and the approaches that failed before this one.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'><circle cx='9' cy='9' r='7.5' fill='none' stroke='%232dd4bf' stroke-width='1.8'/><path d='M9 1.5A7.5 7.5 0 019 16.5Z' fill='%232dd4bf' opacity='.55'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="/app.css">
 <style>
-  .prose { max-width: 74ch; display: flex; flex-direction: column; gap: 18px; padding: 8px 0 40px; }
+  .prose { max-width: 76ch; display: flex; flex-direction: column; gap: 18px; padding: 8px 0 44px; }
   .prose h1 { font-size: 30px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
-  .prose h2 { font-size: 19px; font-weight: 500; margin: 22px 0 0; }
-  .prose h3 { font-size: 15px; font-weight: 500; margin: 12px 0 0; color: var(--ink-2); }
+  .prose h2 { font-size: 19px; font-weight: 500; margin: 24px 0 0; }
+  .prose h3 { font-size: 15px; font-weight: 500; margin: 12px 0 0; color: var(--ink); }
   .prose p, .prose li { font-size: 14.5px; line-height: 1.72; color: var(--ink-2); margin: 0; }
   .prose strong { color: var(--ink); font-weight: 600; }
   .prose ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
   .lede { font-size: 17px; line-height: 1.66; color: var(--ink); }
   table { border-collapse: collapse; width: 100%; font-family: var(--mono); font-size: 12.5px; }
+  caption { text-align: left; padding-bottom: 8px; color: var(--faint); font-size: 9px; letter-spacing: 0.12em; }
   th { text-align: right; padding: 9px 10px; border-bottom: 1px solid var(--line); color: var(--faint); font-size: 9px; letter-spacing: 0.12em; font-weight: 400; }
   th:first-child, td:first-child { text-align: left; }
   td { text-align: right; padding: 9px 10px; border-bottom: 1px solid var(--line-soft); color: var(--ink-2); }
   td:first-child { color: var(--ink); }
-  tr.bad td { color: var(--crit); }
+  td.off { color: var(--warn); }
   .box { background: var(--surf); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
   .box.warn { border-color: rgba(250, 178, 25, 0.28); }
+  .two { display: flex; gap: 16px; align-items: flex-start; }
+  .two > * { flex: 1 1 0; min-width: 0; }
   .wrap { overflow-x: auto; }
   code { font-family: var(--mono); font-size: 12.5px; color: var(--teal-up); background: rgba(14,171,154,.08); padding: 2px 6px; border-radius: 4px; }
+  @media (max-width: 860px) { .two { flex-direction: column; } }
 </style>
 </head>
 <body>
@@ -40,7 +44,8 @@
   </a>
   <div class="navlinks">
     <a href="/">Tonight</a>
-    <a href="#bands">Method</a>
+    <a href="#measure">Method</a>
+    <a href="#replication">Replication</a>
     <a href="#failed">What did not work</a>
     <a href="#limits">Limits</a>
   </div>
@@ -53,17 +58,17 @@
 
   <h1>Method, and what did not work</h1>
   <p class="lede">
-    Bitget lists 335 tokenised names. Their home markets are open 32.5 hours of every 168, so for
-    about four fifths of the week these things trade with nothing real setting the price. Almanac
-    answers one question about those hours: <strong>when a move happens in the dark, how often does
-    it survive the bell?</strong>
+    Bitget lists more than two and a half thousand tokenised shares. Their home markets are open 32.5
+    hours of every 168, so for about four fifths of the week these things trade with nothing real
+    setting the price. Almanac answers one question about those hours:
+    <strong>when a move happens in the dark, how often does it survive the bell?</strong>
   </p>
   <p>
-    It never predicts direction, and it never gives advice. It states how often moves like the one in
-    front of you were undone, and it publishes how often those statements have turned out to be true.
+    It never predicts direction, and it never advises. It states how often moves like the one in front
+    of you were undone, and it publishes how often those statements turned out to be true.
   </p>
 
-  <h2 id="bands">How a night is measured</h2>
+  <h2 id="measure">How a night is measured</h2>
   <p>
     One night is one measurement. The reference is the <strong>16:00 ET close</strong> of the session
     the night belongs to; the move is read at <strong>09:15 ET</strong>, fifteen minutes before the
@@ -86,58 +91,121 @@
   </p>
   <p>
     Three percent is nothing on a token that ranges eight percent a day. On one that ranges one
-    percent, three percent is news. That ratio was chosen on the first 60% of the record and the band
+    percent, three percent is news. The ratio was chosen on the first 60% of the record and the band
     edges fixed there before the rest was looked at.
   </p>
 
-  <div class="wrap box">
-    <table>
-      <caption class="mono faint" style="text-align: left; padding-bottom: 8px;">MOVE ÷ NORMAL DAY · 1,659 NIGHTS · 39 NAMES · 2 JUL – 18 SEP 2026</caption>
-      <thead><tr><th>Band</th><th>Nights</th><th>Undone by 10:30</th><th>Median kept</th></tr></thead>
-      <tbody>
-        <tr><td>under 0.3</td><td>346</td><td>48.3%</td><td>0.57</td></tr>
-        <tr><td>0.3 – 0.5</td><td>334</td><td>35.0%</td><td>0.87</td></tr>
-        <tr><td>0.5 – 0.8</td><td>376</td><td>23.7%</td><td>1.00</td></tr>
-        <tr><td>0.8 – 1.3</td><td>322</td><td>10.9%</td><td>1.00</td></tr>
-        <tr><td>over 1.3</td><td>281</td><td>1.8%</td><td>1.00</td></tr>
-        <tr><td><strong>any night</strong></td><td>1,659</td><td><strong>24.9%</strong></td><td>0.96</td></tr>
-      </tbody>
-    </table>
-  </div>
+  <h2 id="replication">Measured twice, on two different instruments</h2>
+  <p>
+    Bitget carries these stocks two ways, and they are not the same thing. An <strong>rToken</strong>
+    is the tokenised share itself, traded spot. A <strong>perpetual</strong> is a contract written
+    against the stock's price — a position, not a holding. Different venue, different order books,
+    different participants, different base rate.
+  </p>
+  <p>
+    The same measurement was run on both, from the same code. If the ladder only appeared on one of
+    them it would be a fact about that venue rather than about the dark hours.
+  </p>
 
-  <h2>How it grades itself</h2>
+  <div class="two">
+    <div class="wrap box">
+      <table>
+        <caption>rTOKENS (SPOT) · 1,237 NIGHTS · 35 NAMES · 1 JUL – 21 SEP 2026</caption>
+        <thead><tr><th>Band</th><th>Nights</th><th>Undone</th><th>Median kept</th></tr></thead>
+        <tbody>
+          <tr><td>under 0.3</td><td>292</td><td>50.7%</td><td>0.43</td></tr>
+          <tr><td>0.3 – 0.5</td><td>337</td><td>40.1%</td><td>0.67</td></tr>
+          <tr><td>0.5 – 0.8</td><td>307</td><td>27.7%</td><td>0.90</td></tr>
+          <tr><td>0.8 – 1.3</td><td>207</td><td>21.3%</td><td>0.99</td></tr>
+          <tr><td>over 1.3</td><td>94</td><td>7.4%</td><td>0.97</td></tr>
+          <tr><td><strong>any night</strong></td><td>1,237</td><td><strong>33.9%</strong></td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="wrap box">
+      <table>
+        <caption>PERPETUALS · 1,659 NIGHTS · 39 NAMES · 2 JUL – 18 SEP 2026</caption>
+        <thead><tr><th>Band</th><th>Nights</th><th>Undone</th><th>Median kept</th></tr></thead>
+        <tbody>
+          <tr><td>under 0.3</td><td>346</td><td>48.3%</td><td>0.57</td></tr>
+          <tr><td>0.3 – 0.5</td><td>334</td><td>35.0%</td><td>0.87</td></tr>
+          <tr><td>0.5 – 0.8</td><td>376</td><td>23.7%</td><td>1.00</td></tr>
+          <tr><td>0.8 – 1.3</td><td>322</td><td>10.9%</td><td>1.01</td></tr>
+          <tr><td>over 1.3</td><td>281</td><td>1.8%</td><td>0.98</td></tr>
+          <tr><td><strong>any night</strong></td><td>1,659</td><td><strong>24.9%</strong></td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p>
+    The base rates differ — a third against a quarter — and the ladder runs the same way down both.
+    Almanac reads whichever instrument you have selected, against that instrument's own table, never
+    against the other one's.
+  </p>
+
+  <h2 id="record">How it grades itself</h2>
   <p>
     Every night in the record is replayed in order. At each one the desk sees only the nights that had
     already happened, states the chance the move gets undone, and then the morning settles it. The
-    table is rebuilt as history accrues — every 25 nights rather than every night, which can only
-    make the desk look worse, since it is deciding on a table slightly out of date.
+    table is rebuilt as history accrues — every 25 nights rather than every night, which can only make
+    the desk look worse, since it is deciding on a table slightly out of date.
   </p>
   <p>
     It is graded on whether its <strong>odds are true</strong>, not on how often it was "right". A
     desk that says one in twenty should be wrong about one time in twenty.
   </p>
 
-  <div class="wrap box">
-    <table>
-      <caption class="mono faint" style="text-align: left; padding-bottom: 8px;">1,259 GRADED NIGHTS · 22 JUL – 18 SEP 2026</caption>
-      <thead><tr><th>Band</th><th>Nights</th><th>It said</th><th>It happened</th><th>Gap</th></tr></thead>
-      <tbody>
-        <tr><td>under 0.3</td><td>276</td><td>48.4%</td><td>50.4%</td><td>+2.0</td></tr>
-        <tr><td>0.3 – 0.5</td><td>263</td><td>34.9%</td><td>36.9%</td><td>+2.0</td></tr>
-        <tr><td>0.5 – 0.8</td><td>280</td><td>24.1%</td><td>25.0%</td><td>+0.9</td></tr>
-        <tr><td>0.8 – 1.3</td><td>220</td><td>12.7%</td><td>10.0%</td><td>−2.7</td></tr>
-        <tr><td>over 1.3</td><td>220</td><td>1.7%</td><td>1.8%</td><td>+0.1</td></tr>
-      </tbody>
-    </table>
-    <p class="mono muted" style="letter-spacing: 0.06em;">
-      BRIER 0.1671 · SAME, KNOWING NOTHING 0.1961 · SKILL +14.8% · WORST GAP 2.7 POINTS
+  <div class="two">
+    <div class="wrap box">
+      <table>
+        <caption>rTOKENS · 926 GRADED NIGHTS</caption>
+        <thead><tr><th>Band</th><th>n</th><th>It said</th><th>It happened</th><th>Gap</th></tr></thead>
+        <tbody>
+          <tr><td>under 0.3</td><td>217</td><td>49.2%</td><td>53.9%</td><td>+4.7</td></tr>
+          <tr><td>0.3 – 0.5</td><td>260</td><td>40.8%</td><td>41.5%</td><td>+0.8</td></tr>
+          <tr><td>0.5 – 0.8</td><td>233</td><td>28.2%</td><td>29.6%</td><td>+1.4</td></tr>
+          <tr><td>0.8 – 1.3</td><td>148</td><td>27.0%</td><td>18.2%</td><td class="off">−8.7</td></tr>
+          <tr><td>over 1.3</td><td>68</td><td>11.5%</td><td>2.9%</td><td class="off">−8.5</td></tr>
+        </tbody>
+      </table>
+      <p class="mono muted" style="letter-spacing: .06em;">BRIER 0.2101 · KNOWING NOTHING 0.2289 · SKILL +8.2%</p>
+    </div>
+    <div class="wrap box">
+      <table>
+        <caption>PERPETUALS · 1,359 GRADED NIGHTS</caption>
+        <thead><tr><th>Band</th><th>n</th><th>It said</th><th>It happened</th><th>Gap</th></tr></thead>
+        <tbody>
+          <tr><td>under 0.3</td><td>287</td><td>48.1%</td><td>49.8%</td><td>+1.8</td></tr>
+          <tr><td>0.3 – 0.5</td><td>275</td><td>34.6%</td><td>36.7%</td><td>+2.1</td></tr>
+          <tr><td>0.5 – 0.8</td><td>310</td><td>23.3%</td><td>25.2%</td><td>+1.9</td></tr>
+          <tr><td>0.8 – 1.3</td><td>245</td><td>12.9%</td><td>9.8%</td><td>−3.1</td></tr>
+          <tr><td>over 1.3</td><td>242</td><td>1.7%</td><td>1.7%</td><td>−0.1</td></tr>
+        </tbody>
+      </table>
+      <p class="mono muted" style="letter-spacing: .06em;">BRIER 0.1647 · KNOWING NOTHING 0.1926 · SKILL +14.5%</p>
+    </div>
+  </div>
+
+  <div class="box warn">
+    <h3>Where it is worst: the top two rToken bands</h3>
+    <p>
+      On rTokens the two highest bands are <strong>conservative by roughly 8.5 points</strong> — the
+      desk said 27.0% and 11.5% where 18.2% and 2.9% happened. It is wrong in the safer direction,
+      warning about moves that turned out to be solid, but it is wrong.
+    </p>
+    <p>
+      Those are the thinnest samples in the whole record: <strong>148 and 68 graded nights</strong>,
+      against 245 and 242 on the perpetual side, where the same bands land within 3.1 points. The
+      likeliest reading is that the rToken table has not yet seen enough large moves to price them,
+      and that the gap narrows as it does. That is a prediction this page will be held to.
     </p>
   </div>
+
   <p>
     Brier score is the mean squared error of those probabilities against what happened; lower is
     better. The benchmark is a desk that quotes the overall base rate and knows nothing else. Skill
-    above zero means the bands carry information the base rate does not. <strong>Had it come out at
-    or below zero, this page would say so and the bands would be gone.</strong>
+    above zero means the bands carry information the base rate does not.
+    <strong>Had skill come out at or below zero, this page would say so and the bands would be gone.</strong>
   </p>
 
   <h2 id="failed">What did not work</h2>
@@ -149,14 +217,14 @@
   <div class="box warn">
     <h3>1. Per-name history. It lost to doing nothing.</h3>
     <p>
-      The first version answered from each name's own record: Micron gives its overnight moves back,
-      Amazon extends them, so quote the name's own survival rate. Measured backwards it looked
+      The first version answered from each name's own record: this one gives its overnight moves back,
+      that one extends them, so quote the name's own survival rate. Measured backwards it looked
       excellent — median kept ran from 35% on one name to 154% on another.
     </p>
     <p>
       Graded walk-forward, it <strong>scored 74.0% where always saying "it stands" scored 81.5%</strong>
-      on the same nights. It was <strong>7.6 points worse than knowing nothing</strong>. Its
-      "unwinds" call was right 31% of the time — worse than a coin flip, so it was actively harmful.
+      on the same nights. It was <strong>7.6 points worse than knowing nothing</strong>. Its "unwinds"
+      call was right 31% of the time — worse than a coin flip, so it was actively harmful.
     </p>
     <p>
       The per-name pattern was real in the past and carried no information about the next night. Only
@@ -168,44 +236,48 @@
     <h3>2. Five other predictors. Four were noise.</h3>
     <p>
       Overnight volume against normal, realised volatility through the night, how early in the night
-      the move arrived, how many dead candles it traded through, and the name's turnover — each was
-      split into quintiles on the training half and tested on data it had never seen.
+      the move arrived, how many dead candles it traded through, and the name's turnover — each split
+      into quintiles on the training half and tested on data it had never seen.
     </p>
     <p>
       <strong>None beat the benchmark.</strong> Only the move-against-normal-day ratio was monotonic
-      on both halves, and only it separated <em>within</em> every raw size bucket — which is what
-      ruled out it being "small moves get erased" wearing a disguise.
+      on both halves, and only it separated <em>within</em> every raw size bucket — which is what ruled
+      out its being "small moves get erased" wearing a disguise.
     </p>
   </div>
 
   <h3>Two findings that survived, and surprised us</h3>
   <ul>
-    <li><strong>Weekend gaps are calmer, not wilder.</strong> 21.3% undone against 25.8% on weeknights, over 333 weekend nights. More unwatched hours did not mean more nonsense.</li>
-    <li><strong>Some of these names have no home market at all.</strong> OPENAI, ANTHROPIC, SHEIN and others are private companies. Nothing ever arrives at a bell to correct them, and their moves are undone just <strong>11.6%</strong> of the time against 27.3% for names with a real listing behind them.</li>
+    <li><strong>Weekend gaps are calmer, not wilder.</strong> 29.4% undone against 34.9% on weeknights for rTokens; 21.3% against 25.8% for perpetuals. More unwatched hours did not mean more nonsense, on either instrument.</li>
+    <li><strong>Some names have no home market at all.</strong> On the perpetual side the universe includes OPENAI, ANTHROPIC and SHEIN — private companies. Nothing ever arrives at a bell to correct them, and their moves are undone just <strong>11.6%</strong> of the time against 27.3% for names with a real listing behind them.</li>
   </ul>
 
   <h2 id="limits">Limits, stated plainly</h2>
   <ul>
-    <li><strong>Ninety days.</strong> 2 July to 18 September 2026. One quarter, one market regime. A different regime may move these numbers.</li>
-    <li><strong>Thirty-nine names</strong>, the most traded of the 335, so the record leans toward liquid ones. The rail covers 40 names; the bands are what the record measured.</li>
-    <li><strong>Not all of them are stocks.</strong> The universe caught commodities, index and leveraged products alongside single names. They are measured the same way, and the ratio treats them on their own terms, but it is worth knowing.</li>
+    <li><strong>About ninety days.</strong> July to September 2026. One quarter, one market regime. A different regime may move these numbers.</li>
+    <li><strong>The busiest names only</strong> — 35 rTokens and 39 perpetuals, taken by turnover, so the record leans liquid. Bitget lists far more.</li>
+    <li><strong>Not all of them are single stocks.</strong> The universes caught index, sector and leveraged products, and on the perpetual side some commodities. They are measured the same way, and the ratio judges each on its own terms, but it is worth knowing.</li>
     <li><strong>One hour.</strong> Survival is read at 10:30 ET. A move undone at 14:00 counts as having stood.</li>
+    <li><strong>The top rToken bands are thin</strong> — 94 nights in the highest band against 281 on the perpetual side. Treat those two rows as the least settled thing on this page.</li>
     <li><strong>Direction is not modelled.</strong> Almanac has no view on which way a price goes, and will not be given one.</li>
     <li><strong>No account, no orders, no advice.</strong> Public market endpoints only. Nothing here is a recommendation to buy or sell anything.</li>
   </ul>
 
   <h2>Where the numbers come from</h2>
   <p>
-    Bitget's public market API: <code>/api/v2/mix/market/contracts</code> for the universe (a name is
-    tokenised when Bitget's own <code>isRwa</code> flag says so, read live rather than kept as a list
-    here), <code>/history-candles</code> at 15 minutes for every night, and <code>/tickers</code> to
-    order the rail. No key, no account, no private data.
+    Bitget's public market API. For rTokens: <code>/api/v2/spot/public/symbols</code> for the universe
+    (a name counts when its base coin is an <code>r</code>-prefixed share), <code>/spot/market/history-candles</code>
+    at 15 minutes for every night, <code>/spot/market/tickers</code> to order the rail. For perpetuals
+    the same three under <code>/api/v2/mix/</code>, with Bitget's own <code>isRwa</code> flag naming
+    the universe. No key, no account, no private data.
   </p>
   <p>
     Qwen writes the answer in the question box and nothing else. It is handed a block of figures the
-    desk computed, told it may not do arithmetic or predict direction, and every number it returns is
-    checked against the ones it was given — if a figure appears that nobody handed it, its answer is
-    discarded and the desk's own wording is served, with a line on the page saying that happened.
+    desk computed — already formatted, so there is nothing to round or convert — told it may not do
+    arithmetic or predict direction, and every number it returns is checked against the ones it was
+    given. If a figure appears that nobody handed it, its answer is discarded, the desk's own wording
+    is served instead, and the page says that is what happened. The same is true when the model times
+    out.
   </p>
   <p class="mono faint" style="letter-spacing: 0.06em; padding-top: 12px;">
     ALL CODE WRITTEN DURING THE BITGET AI BASE CAMP HACKATHON S2 · NO DEPENDENCIES · MIT
