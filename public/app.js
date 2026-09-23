@@ -303,6 +303,45 @@ async function loadLive() {
   $("livebody").innerHTML = head + rows + total;
 }
 
+/**
+ * The company behind the token. Its own request, so a slow data server delays
+ * nothing, and it stays visibly separate from the measured reading.
+ */
+async function loadCompany(symbol) {
+  const el = $("company");
+  const mine = symbol;
+  let d;
+  try { d = await fetch(`/api/company?symbol=${encodeURIComponent(symbol)}&market=${state.market}`).then((x) => x.json()); }
+  catch { el.hidden = true; return; }
+  if (mine !== state.symbol) return;
+
+  const c = d.company;
+  if (!c || (!c.quote && !c.events)) { el.hidden = true; return; }
+
+  const bits = [];
+  if (c.quote && c.quote.last != null) {
+    const ch = c.quote.changePct;
+    bits.push(`<span class="ev"><b>${c.ticker}</b> ${c.quote.last} ${ch == null ? "" :
+      `<span style="color:${ch < 0 ? "var(--crit)" : "var(--good)"}">${sg(ch)}</span>`} in its own session</span>`);
+  }
+  const e = c.events || {};
+  if (e.earnings) {
+    const d0 = e.earnings.days;
+    const when = d0 === 0 ? "today" : d0 > 0 ? `in ${d0} day${d0 === 1 ? "" : "s"}` : `${-d0} day${d0 === -1 ? "" : "s"} ago`;
+    bits.push(`<span class="ev${Math.abs(d0) <= 2 ? " soon" : ""}"><b>${e.earnings.period || "results"}</b> ${e.earnings.expected ? "due" : "reported"} ${when}</span>`);
+  }
+  if (e.exDividend) {
+    const d0 = e.exDividend.days;
+    bits.push(`<span class="ev${Math.abs(d0) <= 2 ? " soon" : ""}"><b>ex-dividend</b> ${d0 === 0 ? "today" : d0 > 0 ? `in ${d0}d` : `${-d0}d ago`}${e.exDividend.amount ? ` · $${e.exDividend.amount}` : ""}</span>`);
+  }
+  if (e.split) bits.push(`<span class="ev soon"><b>split</b> ${e.split.ratio || ""} ${e.split.date}</span>`);
+
+  if (!bits.length) { el.hidden = true; return; }
+  el.hidden = false;
+  el.innerHTML = `<span class="src">the company behind it</span>${bits.join("")}` +
+    `<span class="src">context only · not part of the measurement</span>`;
+}
+
 /* ---------- wiring ---------- */
 
 async function load(symbol, { thenAsk = false } = {}) {
@@ -312,6 +351,7 @@ async function load(symbol, { thenAsk = false } = {}) {
   renderReading(r);
   clock(r);
   if (state.board) renderBoard(state.board);
+  loadCompany(symbol);
   if (thenAsk) ask(`Is ${r.display || clean(r.symbol)} really moving tonight?`, { quiet: true });
 }
 

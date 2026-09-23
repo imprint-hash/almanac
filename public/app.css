@@ -128,6 +128,20 @@ button.chip { cursor: pointer; }
   color: var(--ink); font-family: var(--sans); font-size: 14px;
 }
 
+/* The company behind the token: its own session, and anything dated near
+   tonight. Visibly set apart from the reading, because it is context and not
+   part of what was measured. */
+.company { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.company .src { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); }
+.company .ev {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--line);
+  border-radius: 7px; padding: 5px 10px; color: var(--ink-2);
+}
+.company .ev b { font-weight: 500; color: var(--ink); }
+.company .ev.soon { border-color: rgba(250,178,25,0.34); color: var(--warn); }
+.company .ev.soon b { color: var(--warn); }
+
 .hero-right { width: 330px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; }
 .sparkhead, .sparkfoot { display: flex; align-items: baseline; justify-content: space-between; }
 .sparkfoot { font-size: 10px; color: var(--faint); letter-spacing: 0.06em; }
@@ -221,7 +235,21 @@ svg text { font-family: var(--mono); }
   .toolbar { flex-wrap: wrap; row-gap: 8px; }
   .toggle { font-size: 11.5px; }
   .hero { flex-direction: column; align-items: stretch; padding: 20px; }
-  .hero-right { width: auto; }
+  /* The company behind the token: its own session, and anything dated near
+   tonight. Visibly set apart from the reading, because it is context and not
+   part of what was measured. */
+.company { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.company .src { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); }
+.company .ev {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--line);
+  border-radius: 7px; padding: 5px 10px; color: var(--ink-2);
+}
+.company .ev b { font-weight: 500; color: var(--ink); }
+.company .ev.soon { border-color: rgba(250,178,25,0.34); color: var(--warn); }
+.company .ev.soon b { color: var(--warn); }
+
+.hero-right { width: auto; }
   .verdict { font-size: 22px; max-width: none; }
   .thead { display: none; }
   .row {
