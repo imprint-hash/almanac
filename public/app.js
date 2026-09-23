@@ -23,7 +23,19 @@ const FIRST = "RNVDAUSDT";
 /* Only the newest question may write to the answer box. */
 let askSeq = 0;
 
-let state = { market: "rtoken", symbol: null, board: null, reading: null, hideSmall: true, picked: false };
+/* A reading is worth linking to: /?market=perp&symbol=NVDA opens on that name,
+   in that market, instead of on whatever moved most tonight. */
+const params = new URLSearchParams(location.search);
+const asked = { market: params.get("market"), symbol: (params.get("symbol") || "").toUpperCase() };
+
+let state = {
+  market: asked.market === "perp" ? "perp" : "rtoken",
+  symbol: null,
+  board: null,
+  reading: null,
+  hideSmall: true,
+  picked: Boolean(asked.symbol),
+};
 
 /** The instrument switch. Both markets were measured the same way, so the page
     offers the other one rather than asking anyone to take the first on trust. */
@@ -386,7 +398,7 @@ $("askform").addEventListener("submit", (e) => {
    and carries the bands, the record and the baseline with it — so it paints the
    charts first and the rail fills in behind it. Waiting for the sweep before
    drawing anything made a working page look like a dead one. */
-load(FIRST);
+load(asked.symbol || FIRST);
 loadBoard();
 setInterval(() => { if (state.symbol) load(state.symbol); }, 60_000);
 setInterval(loadBoard, 180_000);
