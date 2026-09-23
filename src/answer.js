@@ -43,7 +43,10 @@ export function facts(reading) {
   const r = reading.reading;
   const s = r?.stat;
   return {
-    symbol: clean(reading.symbol),
+    // The name as the exchange writes it — rIUSB, not RIUSBUSDT. Handed the
+    // raw symbol the model re-spells it, and a desk that cannot get the ticker
+    // right has no business quoting probabilities.
+    symbol: reading.display && reading.display !== reading.symbol ? reading.display : clean(reading.symbol),
     marketOpen: reading.marketOpen,
     hoursSinceClose: n.hoursSinceClose != null ? Number(n.hoursSinceClose.toFixed(1)) : null,
     hoursToBell: n.hoursToBell != null ? Number(n.hoursToBell.toFixed(1)) : null,
