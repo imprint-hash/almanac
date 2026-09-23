@@ -190,17 +190,28 @@ export function prompt(question, f) {
   ];
 }
 
-/** Every percentage in the text must be one we handed the model. */
+/**
+ * Every figure in the answer must be one we handed the model.
+ *
+ * The allowed set is built from the very strings the model was given, so the
+ * check and the prompt can never drift apart. Clock times are removed first:
+ * "10:30" is the hour the outcome is read at, it appears in the desk's own
+ * wording, and an earlier version of this check read the 30 as an invented
+ * statistic and threw away a perfectly good answer.
+ */
 export function numbersAreOurs(text, f) {
-  const allowed = new Set();
-  for (const v of [f.move, f.normalDay, f.undoneInBand, f.undoneAtRandom, f.statedBefore, f.happenedBefore, f.skill]) {
-    if (v == null) continue;
-    for (const d of [0, 1, 2]) allowed.add(Math.abs(100 * v).toFixed(d));
-  }
-  if (f.ratio != null) for (const d of [1, 2]) allowed.add(f.ratio.toFixed(d));
-  for (const v of [f.nightsInBand, f.gradedNights, f.hoursSinceClose, f.hoursToBell]) {
-    if (v != null) allowed.add(String(v));
-  }
-  const found = text.match(/\d+(?:\.\d+)?/g) || [];
-  return found.every((x) => allowed.has(x) || allowed.has(Number(x).toFixed(0)) || Number(x) <= 12);
+  const given = JSON.stringify(forModel(f));
+  const allowed = new Set(given.match(/\d+(?:\.\d+)?/g) || []);
+
+  // The times the method is defined at, and the ordinary furniture of a sentence.
+  for (const t of ["9", "09", "15", "16", "10", "30", "24", "0", "1", "2", "3", "4", "5"]) allowed.add(t);
+
+  const cleaned = text
+    .replace(/\d{1,2}:\d{2}/g, " ")      // clock times
+    .replace(/\b(19|20)\d{2}\b/g, " ");  // years
+
+  const found = cleaned.match(/\d+(?:\.\d+)?/g) || [];
+  return found.every(
+    (x) => allowed.has(x) || allowed.has(String(Number(x))) || allowed.has(Number(x).toFixed(0)),
+  );
 }
