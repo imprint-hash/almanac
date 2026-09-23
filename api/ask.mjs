@@ -28,7 +28,7 @@ const ENDPOINT =
  * qwen3.8-max reasons before replying, which costs about thirteen seconds and
  * often more. One retry only if there is real time for it.
  */
-const BUDGET_MS = Number(process.env.QWEN_BUDGET_MS || 45_000);
+const BUDGET_MS = Number(process.env.QWEN_BUDGET_MS || 24_000);
 
 async function viaQwen(messages, deadline) {
   let last;
@@ -39,8 +39,19 @@ async function viaQwen(messages, deadline) {
       const res = await fetch(ENDPOINT, {
         method: "POST",
         headers: { authorization: `Bearer ${KEY}`, "content-type": "application/json" },
-        body: JSON.stringify({ model: MODEL, messages, temperature: 0.2, max_tokens: 260 }),
-        signal: AbortSignal.timeout(Math.min(left, 16_000)),
+        body: JSON.stringify({
+          model: MODEL,
+          messages,
+          temperature: 0.2,
+          max_tokens: 260,
+          // qwen3.8-max reasons before answering, and on a prompt this
+          // prescriptive it reasons without stopping — measured at over sixty
+          // seconds against five with this off. There is nothing here for it to
+          // work out anyway: the desk has already done the arithmetic and the
+          // model's whole job is to say the figures in a sentence.
+          enable_thinking: false,
+        }),
+        signal: AbortSignal.timeout(Math.min(left, 12_000)),
       });
       if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 120)}`);
       const body = await res.json();
