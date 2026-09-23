@@ -67,47 +67,61 @@ export function facts(reading) {
   };
 }
 
-/** The desk's own answer, composed from the figures. Always available. */
+/**
+ * The desk's own answer, composed from the figures. Always available.
+ *
+ * This is not a fallback in any small sense: the model is slow and often times
+ * out, so this is what most people read most of the time. It gets the same care
+ * — plain words, the meaning before the number, and no term left standing that
+ * a person who does not trade for a living would have to look up.
+ */
 export function compose(f) {
-  const bits = [];
-
   if (f.move == null) {
-    return "I could not read a reference close for this name, so I am not going to give you a number.";
+    return "I could not find a closing price to measure against, so I am not going to give you a number.";
   }
+
+  const dir = f.move < 0 ? "down" : "up";
+  const size = Math.abs(100 * f.move).toFixed(2);
 
   if (Math.abs(f.move) < 0.005) {
-    bits.push(`${f.symbol} has moved ${sg(f.move)} since the close. That is under half a percent — inside the spread, and not worth a reading.`);
-    return bits.join(" ");
+    return `${f.symbol} is ${dir} ${size}% since the market closed. That is less than half a percent — small enough that it is just the normal jitter of trading, and not worth reading anything into.`;
   }
 
-  bits.push(
-    `${f.symbol} has moved ${sg(f.move)} since the close, and it covers ${pc(f.normalDay, 2)} in an ordinary session — so tonight is ${f.ratio.toFixed(2)}× a normal day for it.`,
-  );
+  const bits = [`${f.symbol} is ${dir} ${size}% since the market closed.`];
+
+  // What it means for this name comes first. The same 3% is nothing on a jumpy
+  // name and serious on a calm one, and that is the whole point of the desk.
+  bits.push(`For this one that is ${plainRatio(f.ratio)}.`);
 
   if (f.undoneInBand != null) {
+    const undone = Math.round(f.undoneInBand * f.nightsInBand);
     bits.push(
-      `In that band, ${pc(f.undoneInBand)} of ${f.nightsInBand} measured nights were undone by 10:30, against ${pc(f.undoneAtRandom)} for a night picked at random.`,
+      `Looking back, moves about this big on names like this happened ${f.nightsInBand} times — and on ${undone} of them the price drifted back to roughly where it started within an hour of the US market reopening.`,
     );
-    const ratio = f.undoneInBand / f.undoneAtRandom;
-    if (ratio >= 1.4) bits.push("That is a good deal riskier than usual. I would wait for the bell.");
-    else if (ratio <= 0.6) bits.push("That is a good deal safer than usual. Moves like this have tended to stand.");
-    else bits.push("That is about ordinary.");
+    bits.push(
+      `That is ${pc(f.undoneInBand)}, against ${pc(f.undoneAtRandom)} for an ordinary night, so this one is ${plainCompare(f.undoneInBand, f.undoneAtRandom)}.`,
+    );
   } else {
-    bits.push("I do not have enough measured nights in that band to quote you a number, so I will not.");
+    bits.push("I have not measured enough nights like this one to put a number on it, so I will not pretend I can.");
   }
 
   if (f.noHomeMarket) {
-    bits.push("Worth knowing: this name has no home market. No bell ever arrives to settle it, so its moves are rarely corrected by anything.");
+    bits.push(
+      "One thing worth knowing: this name has no stock market behind it — it is a private company. No opening bell ever arrives to correct its price.",
+    );
   }
 
   if (f.statedBefore != null) {
     const gap = f.happenedBefore - f.statedBefore;
+    const off = Math.abs(100 * gap);
     bits.push(
-      `On this band I have said ${pc(f.statedBefore)} before and ${pc(f.happenedBefore)} actually happened — I run about ${Math.abs(100 * gap).toFixed(0)} point${Math.abs(100 * gap) >= 1.5 ? "s" : ""} ${gap > 0 ? "optimistic" : "pessimistic"} here.`,
+      off < 2
+        ? `On nights like this I have been about right before: I expected ${pc(f.statedBefore)} to drift back, and ${pc(f.happenedBefore)} did.`
+        : `Be aware I lean ${gap > 0 ? "hopeful" : "gloomy"} on nights like this: I expected ${pc(f.statedBefore)} to drift back and ${pc(f.happenedBefore)} actually did, so I am out by about ${off.toFixed(0)} points here.`,
     );
   }
 
-  bits.push("I have no read on direction, and I will not pretend to.");
+  bits.push("What I cannot tell you is which way it goes from here. Nothing I measure says that.");
   return bits.join(" ");
 }
 
@@ -124,6 +138,23 @@ export function compose(f) {
  * sent "down 1.61%" it can only repeat it. Formatting is the desk's job, and
  * doing it here also means the check afterwards is comparing like with like.
  */
+/** The ratio, said the way someone would say it out loud. */
+function plainRatio(r) {
+  if (r >= 2) return `much bigger than usual — over ${Math.floor(r)} times what it normally covers in a whole day`;
+  if (r >= 1.3) return "bigger than a whole ordinary day of movement for it";
+  if (r >= 0.8) return "about as much as it normally covers in a whole day";
+  if (r >= 0.5) return "about half of what it normally covers in a day";
+  if (r >= 0.3) return "a third or so of a normal day for it — fairly small";
+  return "small for this name — well under a third of what it normally covers in a day";
+}
+
+function plainCompare(mine, base) {
+  const x = mine / base;
+  if (x >= 1.4) return "noticeably more likely to come back than usual";
+  if (x <= 0.6) return "much less likely to come back than usual";
+  return "about as likely as usual";
+}
+
 export function forModel(f) {
   const tooSmall = f.move != null && Math.abs(f.move) < 0.005;
 
@@ -135,7 +166,7 @@ export function forModel(f) {
       f.move == null ? null : `${f.move < 0 ? "down" : "up"} ${Math.abs(100 * f.move).toFixed(2)}%`,
     "what this name covers in an ordinary session":
       f.normalDay == null ? null : `${(100 * f.normalDay).toFixed(2)}%`,
-    "so tonight's move is worth": f.ratio == null ? null : `${f.ratio.toFixed(2)} times a normal day for it`,
+    "how unusual that is for this name": f.ratio == null ? null : plainRatio(f.ratio),
     "the state of its home market": f.marketOpen
       ? "open, so this price is being set by a real exchange"
       : `shut, and has been for ${f.hoursSinceClose} hours`,
@@ -145,9 +176,11 @@ export function forModel(f) {
     d["whether this is worth reading at all"] =
       "no — it is under half a percent, which is inside the spread. Say that, and do not quote any other figure.";
   } else if (f.undoneInBand != null) {
-    d["how often moves this size, for a name like this, were undone by 10:30"] = `${(100 * f.undoneInBand).toFixed(1)}%`;
-    d["how many measured nights that is based on"] = f.nightsInBand;
-    d["how often a night picked at random is undone"] = `${(100 * f.undoneAtRandom).toFixed(1)}%`;
+    const undone = Math.round(f.undoneInBand * f.nightsInBand);
+    d["what happened to moves like this before"] =
+      `on ${undone} of ${f.nightsInBand} nights the price came back to roughly where it started within an hour of the US market reopening — that is ${(100 * f.undoneInBand).toFixed(1)}%`;
+    d["how that compares with an ordinary night"] =
+      `${(100 * f.undoneAtRandom).toFixed(1)}% of all nights come back like that, so this is ${plainCompare(f.undoneInBand, f.undoneAtRandom)}`;
   } else {
     d["what history says about a move this size"] =
       "not enough measured nights to quote a figure. Say so plainly.";
@@ -159,8 +192,8 @@ export function forModel(f) {
   }
 
   if (!tooSmall && f.statedBefore != null) {
-    d["what the desk has said before about moves like this"] = `${(100 * f.statedBefore).toFixed(1)}%`;
-    d["what actually happened those times"] = `${(100 * f.happenedBefore).toFixed(1)}%`;
+    d["how well the desk has judged this kind of night before"] =
+      `it expected ${(100 * f.statedBefore).toFixed(1)}% of them to come back and ${(100 * f.happenedBefore).toFixed(1)}% did`;
   }
 
   for (const k of Object.keys(d)) if (d[k] == null) delete d[k];
@@ -175,6 +208,16 @@ export function prompt(question, f) {
         "You are Almanac, a research desk for tokenised US stocks on Bitget. Someone may be reading you at " +
         "three in the morning, frightened about a position. Be calm, plain and brief.\n\n" +
         "Answer in AT MOST four short sentences. No preamble, no bullet points, no headings.\n\n" +
+        "Write for someone who does not trade for a living.\n\n" +
+        "Your FIRST sentence must say how unusual tonight's move is for this particular name, using " +
+        "the FACTS block's own words for it. That is the whole point of the desk: the same 3% is " +
+        "nothing on a jumpy name and serious on a calm one. Only after that give what happened to " +
+        "moves like it before.\n\n" +
+        "Lead with what it MEANS, then the number " +
+        "behind it. Never leave a piece of jargon unexplained: not 'undone', not 'ratio', not " +
+        "'0.42x', not a bare clock time. If you mention how often something happened, say it as a " +
+        "count of nights as well as a percentage. The FACTS block already spells these out in plain " +
+        "words — use its wording rather than compressing it back into shorthand.\n\n" +
         "Hard rules:\n" +
         "- Every figure you use must be copied VERBATIM from the FACTS block, exactly as written there. " +
         "Never convert, recompute, re-round or invent one, and never write a bare decimal as if it were a price.\n" +
