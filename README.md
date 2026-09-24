@@ -112,6 +112,11 @@ next to the things it beat.
    81.5%** — 7.6 points worse than knowing nothing. Its "unwinds" call was right 31% of the time.
 2. **Five other predictors, four were noise.** Overnight volume, realised volatility, how early the
    move arrived, dead candles, turnover. None beat the benchmark out of sample.
+3. **Earnings nights — tested, and we cannot tell.** Every night was tagged with whether a real
+   dated earnings disclosure landed in it. Raw it looks like a finding (8.7% undone against 27.1%
+   on perpetuals) but earnings nights carry bigger moves, and compared *within* each band it
+   collapses: **p = 0.59 on rTokens**, 0.056 on perpetuals with 23 nights and two undone. The two
+   instruments disagree, so it stays out of the odds and on the page as context only.
 
 Two findings that survived and surprised us: **weekend gaps are calmer, not wilder**, on both
 instruments; and names with **no home market at all** — OPENAI, ANTHROPIC, SHEIN — are undone just

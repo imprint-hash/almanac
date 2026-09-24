@@ -225,8 +225,8 @@
 
   <h2 id="failed">What did not work</h2>
   <p>
-    Two approaches were built and measured before this one. Both are here because a method is only
-    worth reading next to the things it beat.
+    Three things were built and measured and did not earn their place. They are here because a method
+    is only worth reading next to the things it beat.
   </p>
 
   <div class="box warn">
@@ -258,6 +258,33 @@
       <strong>None beat the benchmark.</strong> Only the move-against-normal-day ratio was monotonic
       on both halves, and only it separated <em>within</em> every raw size bucket — which is what ruled
       out its being "small moves get erased" wearing a disguise.
+    </p>
+  </div>
+
+  <div class="box warn">
+    <h3>3. Earnings nights. Tested, and we cannot tell.</h3>
+    <p>
+      The obvious explanation for a real overnight move is that the company reported. Bitget's data
+      server carries the earnings calendar, so every measured night was tagged with whether a
+      disclosure actually landed in those dark hours — the real dated report, never the forecast
+      date, which would put a result on a night it may never have happened on.
+    </p>
+    <p>
+      Raw, it looks like a finding: on the perpetual side earnings nights were undone
+      <strong>8.7%</strong> of the time against 27.1% for ordinary nights. But earnings nights carry
+      bigger moves — median ratio 0.60 against 0.49 — and bigger moves already survive more often, so
+      the comparison has to be made <em>inside</em> each band.
+    </p>
+    <p>
+      Done that way it falls apart. On rTokens, <strong>Fisher's exact test gives p = 0.59</strong> —
+      no evidence of any difference, and in the 0.8–1.3 band earnings nights were undone
+      <em>more</em> often. On perpetuals p = 0.056, which is borderline on <strong>23 nights with
+      two undone</strong>: one different outcome would move it either way.
+    </p>
+    <p>
+      <strong>And the two instruments disagree.</strong> Everything else here had to replicate on
+      both before it was believed; this does not, so it is not believed. The earnings date stays on
+      the page as context a reader can weigh, and stays out of the odds.
     </p>
   </div>
 
