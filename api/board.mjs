@@ -23,7 +23,10 @@ export default async function handler(req, res) {
       hit = { at: Date.now(), result };
       cache.set(m.id, hit);
     }
-    res.setHeader("cache-control", "public, max-age=60, stale-while-revalidate=240");
+    // s-maxage lets Vercel's edge hold the sweep, so a visitor almost never waits
+    // for forty names to be asked; a slightly old board is served while a new
+    // one is fetched behind it.
+    res.setHeader("cache-control", "public, max-age=60, s-maxage=120, stale-while-revalidate=900");
     res.status(200).json({
       market: m.id, label: m.label, markets,
       at: hit.at, asked: hit.result.asked, answered: hit.result.answered, rows: hit.result.rows,
