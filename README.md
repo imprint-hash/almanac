@@ -54,6 +54,27 @@ That last row is why, on this site, **code sets every number and the model only 
 4. **The report card.** What Almanac said before each bell against what happened, on the front page.
 5. **Light and dark**, and it works on a phone.
 
+## A research task, from question to decision
+
+Asked on the live site on **8 Oct 2026**, the day chip stocks fell:
+
+1. **The question.** *"rNVDA is down 3.1%. Is that move real, or will it be gone by the open?"*
+2. **Size it for this stock.** Almanac divides the move by what rNVDA covers on a normal day
+   (1.84%): **1.71×**. That puts it in the top band, "more than this name moves in a day".
+3. **Count what happened before.** Moves in that band were undone by 10:30 in **7 of 94 nights
+   (7.4%)**. A night picked at random is undone **33.9%** of the time.
+4. **Check the record.** In that band Almanac had said 11.5% before each bell and 2.9% happened
+   (68 nights called in advance), so if anything it is cautious there.
+5. **Look around it.** Bitget's MCP data: no earnings, dividend or split near the date. bitget-signal:
+   Bitcoin leaning down on the 4-hour chart, so the whole room was falling. Context only.
+6. **Ask in plain words.** Qwen, on Bitget's endpoint, puts it in a sentence: *"On 7 of 94 nights
+   the price came back … that is 7.4%. That compares with 33.9% of all nights."* Every number is
+   checked against the desk.
+7. **The insight a human acts on.** This move is very unlikely to be a fake-out. Selling now to
+   "buy back after the bounce" bets on something that happened 7 times in 94. Almanac does not say
+   which way the price goes next, and it does not tell anyone to buy or sell: the decision stays
+   with the person.
+
 ## Built on Bitget Agent Hub
 
 | Piece | What Almanac uses it for |
