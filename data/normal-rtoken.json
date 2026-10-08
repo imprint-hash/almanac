@@ -173,5 +173,166 @@
   "turnover": 2399100791.655366,
   "display": "rIVV",
   "asOf": "2026-10-08T14:29:39.526Z"
+ },
+ "RMUUSDT": {
+  "normalDay": 0.03224462323380622,
+  "sessions": 19,
+  "turnover": 15455481838.589565,
+  "display": "rMU",
+  "asOf": "2026-09-23T12:54:53.768Z"
+ },
+ "RNVDAUSDT": {
+  "normalDay": 0.017714838896478666,
+  "sessions": 17,
+  "turnover": 9946526863.626923,
+  "display": "rNVDA",
+  "asOf": "2026-09-23T12:55:01.432Z"
+ },
+ "RSNDKUSDT": {
+  "normalDay": 0.047936702660812666,
+  "sessions": 19,
+  "turnover": 8403326992.302731,
+  "display": "rSNDK",
+  "asOf": "2026-09-23T12:55:03.786Z"
+ },
+ "RAAPLUSDT": {
+  "normalDay": 0.01942098600845912,
+  "sessions": 21,
+  "turnover": 5077879307.76884,
+  "display": "rAAPL",
+  "asOf": "2026-09-23T12:55:09.730Z"
+ },
+ "RIUSBUSDT": {
+  "normalDay": 0.0022625533738877546,
+  "sessions": 18,
+  "turnover": 4101708196.1990743,
+  "display": "rIUSB",
+  "asOf": "2026-09-23T12:55:15.259Z"
+ },
+ "RMBBUSDT": {
+  "normalDay": 0.003829864987246789,
+  "sessions": 18,
+  "turnover": 4171350602.0278172,
+  "display": "rMBB",
+  "asOf": "2026-09-23T12:55:15.693Z"
+ },
+ "RSPCXUSDT": {
+  "normalDay": 0.04198326121231749,
+  "sessions": 17,
+  "turnover": 4519501342.253697,
+  "display": "rSPCX",
+  "asOf": "2026-09-23T12:55:16.659Z"
+ },
+ "RMTUMUSDT": {
+  "normalDay": 0.012824076846620559,
+  "sessions": 18,
+  "turnover": 3398278019.4402065,
+  "display": "rMTUM",
+  "asOf": "2026-09-23T12:55:19.329Z"
+ },
+ "RMSFTUSDT": {
+  "normalDay": 0.01751282269440071,
+  "sessions": 23,
+  "turnover": 4463489596.487014,
+  "display": "rMSFT",
+  "asOf": "2026-09-23T12:55:19.364Z"
+ },
+ "RIEMGUSDT": {
+  "normalDay": 0.009491931070729466,
+  "sessions": 43,
+  "turnover": 3688378663.7150197,
+  "display": "rIEMG",
+  "asOf": "2026-09-23T12:55:22.280Z"
+ },
+ "RDELLUSDT": {
+  "normalDay": 0.04826511262569902,
+  "sessions": 24,
+  "turnover": 3491595201.942841,
+  "display": "rDELL",
+  "asOf": "2026-09-23T12:55:24.181Z"
+ },
+ "RXLFUSDT": {
+  "normalDay": 0.01119706581135808,
+  "sessions": 18,
+  "turnover": 2658952197.4228115,
+  "display": "rXLF",
+  "asOf": "2026-09-23T12:55:25.472Z"
+ },
+ "RMRVLUSDT": {
+  "normalDay": 0.04288116453257629,
+  "sessions": 21,
+  "turnover": 2644018405.2592344,
+  "display": "rMRVL",
+  "asOf": "2026-09-23T12:55:31.607Z"
+ },
+ "RORCLUSDT": {
+  "normalDay": 0.03674914072731475,
+  "sessions": 22,
+  "turnover": 2564928975.2262664,
+  "display": "rORCL",
+  "asOf": "2026-09-23T12:55:32.701Z"
+ },
+ "RJPMUSDT": {
+  "normalDay": 0.021740682308933383,
+  "sessions": 27,
+  "turnover": 2505868462.3803167,
+  "display": "rJPM",
+  "asOf": "2026-09-23T12:55:35.042Z"
+ },
+ "RVUSDT": {
+  "normalDay": 0.011137745055515997,
+  "sessions": 28,
+  "turnover": 2546051665.98244,
+  "display": "rV",
+  "asOf": "2026-09-23T12:55:35.525Z"
+ },
+ "RWBDUSDT": {
+  "normalDay": 0.011178208139687259,
+  "sessions": 35,
+  "turnover": 2442230051.8473806,
+  "display": "rWBD",
+  "asOf": "2026-09-23T12:55:38.989Z"
+ },
+ "RCSCOUSDT": {
+  "normalDay": 0.023632243680070643,
+  "sessions": 26,
+  "turnover": 2419431146.1069236,
+  "display": "rCSCO",
+  "asOf": "2026-09-23T12:55:39.334Z"
+ },
+ "REWYUSDT": {
+  "normalDay": 0.021013493923409444,
+  "sessions": 24,
+  "turnover": 2405633880.940041,
+  "display": "rEWY",
+  "asOf": "2026-09-23T12:55:42.118Z"
+ },
+ "RPANWUSDT": {
+  "normalDay": 0.042739845288396305,
+  "sessions": 26,
+  "turnover": 2394238352.6532373,
+  "display": "rPANW",
+  "asOf": "2026-09-23T12:55:43.639Z"
+ },
+ "RMSTRUSDT": {
+  "normalDay": 0.052552545242721446,
+  "sessions": 17,
+  "turnover": 2150014483.541362,
+  "display": "rMSTR",
+  "asOf": "2026-09-23T12:55:48.146Z"
+ },
+ "RCRMUSDT": {
+  "normalDay": 0.028865055544533072,
+  "sessions": 25,
+  "turnover": 2164805645.3963685,
+  "display": "rCRM",
+  "asOf": "2026-09-23T12:55:48.614Z"
+ },
+ "RVLOUSDT": {
+  "normalDay": 0.045535000351206265,
+  "sessions": 30,
+  "turnover": 1955870152.8261025,
+  "display": "rVLO",
+  "asOf": "2026-09-23T12:55:54.643Z"
  }
 }

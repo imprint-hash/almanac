@@ -7,7 +7,7 @@
  *   node bin/refresh-normal.mjs rtoken
  *   node bin/refresh-normal.mjs perp
  */
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { candles, universe, turnover, market } from "../src/bitget.js";
 import { sessionRanges, normalDay, NORMAL_DAY_SESSIONS } from "../src/night.js";
 import { currentDarkHours } from "../src/session.js";
@@ -27,13 +27,27 @@ console.log(`${m.label}: ${Object.keys(names).length} listed, taking the ${picke
 
 const reopens = currentDarkHours().reopens;
 const out = {};
+const file = new URL(`../data/normal-${marketId}.json`, import.meta.url);
+const before = existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : {};
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const queue = [...picked];
 const worker = async () => {
   while (queue.length) {
     const sym = queue.shift();
     const label = (names[sym].display || sym).padEnd(10);
     try {
-      const rows = await candles(sym, { pages: 12, marketId });
+      // Twelve pages per name is a lot of requests, and Bitget answers a burst
+      // with 429. A name that is refused is tried again after a pause.
+      let rows;
+      for (let attempt = 0; ; attempt++) {
+        try {
+          rows = await candles(sym, { pages: 12, marketId });
+          break;
+        } catch (e) {
+          if (!/429/.test(e.message) || attempt >= 3) throw e;
+          await wait(4000 * (attempt + 1));
+        }
+      }
       const ranges = sessionRanges(rows);
       const n = normalDay(rows, reopens, ranges);
       if (n > 0) {
@@ -49,11 +63,14 @@ const worker = async () => {
         process.stdout.write(`  ${label} skipped — fewer than ${NORMAL_DAY_SESSIONS} sessions\n`);
       }
     } catch (e) {
-      process.stdout.write(`  ${label} failed — ${e.message}\n`);
+      // Keep the last good figure rather than dropping the name. The desk
+      // already refuses a figure older than STALE_DAYS, so it cannot linger.
+      if (before[sym]) out[sym] = before[sym];
+      process.stdout.write(`  ${label} failed — ${e.message}${before[sym] ? " (kept the figure from " + before[sym].asOf.slice(0, 10) + ")" : ""}\n`);
     }
   }
 };
-await Promise.all(Array.from({ length: 5 }, worker));
+await Promise.all(Array.from({ length: 2 }, worker));
 
-writeFileSync(new URL(`../data/normal-${marketId}.json`, import.meta.url), JSON.stringify(out, null, 1));
+writeFileSync(file, JSON.stringify(out, null, 1));
 console.log(`\n${Object.keys(out).length} of ${picked.length} names have a normal day, as of ${reopens}`);
