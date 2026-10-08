@@ -175,6 +175,7 @@ h1 span { color: var(--accent); }
 .hot li button { all: unset; cursor: pointer; font-weight: 600; }
 .hot li button:focus-visible { outline: 2px solid var(--accent); }
 .hot .n { color: var(--muted); font-variant-numeric: tabular-nums; }
+.hot li.muted { display: block; }
 .rc { display: grid; grid-template-columns: auto 1fr 1fr; gap: 7px 14px; font-size: 14px; margin: 10px 0 8px; }
 .rc .h { font-size: 12px; color: var(--muted); font-weight: 600; }
 .rc .n { font-weight: 700; font-variant-numeric: tabular-nums; }

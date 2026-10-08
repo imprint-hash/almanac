@@ -1,49 +1,86 @@
 # Almanac
 
-**You woke up, it moved, and the market is shut. Almanac tells you how often moves like that turned out to be real.**
+**A stock token moved while New York was shut. Will the move still be there at 10:30? Almanac counts
+how often moves like it were undone, on Bitget's own data.**
 
-Built for the [Bitget AI Base Camp Hackathon S2](https://bitget-ai.gitbook.io/bitgetai_hackathons2) ·
-Track 3, **AI Trading Desk** · sub-theme **Review & Self-Evolution**.
+- **Live:** https://almanac-pearl.vercel.app
+- **For agents:** `claude mcp add --transport http almanac https://almanac-pearl.vercel.app/api/mcp`
+- Built for the [Bitget AI Base Camp Hackathon S2](https://bitget-ai.gitbook.io/bitgetai_hackathons2) ·
+  Track 3, **AI Trading Desk** · sub-themes **Review & Self-Evolution** and **Personalized Research Workbench**
 
 ---
 
-## What it does
+## The problem
 
-You open it at 3am. It has already checked about forty tokenised stocks on Bitget — where each one is
-trading now against where its real market closed last night — and ranked them by the only thing that
-turned out to matter: **is this a big move for this particular name?**
+Bitget lists thousands of tokenised US shares that trade around the clock. Their home markets are
+open **32.5 hours of every 168**, so for about four fifths of the week these tokens move with nothing
+real setting the price.
 
-Click one, or just ask it:
+You wake at 3 a.m. and a token you hold is down 4%. The market is shut and there is no news you can
+find. Sell, and half the time it bounces back by the open. Sit still, and half the time it was real.
+Nothing on a normal trading screen tells you which, and an AI chatbot will happily guess.
 
-> **rSOXL is down 2.32%.** That is 0.42× a normal day for it.
-> Moves that size, on names like this, were **undone by 10:30 in 40.1% of 337 nights** measured.
-> A night picked at random is undone 33.9% of the time.
-> So: slightly worse than ordinary, and no, I cannot tell you which way it goes next.
+## The solution
 
-That is the whole product. One question — *will this move still be there when the market opens?* —
-answered with a count of what actually happened, never with an opinion.
+Almanac reads every Bitget stock token while New York is shut and answers one question for each,
+like an odds board: **Stands 93% · Undone 7%**. Every number is a count of measured nights, never
+an opinion.
 
-**And it shows its own report card.** Every night for three months it made that same call before
-knowing the answer, then checked itself at the bell. When it says one in five, it has been one in
-five, within two points on most bands. The chart is on the front page, not buried.
+> **rLLY −5.04%.** That is 2.04× what rLLY covers on a normal day.
+> Moves like this were **undone by 10:30 in 7 of 94 nights** measured.
+> A night picked at random is undone 34% of the time.
+> Almanac never says which way it goes next.
+
+**What 926 calls made before the bell taught us:**
+
+| | |
+|---|---|
+| **Big moves almost always stand** | Of moves over 1.3× a stock's normal day, **2 of 68** were undone by the bell |
+| **Small moves are a coin flip** | Of moves under 0.3× a normal day, **54%** were undone |
+| **A simple rule beat the AI** | On 120 past nights, half real and half fake-outs, the size rule called **69%** right. Qwen, given the same facts, called **53%**. A coin gets 50% |
+
+That last row is why, on this site, **code sets every number and the model only explains it.**
+
+### What you see
+
+1. **Tonight's odds board.** Every stock token moving while New York is shut, ranked by how unusual
+   the move is *for that stock*, each with its odds and a plain label: *usually stands*, *shaky*,
+   *coin flip*.
+2. **One token in full.** The odds, the price path since the close, the company's calendar from
+   Bitget's market data (earnings, dividends, splits), and the crypto market's mood from
+   **bitget-signal**.
+3. **Ask in plain words.** "Is rNVDA's move real?" Almanac answers in a second; Qwen on Bitget's
+   endpoint then rewrites it, and every number it uses is checked against the desk's.
+4. **The report card.** What Almanac said before each bell against what happened, on the front page.
+5. **Light and dark**, and it works on a phone.
+
+## Built on Bitget Agent Hub
+
+| Piece | What Almanac uses it for |
+|---|---|
+| **Bitget public market API** | Every price, candle and night measured: 1,237 rToken nights and 1,659 perpetual nights |
+| **Bitget MCP server** (`agent.bitget.com/mcp`) | The real US share behind a token, its earnings calendar, dividends and splits |
+| **bitget-signal** (Agent Hub's keyless signal server) | Bitcoin's 4-hour read (trend, RSI) as the crypto mood tokens trade beside overnight. Called over MCP, the same way an agent calls it |
+| **Qwen on Bitget's hackathon endpoint** | Turns the desk's figures into a sentence. Never sets a number |
+| **Almanac's own MCP server** (`/api/mcp`) | Gives any agent the measured odds: `tonight_moves`, `move_odds`, `report_card` |
+| **Almanac skill** ([`skill/almanac/SKILL.md`](skill/almanac/SKILL.md)) | Teaches Claude Code or OpenClaw when to call Almanac next to Bitget's own Agent Hub skills |
+
+Agent Hub gives an agent Bitget's prices and trading tools. What it could not give is a measured
+answer to *"will this night move hold?"* Almanac adds that answer as one more tool.
+
+```bash
+claude mcp add --transport http almanac https://almanac-pearl.vercel.app/api/mcp
+# then ask your agent: "rNVDA is down 3.4% overnight, will it hold?"
+```
 
 ## What it refuses to do
 
 - **It does not predict direction.** It has no edge there and says so, every time.
 - **It does not trade.** No account, no keys, no orders. It cannot touch anyone's money.
 - **It does not advise.** Never buy, never sell, never hold.
-- **It goes quiet when it knows nothing.** Under half a percent: *"inside the noise, not worth a reading."*
+- **It goes quiet when it knows nothing.** Under half a percent: *"inside the noise."*
 
 ---
-
-## The problem
-
-Bitget lists thousands of tokenised shares. Their home markets are open **32.5 hours of every 168**,
-so for about four fifths of the week these things trade with nothing real setting the price.
-
-You wake at 3am and your position is down 4%. There is no news you can find, and the market is shut.
-Sell and half the time it bounces back by morning; sit still and half the time it was real. Nothing
-on your screen can tell you which.
 
 ## The finding
 
@@ -79,8 +116,8 @@ one click away, not asked to take our word.
 **Two records, and they are not the same thing.** The big one is a *replay*: ninety days of real
 nights re-run in order, the desk seeing only what had already happened at each step. It tests whether
 the odds are true, but every call in it was made after the fact. The second is *live*: each weekday
-before the bell a GitHub Action locks tonight's calls into `data/live/`, and settles them after the
-open. Those files carry a git timestamp, so nothing can be written in afterwards. It is a small
+before the bell a GitHub Action refreshes each name's normal day, locks tonight's calls into
+`data/live/`, and settles them after the open. Those files carry a git timestamp, so nothing can be written in afterwards. It is a small
 record and it will stay small — four nights is four nights — but it is the honest kind.
 
 Every night in the replay is taken in order. At each one the desk sees only the nights that had already
@@ -122,7 +159,7 @@ Two findings that survived and surprised us: **weekend gaps are calmer, not wild
 instruments; and names with **no home market at all** — OPENAI, ANTHROPIC, SHEIN — are undone just
 11.6% of the time, because no bell ever arrives to settle them.
 
-## The company behind the token
+## The company behind the token, and the crypto mood beside it
 
 Almanac measures the token. That leaves an obvious hole: it can say a move was
 unusual for that name, but never why. **Bitget's `bitget-mcp-server`** — free,
@@ -176,9 +213,10 @@ Node 20+. **No dependencies.**
 | `src/measure.js` | The bands, and the reading |
 | `src/grade.js` | The walk-forward replay and the calibration scorecard |
 | `src/answer.js` | The facts the model may use, and the check on what it returns |
-| `src/mcp.js` | A small MCP client for Bitget's read-only data server |
+| `src/mcp.js` | A small MCP client, used for Bitget's data server and bitget-signal |
 | `src/underlying.js` | The real share, its earnings calendar, its corporate actions |
-| `api/` | `board`, `reading`, `ask`, `company`, `live` |
+| `api/` | `board`, `reading`, `ask`, `company`, `mood`, `live`, and `mcp` (Almanac's own MCP server) |
+| `skill/almanac/SKILL.md` | The agent skill |
 | `data/nights-*.json` | Every measured night, both instruments |
 
 ## Limits

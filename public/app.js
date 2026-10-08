@@ -37,7 +37,8 @@ $("theme").addEventListener("click", () => {
 // "likely stands" about a band the reading calls shaky.
 function callFor(undone) {
   if (undone == null) return { text: "Not enough nights", cls: "dim" };
-  if (undone <= 0.2) return { text: "Likely stands", cls: "good" };
+  if (undone <= 0.1) return { text: "Almost always stands", cls: "good" };
+  if (undone <= 0.3) return { text: "Usually stands", cls: "good" };
   if (undone <= 0.42) return { text: "Shaky", cls: "acc" };
   return { text: "Coin flip", cls: "warn" };
 }
@@ -144,10 +145,18 @@ function renderReading(d) {
   const name = d.display || d.symbol;
   const up = (n.move ?? 0) > 0;
   $("f-tk").outerHTML = face(name).replace('class="tk"', 'class="tk" id="f-tk"');
-  $("f-meta").textContent = `Bitget ${state.market === "perp" ? "stock perpetual" : "stock token"} · ${n.isWeekend ? "weekend" : "overnight"} move · since the ${n.session || ""} close`;
+  $("f-meta").textContent = `Bitget ${state.market === "perp" ? "stock perpetual" : "stock token"} · since the ${n.session || ""} close` +
+    (d.marketOpen ? " · New York is open now" : ` · ${n.isWeekend ? "weekend" : "overnight"} move`);
+  // While New York is open the token tracks the real market, so the move since
+  // the close is no longer a night move and is not titled as one.
   $("f-title").innerHTML = n.move == null
     ? `${esc(name)}: no move measured yet`
-    : `${esc(name)} <span class="${up ? "up" : "dn"}">${sg(n.move)}</span> ${d.marketOpen ? "while New York slept." : "overnight."} ${d.marketOpen ? "Did it hold?" : "Still there at 10:30?"}`;
+    : d.marketOpen
+      ? `${esc(name)} <span class="${up ? "up" : "dn"}">${sg(n.move)}</span> since the last close.`
+      : `${esc(name)} <span class="${up ? "up" : "dn"}">${sg(n.move)}</span> while New York sleeps. Still there at 10:30?`;
+  const openNote = d.marketOpen
+    ? "New York is open, so this price is the real market. The odds are for moves made while it is shut; tonight's start at the 16:00 close. "
+    : "";
 
   if (s?.n) {
     const undoneN = Math.round(s.undonePct * s.n);
@@ -155,18 +164,18 @@ function renderReading(d) {
     $("o-undo").textContent = pc(s.undonePct);
     $("o-stand-c").textContent = `${s.n - undoneN} of ${s.n} stood`;
     $("o-undo-c").textContent = `${undoneN} of ${s.n} undone`;
-    $("f-verdict").textContent =
+    $("f-verdict").textContent = openNote +
       `${n.ratio != null ? `This move is ${n.ratio.toFixed(2)}× what ${name} covers on a normal day. ` : ""}` +
       `${r.verdict?.label || ""}. A night picked at random is undone ${pc(d.baseline)} of the time. Almanac never says which way it goes next.`;
   } else {
     $("o-stand").textContent = $("o-undo").textContent = "—";
     $("o-stand-c").textContent = $("o-undo-c").textContent = "no odds";
-    $("f-verdict").textContent = `${r.verdict?.label || "Not enough measured nights to give odds"}.`;
+    $("f-verdict").textContent = `${openNote}${r.verdict?.label || "Not enough measured nights to give odds"}.`;
   }
 
   $("c-name").textContent = name;
   chart($("chart"), d.path, n.closePrice);
-  $("c-right").textContent = d.marketOpen ? "New York is open: this was last night's move" : "Odds called before the bell, checked at 10:30";
+  $("c-right").textContent = d.marketOpen ? "New York is open: the token now follows the real market" : "Odds called before the bell, checked at 10:30";
   document.title = n.move == null ? "Almanac" : `${name} ${sg(n.move, 1)} · Almanac`;
 }
 
