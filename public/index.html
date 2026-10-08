@@ -3,125 +3,167 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Almanac — is that overnight move real?</title>
-<meta name="description" content="What history says about a tokenised stock's move while its home market is shut. Measured on 1,659 nights of Bitget data, and graded against itself.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'><circle cx='9' cy='9' r='7.5' fill='none' stroke='%232dd4bf' stroke-width='1.8'/><path d='M9 1.5A7.5 7.5 0 019 16.5Z' fill='%232dd4bf' opacity='.55'/></svg>">
+<title>Almanac</title>
+<meta name="description" content="A stock token moved while New York was shut. Will the move still be there at 10:30? Odds from 1,237 measured Bitget nights, graded against themselves.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230b8f80'/><path d='M9 23 L16 8 L23 23' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/><path d='M12 18h8' stroke='white' stroke-width='3'/></svg>">
+<script>
+  // Before paint, so a dark-mode reader never sees a white flash.
+  try { const t = localStorage.getItem("almanac:theme"); if (t === "dark" || t === "light") document.documentElement.dataset.theme = t; } catch {}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="/app.css">
 </head>
 <body>
 
-<nav class="nav">
-  <a class="brand" href="/">
-    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5" fill="none" stroke="var(--teal-up)" stroke-width="1.6"></circle><path d="M9 1.5 A7.5 7.5 0 0 1 9 16.5 Z" fill="var(--teal-up)" opacity="0.55"></path></svg>
+<header class="top">
+  <a class="logo" href="/" aria-label="Almanac home">
+    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--accent)"/><path d="M9 23 L16 8 L23 23" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 18h8" stroke="#fff" stroke-width="3"/></svg>
     <span>Almanac</span>
   </a>
-  <div class="navlinks">
-    <a href="#tonight" class="on">Tonight</a>
-    <a href="#bands">Bands</a>
-    <a href="#record">Record</a>
-    <a href="/method.html">Method</a>
+  <form class="search" id="searchform" autocomplete="off" role="search">
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    <label class="sr" for="search">Find a stock token</label>
+    <input id="search" list="tokens" placeholder="Find a stock token… rNVDA, rTSLA">
+    <datalist id="tokens"></datalist>
+  </form>
+  <div class="topright">
+    <span class="clock" id="clock">Reading the New York clock…</span>
+    <span class="hub" title="Almanac reads Bitget's market data and bitget-signal over MCP, and serves its own MCP tools to any agent"><i></i>Built on Bitget Agent Hub</span>
+    <div class="seg" id="marketpick" role="group" aria-label="Which instrument to read"></div>
+    <button class="themebtn" id="theme" type="button" aria-label="Switch light or dark">
+      <svg class="moon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z" fill="currentColor"/></svg>
+      <svg class="sun" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg>
+    </button>
   </div>
-  <div class="grow"></div>
-  <div class="seg" id="marketpick" role="group" aria-label="Which instrument to read"></div>
-  <div class="pill" id="clock"><span class="dot" style="background: var(--warn)"></span><span class="mono">reading the clock…</span></div>
+</header>
+
+<nav class="tabs" aria-label="Sections">
+  <a href="#tonight" class="on">Tonight</a>
+  <a href="#moves">All moves</a>
+  <a href="#record">Report card</a>
+  <a href="#agents">For agents</a>
+  <a href="/method.html">How it works</a>
 </nav>
 
 <main>
-
-  <!-- hero -->
-  <section class="hero" id="tonight">
-    <div class="hero-left">
-      <div class="hero-head">
-        <h1 id="sym">—</h1>
-        <span class="chip" id="symnote">Bitget</span>
-        <span class="chip warn" id="darkfor"></span>
-      </div>
-      <p class="verdict" id="verdict">Reading the night…</p>
-      <form class="ask" id="askform" autocomplete="off">
-        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.6"></circle><path d="M11 11 L14.5 14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg>
-        <label class="sr" for="q">Ask about a name</label>
-        <input id="q" name="q" type="text" placeholder="is this move real?">
-        <button type="submit" class="chip teal">Ask</button>
-      </form>
-      <p class="answer" id="answer" hidden></p>
-      <div class="company" id="company" hidden></div>
+  <section class="lead">
+    <div>
+      <p class="eyebrow" id="eyebrow">What the measured nights say</p>
+      <h1>Big overnight moves almost always stand. <span>Small ones are a coin flip.</span></h1>
+      <p class="sub" id="leadsub">Every night, Almanac gave its odds for each Bitget stock token before New York opened, then checked itself at the bell.</p>
     </div>
-
-    <div class="hero-right">
-      <div class="sparkhead">
-        <span class="mono muted">SINCE THE 16:00 CLOSE</span>
-        <span class="mono" id="sparkmove">—</span>
-      </div>
-      <div id="spark" class="spark"></div>
-      <div class="sparkfoot mono"><span id="sparkclose">—</span><span id="sparknow">—</span></div>
+    <div class="stats">
+      <div class="stat"><b class="good" id="s-big">—</b><span id="s-big-t">huge moves were undone by the bell</span></div>
+      <div class="stat"><b class="warn" id="s-small">—</b><span id="s-small-t">of tiny moves were undone</span></div>
     </div>
   </section>
 
-  <!-- three cards -->
-  <section class="cards">
-    <article class="card">
-      <header><h2>Tonight's reading</h2><span class="mono faint" id="livetag">LIVE</span></header>
-      <div class="figs">
-        <div><div class="fig" id="f-move">—</div><div class="mono muted">MOVED</div></div>
-        <div><div class="fig" id="f-normal">—</div><div class="mono muted">NORMAL DAY</div></div>
-        <div><div class="fig teal" id="f-ratio">—</div><div class="mono muted">RATIO</div></div>
-      </div>
-      <div class="rule"></div>
-      <dl class="kv" id="kv"></dl>
-      <p class="note">Ratio is the move divided by what this name covers in an ordinary session — the only thing that predicted survival.</p>
-    </article>
+  <div class="layout">
+    <div class="col">
+      <article class="card feat" id="tonight" aria-live="polite">
+        <div class="fhead">
+          <span class="tk" id="f-tk">—</span>
+          <div>
+            <p class="meta" id="f-meta">Bitget stock token</p>
+            <h2 id="f-title">Reading tonight…</h2>
+          </div>
+        </div>
+        <div class="fbody">
+          <div class="fleft">
+            <div class="out">
+              <span class="ol">Stands</span>
+              <span class="op" id="o-stand">—</span>
+              <span class="chip good" id="o-stand-c">—</span>
+            </div>
+            <div class="out">
+              <span class="ol">Undone</span>
+              <span class="op dim" id="o-undo">—</span>
+              <span class="chip bad" id="o-undo-c">—</span>
+            </div>
+            <p class="verdict" id="f-verdict"></p>
 
-    <article class="card" id="bands">
-      <header><h2>How often a move that size is undone</h2><span class="mono faint" id="nightstag">—</span></header>
-      <div id="bandchart"></div>
-    </article>
+            <div class="why">
+              <div class="w" id="w-company">
+                <p class="src">Bitget market data · the company</p>
+                <p class="wt">Checking the company calendar…</p>
+              </div>
+              <div class="w" id="w-mood">
+                <p class="src">bitget-signal · crypto mood</p>
+                <p class="wt">Asking bitget-signal…</p>
+              </div>
+            </div>
+          </div>
+          <div class="fright">
+            <div class="legend"><span><i style="background:var(--accent)"></i><b id="c-name">Token</b> tonight</span><span><i class="dash"></i>last real close</span></div>
+            <div class="chart" id="chart"></div>
+            <div class="cfoot"><span id="c-left">Bitget price since the 16:00 close</span><span id="c-right"></span></div>
+          </div>
+        </div>
 
-    <article class="card" id="record">
-      <header><h2>Has it kept its word?</h2><span class="mono faint" id="gradedtag">—</span></header>
-      <div id="relchart"></div>
-      <div class="chips" id="scorechips"></div>
-    </article>
-  </section>
+        <form class="ask" id="askform" autocomplete="off">
+          <label class="sr" for="q">Ask about any token</label>
+          <input id="q" placeholder="Ask in plain words: is rNVDA's move real?">
+          <button type="submit">Ask</button>
+        </form>
+        <div class="answer" id="answer" hidden>
+          <p class="src" id="a-src"></p>
+          <p id="a-text"></p>
+        </div>
+      </article>
 
-  <!-- the board -->
-  <section class="panel">
-    <div class="tabs">
-      <span class="tab on">Tonight</span>
-      <a class="tab" href="#bands">Every band</a>
-      <a class="tab" href="#record">The record</a>
-      <a class="tab" href="/method.html#failed">What did not work</a>
-      <a class="tab" href="/method.html">Method</a>
-      <div class="grow"></div>
-      <span class="chip" id="sortnote">sorted by ratio, not by move</span>
+      <section id="moves">
+        <div class="sechead">
+          <h2>Tonight's moves</h2>
+          <label class="toggle"><input type="checkbox" id="hidesmall" checked><span>Hide moves under 0.5%</span></label>
+        </div>
+        <p class="sorted" id="sorted">Sorted by how unusual the move is for that stock, not by its size.</p>
+        <div class="grid" id="grid"><div class="card empty">Asking Bitget for every stock token…</div></div>
+        <button class="more" id="more" type="button" hidden>Show every token</button>
+      </section>
+
+      <section class="card live" id="live" hidden>
+        <div class="sechead"><h2>Called live, before the bell</h2><a class="link" href="/api/live">Raw data</a></div>
+        <div id="livebody"></div>
+      </section>
     </div>
 
-    <div class="toolbar">
-      <span class="chip teal">Visualise</span>
-      <a class="chip" href="/api/board">Raw JSON</a>
-      <div class="grow"></div>
-      <label class="toggle"><input type="checkbox" id="hidesmall" checked><span class="track"></span><span class="tl">Hide moves under 0.5%</span></label>
-    </div>
+    <aside class="side">
+      <section class="card promo" id="agents">
+        <h3>Ask Almanac from any agent</h3>
+        <p>Almanac is an MCP server. Add it beside Bitget's Agent Hub tools and your agent can ask what a night move is worth.</p>
+        <div class="code" id="mcpcmd">claude mcp add --transport http almanac https://almanac-pearl.vercel.app/api/mcp</div>
+        <button class="copy" id="copymcp" type="button">Copy command</button>
+        <p class="tools">Tools: <code>tonight_moves</code> · <code>move_odds</code> · <code>report_card</code></p>
+      </section>
 
-    <div class="thead mono">
-      <div>NAME</div><div class="r">SINCE CLOSE</div><div class="r">RATIO</div>
-      <div class="pl">BAND</div><div class="r">NIGHTS</div><div class="r">UNDONE</div><div class="pl" id="againsthead">AGAINST A RANDOM NIGHT</div>
-    </div>
-    <div id="rows"><div class="empty">Asking Bitget…</div></div>
-  </section>
+      <section class="card">
+        <h3>Biggest moves tonight</h3>
+        <ol class="hot" id="hot"><li class="muted">Waiting for Bitget…</li></ol>
+      </section>
 
-  <section class="panel live" id="live" hidden>
-    <div class="tabs"><span class="tab on">Called live, before the bell</span>
-      <div class="grow"></div>
-      <a class="chip" href="/api/live">Raw JSON</a>
-      <a class="chip" href="/method.html#record">The replayed record</a>
-    </div>
-    <div id="livebody"></div>
-  </section>
+      <section class="card" id="record">
+        <h3>Report card</h3>
+        <p class="small">Odds stated before the bell, against what then happened.</p>
+        <div class="rc" id="rc"></div>
+        <p class="small" id="rcfoot"></p>
+      </section>
 
-  <footer class="foot mono" id="foot"></footer>
+      <section class="card">
+        <h3>Simple rule vs AI</h3>
+        <p class="small">120 past nights, half real moves and half fake-outs. Each was called from the same facts before the answer was known.</p>
+        <div class="bars">
+          <span>Size rule</span><i style="--w:69%;background:var(--accent)"></i><b>69%</b>
+          <span>Qwen</span><i style="--w:53%;background:var(--muted)"></i><b>53%</b>
+          <span>Coin flip</span><i style="--w:50%;background:var(--line-2)"></i><b>50%</b>
+        </div>
+        <p class="small">Qwen ran on Bitget's hackathon endpoint and got 63 of 120 right. So on this site, code sets every number and the model only explains.</p>
+      </section>
+    </aside>
+  </div>
+
+  <footer class="foot" id="foot"></footer>
 </main>
 
 <script type="module" src="/app.js"></script>

@@ -12,14 +12,18 @@ name: Live record
 
 on:
   schedule:
-    - cron: "5 13 * * 1-5"    # lock — about 25 minutes before the bell (EDT)
+    # GitHub starts scheduled jobs late, sometimes by an hour, so the lock is
+    # tried three times well before the bell. The first one to land stands.
+    - cron: "40 10 * * 1-5"   # refresh normal days, then lock
+    - cron: "40 11 * * 1-5"   # lock, if the first try was late
+    - cron: "35 12 * * 1-5"   # lock, last try
     - cron: "10 15 * * 1-5"   # settle — comfortably after 10:30 ET (EDT)
   workflow_dispatch:
     inputs:
       step:
         description: Which step to run
         type: choice
-        options: [lock, settle, both]
+        options: [refresh, lock, settle, both]
         default: both
 
 permissions:
@@ -44,7 +48,9 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "run=${{ inputs.step }}" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.schedule }}" = "5 13 * * 1-5" ]; then
+          elif [ "${{ github.event.schedule }}" = "40 10 * * 1-5" ]; then
+            echo "run=refresh" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" != "10 15 * * 1-5" ]; then
             echo "run=lock" >> "$GITHUB_OUTPUT"
           else
             echo "run=settle" >> "$GITHUB_OUTPUT"
@@ -53,8 +59,16 @@ jobs:
       # Each command refuses on its own terms — lock will not write after the
       # bell, settle will not judge before the hour is up — so a mistimed run
       # is a no-op rather than a bad row.
+      # What an ordinary session covers drifts, and a stale figure would put
+      # tonight's move in the wrong band. Refreshed once a day, before the lock.
+      - name: Refresh normal days
+        if: steps.step.outputs.run == 'refresh'
+        run: |
+          node bin/refresh-normal.mjs rtoken
+          node bin/refresh-normal.mjs perp
+
       - name: Lock tonight's calls
-        if: steps.step.outputs.run == 'lock' || steps.step.outputs.run == 'both'
+        if: steps.step.outputs.run == 'refresh' || steps.step.outputs.run == 'lock' || steps.step.outputs.run == 'both'
         run: |
           node bin/lock.mjs rtoken
           node bin/lock.mjs perp
@@ -67,12 +81,12 @@ jobs:
 
       - name: Commit the record
         run: |
-          if [ -z "$(git status --porcelain data/live)" ]; then
+          if [ -z "$(git status --porcelain data)" ]; then
             echo "nothing changed"
             exit 0
           fi
           git config user.name "almanac"
           git config user.email "almanac@users.noreply.github.com"
-          git add data/live
+          git add data/live data/normal-*.json
           git commit -m "Live record: ${{ steps.step.outputs.run }} $(date -u +%Y-%m-%d)"
           git push

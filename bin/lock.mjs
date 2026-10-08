@@ -14,7 +14,7 @@
  *   node bin/lock.mjs [rtoken|perp]
  */
 
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
 import { board } from "../src/desk.js";
@@ -32,6 +32,14 @@ const now = Date.now();
 if (now >= w.bell) {
   console.log(`The bell for ${w.reopens} has already rung. Nothing locked — a call made after the`);
   console.log(`open is not a call, and writing one here would make every other row untrustworthy.`);
+  process.exit(0);
+}
+
+// The schedule fires several times before the bell, because GitHub runs cron
+// jobs late. The first lock of a night stands; a later one would only replace
+// an earlier call with one made closer to the open.
+if (existsSync(at(`../data/live/${marketId}-${w.reopens}.json`))) {
+  console.log(`Already locked for ${w.reopens}. The first call of the night stands.`);
   process.exit(0);
 }
 

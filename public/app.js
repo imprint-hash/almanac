@@ -1,444 +1,390 @@
-/**
- * The desk, in the browser.
- *
- * Every figure on screen comes from /api — nothing here invents a number, and
- * where the server could not answer, the page says so instead of drawing an
- * empty chart that looks like a reading.
- */
+// Almanac: tonight's odds board. Every number on it comes from the API, which
+// counts measured nights; the page only lays them out.
 
 const $ = (id) => document.getElementById(id);
-const pc = (v, d = 1) => (v == null ? "—" : `${(100 * v).toFixed(d)}%`);
-const sg = (v, d = 2) => (v == null ? "—" : `${v >= 0 ? "+" : ""}${(100 * v).toFixed(d)}%`);
-const clean = (s) => s.replace(/USDT$/, "");
-// rToken display names all start with a lower-case r, so the first letter would
-// label every row identically. Take the ticker's own initial instead.
-const initial = (s) => (/^r[A-Z0-9]/.test(s) ? s[1] : s[0]);
+const pc = (v, d = 0) => (v == null ? "—" : `${(100 * v).toFixed(d)}%`);
+const sg = (v, d = 2) => (v == null ? "—" : `${v >= 0 ? "+" : "−"}${(100 * Math.abs(v)).toFixed(d)}%`);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const bare = (display) => String(display || "").replace(/^r/, "").replace(/USDT$/, "");
 
-const BAND_TONE = { "under 0.3": "var(--crit)", "0.3-0.5": "var(--serious)", "0.5-0.8": "var(--warn)", "0.8-1.3": "var(--good)", "over 1.3": "var(--good)" };
-
-/* Something to read while the sweep runs. Replaced by whatever actually moved
-   most tonight as soon as the board answers. */
-const FIRST = "RNVDAUSDT";
-
-/* Only the newest question may write to the answer box. */
-let askSeq = 0;
-
-/* A reading is worth linking to: /?market=perp&symbol=NVDA opens on that name,
-   in that market, instead of on whatever moved most tonight. */
-const params = new URLSearchParams(location.search);
-const asked = { market: params.get("market"), symbol: (params.get("symbol") || "").toUpperCase() };
-
-let state = {
+const asked = Object.fromEntries(new URLSearchParams(location.search));
+const state = {
   market: asked.market === "perp" ? "perp" : "rtoken",
   symbol: null,
+  picked: false,
   board: null,
   reading: null,
   hideSmall: true,
-  picked: Boolean(asked.symbol),
+  showAll: false,
 };
+const FIRST = { rtoken: "RNVDAUSDT", perp: "NVDAUSDT" };
+const SHOWN = 9;
 
-/** The instrument switch. Both markets were measured the same way, so the page
-    offers the other one rather than asking anyone to take the first on trust. */
-function renderMarkets(list, current) {
+/* ---------- theme ---------- */
+const store = {
+  get(k) { try { return localStorage.getItem(`almanac:${k}`); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(`almanac:${k}`, v); } catch {} },
+};
+$("theme").addEventListener("click", () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  store.set("theme", root.dataset.theme);
+});
+
+/* ---------- how a band reads ---------- */
+// The same cut-offs the API uses to word a verdict, so a card never says
+// "likely stands" about a band the reading calls shaky.
+function callFor(undone) {
+  if (undone == null) return { text: "Not enough nights", cls: "dim" };
+  if (undone <= 0.2) return { text: "Likely stands", cls: "good" };
+  if (undone <= 0.42) return { text: "Shaky", cls: "acc" };
+  return { text: "Coin flip", cls: "warn" };
+}
+
+/** A stable colour per ticker, so a token keeps its face between visits. */
+function face(display) {
+  const t = bare(display);
+  let h = 0;
+  for (const c of t) h = (h * 31 + c.charCodeAt(0)) % 360;
+  return `<span class="tk" style="background:hsl(${h} 52% 36%)" aria-hidden="true">${esc(t.slice(0, 5))}</span>`;
+}
+
+/* ---------- market switch ---------- */
+function renderMarkets(list) {
   const el = $("marketpick");
-  if (!list || el.dataset.done === String(list.length)) return;
-  el.dataset.done = String(list.length);
-  el.innerHTML = list.map((m) => `<button type="button" data-market="${m.id}" aria-pressed="${m.id === current}" title="${m.what} — ${m.nights} nights measured">${m.label}</button>`).join("");
-  el.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
-    if (b.dataset.market === state.market) return;
+  if (!list?.length || el.childElementCount) return;
+  el.innerHTML = list.map((m) =>
+    `<button type="button" data-market="${m.id}" class="${m.id === state.market ? "on" : ""}" aria-pressed="${m.id === state.market}">${m.id === "perp" ? "Perps" : "rTokens"}</button>`).join("");
+  el.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b || b.dataset.market === state.market) return;
     state.market = b.dataset.market;
     state.picked = false;
-    state.symbol = null;
-    el.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.market === state.market)));
-    $("rows").innerHTML = `<div class="empty">Asking Bitget…</div>`;
+    el.querySelectorAll("button").forEach((x) => {
+      const on = x.dataset.market === state.market;
+      x.classList.toggle("on", on);
+      x.setAttribute("aria-pressed", String(on));
+    });
+    history.replaceState(null, "", state.market === "perp" ? "?market=perp" : "/");
+    load(FIRST[state.market]);
     loadBoard();
-  }));
+    loadLive();
+  });
 }
 
-/* ---------- charts ---------- */
-
-function spark(el, path, close) {
-  if (!path?.length) { el.innerHTML = ""; return; }
-  const W = 330, H = 74;
-  const vals = path.map(([, c]) => c);
-  const lo = Math.min(...vals, close), hi = Math.max(...vals, close);
-  const x = (i) => (W * i) / (path.length - 1 || 1);
-  const y = (v) => 6 + (H - 12) * (1 - (v - lo) / (hi - lo || 1));
-  const d = vals.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
-  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="none" role="img" aria-label="Price since the close">
-    <defs><linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="var(--teal-up)" stop-opacity="0.26"></stop>
-      <stop offset="100%" stop-color="var(--teal-up)" stop-opacity="0"></stop>
-    </linearGradient></defs>
-    <line x1="0" y1="${y(close).toFixed(1)}" x2="${W}" y2="${y(close).toFixed(1)}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 4"></line>
-    <path d="${d} L${W} ${H} L0 ${H} Z" fill="url(#fade)"></path>
-    <path d="${d}" fill="none" stroke="var(--teal-up)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"></path>
-    <circle cx="${W}" cy="${y(vals[vals.length - 1]).toFixed(1)}" r="4" fill="var(--teal-up)" stroke="#0a1513" stroke-width="2"></circle>
-  </svg>`;
+/* ---------- the lead numbers ---------- */
+function renderLead(record, meta) {
+  if (!record?.byBand) return;
+  const big = record.byBand["over 1.3"];
+  const small = record.byBand["under 0.3"];
+  if (big) {
+    const undone = Math.round(big.happened * big.n);
+    $("s-big").textContent = `${undone} of ${big.n}`;
+    $("s-big-t").textContent = "huge moves (over 1.3× a normal day) were undone by the bell";
+  }
+  if (small) {
+    $("s-small").textContent = pc(small.happened);
+    $("s-small-t").textContent = "of tiny moves (under 0.3× a normal day) were undone";
+  }
+  $("eyebrow").textContent = `What ${record.quoted.toLocaleString()} calls made before the bell taught us`;
+  $("leadsub").textContent =
+    `Every night from ${record.from} to ${record.to}, Almanac gave its odds for each Bitget stock token before New York opened, ` +
+    `then checked itself at the bell. The size of the move, for that particular stock, told us more than anything else.`;
+  void meta;
 }
 
-function bandChart(el, bands, baseline, here) {
-  const W = 396, H = 196, L = 34, B = 46, T = 14, max = 0.55;
-  const keys = Object.keys(bands);
-  const step = (W - L - 14) / keys.length;
-  const bx = (i) => L + 6 + i * step;
-  const bw = Math.min(46, step - 22);
-  const by = (v) => T + (H - T - B) * (1 - v / max);
-
-  const grid = [0, 0.2, 0.4].map((v) => `
-    <line x1="${L}" y1="${by(v).toFixed(1)}" x2="${W - 6}" y2="${by(v).toFixed(1)}" stroke="var(--line)"></line>
-    <text x="${L - 8}" y="${(by(v) + 3.5).toFixed(1)}" text-anchor="end" fill="var(--faint)" font-size="9">${(100 * v).toFixed(0)}%</text>`).join("");
-
-  const bars = keys.map((k, i) => {
-    const s = bands[k], on = k === here;
-    return `<g>
-      <rect x="${bx(i)}" y="${by(s.undonePct).toFixed(1)}" width="${bw}" height="${(by(0) - by(s.undonePct)).toFixed(1)}" rx="4"
-            fill="var(--teal)" opacity="${on ? 1 : 0.42}"${on ? ' stroke="var(--teal-up)" stroke-width="2"' : ""}>
-        <title>${k}: ${pc(s.undonePct)} of ${s.n} nights were undone</title></rect>
-      <text x="${bx(i) + bw / 2}" y="${(by(s.undonePct) - 7).toFixed(1)}" text-anchor="middle" fill="${on ? "var(--ink)" : "var(--ink-2)"}" font-size="12" font-weight="${on ? 600 : 400}">${pc(s.undonePct, 0)}</text>
-      <text x="${bx(i) + bw / 2}" y="${H - 26}" text-anchor="middle" fill="${on ? "var(--ink)" : "var(--muted)"}" font-size="9">${k}</text>
-      ${on ? `<text x="${bx(i) + bw / 2}" y="${H - 11}" text-anchor="middle" fill="var(--teal-up)" font-size="9" font-weight="600">▲ HERE</text>` : ""}
-    </g>`;
-  }).join("");
-
-  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Share of overnight moves undone by ten thirty, by band">
+/* ---------- the featured card ---------- */
+function chart(el, path, close) {
+  if (!path?.length || close == null) {
+    el.innerHTML = `<div class="empty">No price path since the close yet.</div>`;
+    return;
+  }
+  const W = 520, H = 250, PADR = 54, PADB = 22;
+  const ts = path.map((p) => p[0]), ps = path.map((p) => p[1]).concat(close);
+  const t0 = Math.min(...ts), t1 = Math.max(...ts);
+  let lo = Math.min(...ps), hi = Math.max(...ps);
+  const pad = (hi - lo || close * 0.002) * 0.18;
+  lo -= pad; hi += pad;
+  const x = (t) => ((t - t0) / (t1 - t0 || 1)) * (W - PADR);
+  const y = (p) => (1 - (p - lo) / (hi - lo)) * (H - PADB);
+  const d = path.map((p, i) => `${i ? "L" : "M"}${x(p[0]).toFixed(1)} ${y(p[1]).toFixed(1)}`).join(" ");
+  const last = path[path.length - 1];
+  const move = last[1] / close - 1;
+  const area = `${d} L${x(last[0]).toFixed(1)} ${H - PADB} L0 ${H - PADB} Z`;
+  const hhmm = (t) => new Date(t).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "America/New_York" });
+  const ticks = [0, 0.33, 0.66, 1].map((f) => t0 + f * (t1 - t0));
+  const grid = [0.2, 0.45, 0.7, 0.95].map((f) => `<line x1="0" x2="${W - PADR}" y1="${(f * (H - PADB)).toFixed(1)}" y2="${(f * (H - PADB)).toFixed(1)}" stroke="var(--line)" stroke-width="1"/>`).join("");
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Price since the close, ${sg(move)}">
+    <defs><linearGradient id="fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity=".18"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>
     ${grid}
-    <line x1="${L}" y1="${by(baseline).toFixed(1)}" x2="${W - 6}" y2="${by(baseline).toFixed(1)}" stroke="var(--warn)" stroke-width="1.5" stroke-dasharray="4 4"></line>
-    <text x="${W - 8}" y="${(by(baseline) - 6).toFixed(1)}" text-anchor="end" fill="var(--warn)" font-size="9">RANDOM NIGHT ${pc(baseline)}</text>
-    ${bars}
-  </svg>`;
+    <line x1="0" x2="${W - PADR}" y1="${y(close).toFixed(1)}" y2="${y(close).toFixed(1)}" stroke="var(--line-2)" stroke-width="1.5" stroke-dasharray="5 5"/>
+    <path d="${area}" fill="url(#fill)"/>
+    <path d="${d}" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    <circle cx="${x(last[0]).toFixed(1)}" cy="${y(last[1]).toFixed(1)}" r="9" fill="var(--accent)" opacity=".2"/>
+    <circle cx="${x(last[0]).toFixed(1)}" cy="${y(last[1]).toFixed(1)}" r="4.5" fill="var(--accent)"/>
+    <g font-family="Figtree, sans-serif" font-size="12" fill="var(--muted)">
+      <text x="${W - PADR + 8}" y="${(y(close) + 4).toFixed(1)}">close</text>
+      <text x="${W - PADR + 8}" y="${(y(last[1]) + 4).toFixed(1)}" fill="var(--ink-2)" font-weight="700">${sg(move, 1)}</text>
+      ${ticks.map((t, i) => `<text x="${x(t).toFixed(1)}" y="${H - 4}" text-anchor="${i === 0 ? "start" : i === 3 ? "end" : "middle"}">${hhmm(t)}</text>`).join("")}
+    </g></svg>`;
 }
-
-function relChart(el, byBand) {
-  const W = 396, H = 196, L = 38, B = 42, T = 14, R = 14, max = 0.56;
-  const x = (v) => L + (W - L - R) * (v / max);
-  const y = (v) => T + (H - T - B) * (1 - v / max);
-  const grid = [0, 0.2, 0.4].map((v) => `
-    <line x1="${x(v).toFixed(1)}" y1="${T}" x2="${x(v).toFixed(1)}" y2="${H - B}" stroke="var(--line)"></line>
-    <line x1="${L}" y1="${y(v).toFixed(1)}" x2="${W - R}" y2="${y(v).toFixed(1)}" stroke="var(--line)"></line>
-    <text x="${x(v).toFixed(1)}" y="${H - B + 14}" text-anchor="middle" fill="var(--faint)" font-size="9">${(100 * v).toFixed(0)}%</text>
-    <text x="${L - 7}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end" fill="var(--faint)" font-size="9">${(100 * v).toFixed(0)}%</text>`).join("");
-  const dots = Object.entries(byBand).map(([k, s]) => `
-    <circle cx="${x(s.said).toFixed(1)}" cy="${y(s.happened).toFixed(1)}" r="5" fill="var(--teal)" stroke="var(--surf)" stroke-width="2">
-      <title>${k}: it said ${pc(s.said)}, ${pc(s.happened)} happened, over ${s.n} nights</title></circle>`).join("");
-
-  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Odds it stated against what happened; points on the diagonal mean the odds were honest">
-    ${grid}
-    <line x1="${x(0).toFixed(1)}" y1="${y(0).toFixed(1)}" x2="${x(max).toFixed(1)}" y2="${y(max).toFixed(1)}" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 4"></line>
-    <text x="${x(0.42).toFixed(1)}" y="${y(0.47).toFixed(1)}" text-anchor="end" fill="var(--muted)" font-size="9">PERFECTLY HONEST</text>
-    ${dots}
-    <text x="${L + 2}" y="${H - 6}" fill="var(--faint)" font-size="9">IT SAID →</text>
-    <text x="${W - R}" y="${H - 6}" text-anchor="end" fill="var(--faint)" font-size="9">↑ IT HAPPENED</text>
-  </svg>`;
-}
-
-/* ---------- rendering ---------- */
 
 function renderReading(d) {
+  renderMarkets(d.markets);
+  renderLead(d.record, d.meta);
+  renderRecord(d.record);
+  clock(d);
   if (d.error) {
-    $("verdict").textContent = d.error;
+    $("f-title").textContent = d.error;
     return;
   }
-  const n = d.night, r = d.reading;
-  $("sym").textContent = d.display && d.display !== d.symbol ? d.display : clean(d.symbol);
-  $("symnote").textContent = `${d.label || "Bitget"} · Bitget`;
-  renderMarkets(d.markets, state.market);
-  $("darkfor").textContent = d.marketOpen
-    ? "US market open — this price is real"
-    : `no home market for ${n.hoursSinceClose.toFixed(1)}h`;
-  $("darkfor").className = d.marketOpen ? "chip" : "chip warn";
 
-  const label = r.verdict?.label ?? "—";
-  const ph = $("q");
-  if (ph && !ph.dataset.touched) ph.placeholder = `is ${d.display || clean(d.symbol)} really moving?`;
-  $("verdict").innerHTML = label.replace(/(almost never been undone|undone by 10:30|inside the noise)/, "<em>$1</em>");
+  const n = d.night || {}, r = d.reading || {}, s = r.stat;
+  const name = d.display || d.symbol;
+  const up = (n.move ?? 0) > 0;
+  $("f-tk").outerHTML = face(name).replace('class="tk"', 'class="tk" id="f-tk"');
+  $("f-meta").textContent = `Bitget ${state.market === "perp" ? "stock perpetual" : "stock token"} · ${n.isWeekend ? "weekend" : "overnight"} move · since the ${n.session || ""} close`;
+  $("f-title").innerHTML = n.move == null
+    ? `${esc(name)}: no move measured yet`
+    : `${esc(name)} <span class="${up ? "up" : "dn"}">${sg(n.move)}</span> ${d.marketOpen ? "while New York slept." : "overnight."} ${d.marketOpen ? "Did it hold?" : "Still there at 10:30?"}`;
 
-  $("f-move").textContent = sg(n.move);
-  $("f-move").className = "fig " + (n.move < 0 ? "down" : "up");
-  $("f-normal").textContent = pc(n.normalDay, 2);
-  $("f-ratio").textContent = n.ratio ? n.ratio.toFixed(2) + "×" : "—";
+  if (s?.n) {
+    const undoneN = Math.round(s.undonePct * s.n);
+    $("o-stand").textContent = pc(1 - s.undonePct);
+    $("o-undo").textContent = pc(s.undonePct);
+    $("o-stand-c").textContent = `${s.n - undoneN} of ${s.n} stood`;
+    $("o-undo-c").textContent = `${undoneN} of ${s.n} undone`;
+    $("f-verdict").textContent =
+      `${n.ratio != null ? `This move is ${n.ratio.toFixed(2)}× what ${name} covers on a normal day. ` : ""}` +
+      `${r.verdict?.label || ""}. A night picked at random is undone ${pc(d.baseline)} of the time. Almanac never says which way it goes next.`;
+  } else {
+    $("o-stand").textContent = $("o-undo").textContent = "—";
+    $("o-stand-c").textContent = $("o-undo-c").textContent = "no odds";
+    $("f-verdict").textContent = `${r.verdict?.label || "Not enough measured nights to give odds"}.`;
+  }
 
-  const s = r.stat;
-  $("kv").innerHTML = [
-    ["Band tonight", r.band ? r.band + "×" : "—"],
-    ["Nights measured there", s ? String(s.n) : "—"],
-    ["Undone by 10:30", s ? pc(s.undonePct) : "—"],
-    ["Any night at random", pc(d.baseline)],
-    ["Normal day from", d.sessionsBehindNormalDay ? `${d.sessionsBehindNormalDay} sessions` : d.normalDaySource],
-  ].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("");
-
-  $("sparkmove").textContent = sg(n.move);
-  $("sparkmove").style.color = n.move < 0 ? "var(--crit)" : "var(--good)";
-  $("sparkclose").textContent = n.closePrice != null ? `CLOSE ${n.closePrice}` : "";
-  $("sparknow").textContent = n.nowPrice != null ? `NOW ${n.nowPrice}` : "";
-  spark($("spark"), d.path, n.closePrice ?? n.nowPrice);
-
-  bandChart($("bandchart"), d.bands, d.baseline, r.band);
-  $("nightstag").textContent = `${d.meta.nights.toLocaleString()} NIGHTS`;
-
-  relChart($("relchart"), d.record.byBand);
-  $("gradedtag").textContent = `${d.record.quoted.toLocaleString()} GRADED`;
-  $("scorechips").innerHTML = [
-    `<span class="chip">Brier ${d.record.brier.toFixed(4)}</span>`,
-    `<span class="chip">Baseline ${d.record.baseline.toFixed(4)}</span>`,
-    `<span class="chip" style="color: var(--good); border-color: rgba(12,163,12,.3)">Skill +${(100 * d.record.skill).toFixed(1)}%</span>`,
-  ].join("");
+  $("c-name").textContent = name;
+  chart($("chart"), d.path, n.closePrice);
+  $("c-right").textContent = d.marketOpen ? "New York is open: this was last night's move" : "Odds called before the bell, checked at 10:30";
+  document.title = n.move == null ? "Almanac" : `${name} ${sg(n.move, 1)} · Almanac`;
 }
 
-function renderBoard(d) {
-  const el = $("rows");
-  if (d.error) { el.innerHTML = `<div class="empty">${d.error}</div>`; return; }
-  const rows = d.rows.filter((r) => !state.hideSmall || Math.abs(r.move) >= 0.005);
-  if (!rows.length) { el.innerHTML = `<div class="empty">Nothing has moved half a percent tonight. That is the honest answer.</div>`; return; }
-
-  el.innerHTML = rows.map((r) => {
-    const s = d.bands[r.band] || {};
-    const tone = BAND_TONE[r.band] || "var(--muted)";
-    const width = Math.max(4, ((s.undonePct || 0) / 0.55) * 100);
-    return `<div class="row${r.symbol === state.symbol ? " on" : ""}" data-sym="${r.symbol}" role="button" tabindex="0">
-      <div class="name"><span class="tickerbox">${initial(r.display || clean(r.symbol))}</span><span class="num">${r.display || clean(r.symbol)}</span></div>
-      <div class="num r" style="color: ${r.move < 0 ? "var(--crit)" : "var(--good)"}">${sg(r.move)}</div>
-      <div class="num r">${r.ratio.toFixed(2)}×</div>
-      <div class="pl"><span class="chip" style="color: ${tone}">${r.band}×</span></div>
-      <div class="num r nights muted">${s.n ?? "—"}</div>
-      <div class="num r" style="color: ${tone}">${pc(s.undonePct)}</div>
-      <div class="against"><span class="bar" style="width: ${width}%"></span><span>${(s.undonePct / d.baseline).toFixed(1)}× a random night</span></div>
-    </div>`;
-  }).join("");
-
-  $("againsthead").textContent = `AGAINST ${pc(d.baseline)} AT RANDOM`;
-  $("foot").innerHTML = [
-    `MEASURED ${d.meta.from} → ${d.meta.to} · ${d.meta.symbols} NAMES`,
-    `WEEKEND GAPS ARE CALMER · ${pc(d.cuts.weekend.undonePct)} vs ${pc(d.cuts.weeknight.undonePct)}`,
-    `NO HOME MARKET · ${pc(d.cuts.noHomeMarket.undonePct)}`,
-    `${d.answered} OF ${d.asked} NAMES ANSWERED`,
-    `<span class="grow"></span><span class="muted">PUBLIC MARKET DATA · NO ACCOUNT · NO ORDERS · NOT ADVICE</span>`,
-  ].map((t) => `<span>${t}</span>`).join("");
+/* ---------- context cards ---------- */
+async function loadCompany(symbol) {
+  const el = $("w-company").querySelector(".wt");
+  el.textContent = "Checking the company calendar…";
+  let d;
+  try { d = await fetch(`/api/company?symbol=${encodeURIComponent(symbol)}&market=${state.market}`).then((x) => x.json()); }
+  catch { d = null; }
+  if (symbol !== state.symbol) return;
+  const c = d?.company;
+  if (!c) { el.textContent = "Bitget's data server did not answer for this one."; return; }
+  const bits = [];
+  if (c.quote?.last != null) bits.push(`${c.ticker} last traded at $${c.quote.last}${c.quote.changePct != null ? ` (${c.quote.changePct > 0 ? "+" : ""}${Number(c.quote.changePct).toFixed(2)}% that day)` : ""}.`);
+  const e = c.events || {};
+  const when = (days) => (days === 0 ? "today" : days > 0 ? `in ${days} day${days === 1 ? "" : "s"}` : `${-days} day${days === -1 ? "" : "s"} ago`);
+  if (e.earnings) bits.push(`Results ${e.earnings.expected ? "due" : "reported"} ${when(e.earnings.days)}.`);
+  if (e.exDividend) bits.push(`Ex-dividend ${when(e.exDividend.days)}.`);
+  if (e.split) bits.push(`Share split ${when(e.split.days)}.`);
+  el.textContent = bits.length ? bits.join(" ") : `No earnings, dividend or split near tonight for ${c.ticker}.`;
 }
 
-/**
- * The countdown.
- *
- * The moment matters more than the state: "shut" is a fact, "opens in 3h 41m"
- * is the thing that decides whether you act now or wait. It ticks in the
- * browser against timestamps the server sent, and the offset between the two
- * clocks is carried so a viewer whose laptop is a few minutes out still sees
- * the right number.
- */
+async function loadMood() {
+  const el = $("w-mood").querySelector(".wt");
+  let d;
+  try { d = await fetch("/api/mood").then((x) => x.json()); } catch { d = null; }
+  const m = d?.mood;
+  if (!m) { el.textContent = "bitget-signal did not answer just now."; return; }
+  el.textContent = `Bitcoin is ${m.words} on the 4-hour chart` +
+    `${m.rsiSignal && m.rsiSignal !== "neutral" ? `, and ${m.rsiSignal} (RSI ${Math.round(m.rsi)})` : ""}. ` +
+    `Context only: crypto's mood does not change the odds above.`;
+}
+
+/* ---------- report card ---------- */
+const BAND_NAMES = { "under 0.3": "Tiny", "0.3-0.5": "Small", "0.5-0.8": "Medium", "0.8-1.3": "Large", "over 1.3": "Huge" };
+function renderRecord(rec) {
+  if (!rec?.byBand || $("rc").childElementCount) return;
+  $("rc").innerHTML = `<span class="h">Move size</span><span class="h">We said undone</span><span class="h">Really undone</span>` +
+    Object.entries(rec.byBand).map(([b, v]) =>
+      `<span>${BAND_NAMES[b] || b}</span><span class="n">${pc(v.said)}</span><span class="n">${pc(v.happened)}</span>`).join("");
+  const close = Object.values(rec.byBand).filter((v) => Math.abs(v.gap) <= 0.02).length;
+  $("rcfoot").textContent = `${rec.quoted.toLocaleString()} calls, ${rec.from} to ${rec.to}, each made before the bell using only earlier nights. Within 2 points on ${close} of 5 sizes, within ${Math.ceil(100 * rec.worstGap)} on all.`;
+}
+
+/* ---------- the board ---------- */
+function renderBoard(b) {
+  const grid = $("grid");
+  if (b.error || !b.rows?.length) {
+    grid.innerHTML = `<div class="card empty">${esc(b.error || "No stock token has moved enough to read yet.")}</div>`;
+    return;
+  }
+  const rows = b.rows.filter((r) => !state.hideSmall || Math.abs(r.move) >= 0.005);
+  const shown = state.showAll ? rows : rows.slice(0, SHOWN);
+  grid.innerHTML = shown.map((r) => {
+    const band = b.bands?.[r.band];
+    const call = callFor(band?.n >= 25 ? band.undonePct : null);
+    const stands = band ? 1 - band.undonePct : null;
+    return `<button type="button" class="m${r.symbol === state.symbol ? " on" : ""}" data-sym="${r.symbol}">
+      <div class="mh">${face(r.display)}
+        <div class="nm"><b>${esc(r.display)} <span class="${r.move > 0 ? "good" : "bad"}">${sg(r.move)}</span></b><small>${r.ratio.toFixed(2)}× a normal day</small></div>
+        <div class="gauge" style="color:var(--${call.cls === "acc" ? "accent" : call.cls === "dim" ? "muted" : call.cls})">${pc(stands)}<small>stands</small></div>
+      </div>
+      <div class="call chip ${call.cls}">${call.text}</div>
+      <div class="mf"><span>${band?.n ?? "—"} nights like it</span><span>${pc(band?.undonePct)} undone</span></div>
+    </button>`;
+  }).join("") || `<div class="card empty">Every move tonight is under 0.5%. Untick the box to see them.</div>`;
+  $("more").hidden = state.showAll || rows.length <= SHOWN;
+  $("more").textContent = `Show all ${rows.length} tokens`;
+  $("sorted").textContent = `${b.answered} of ${b.asked} tokens answered. Sorted by how unusual the move is for that stock, not by its size.`;
+
+  const hot = [...b.rows].sort((a, c) => Math.abs(c.move) - Math.abs(a.move)).slice(0, 5);
+  $("hot").innerHTML = hot.map((r, i) =>
+    `<li><span class="n">${i + 1}</span><button type="button" data-sym="${r.symbol}">${esc(r.display)}</button><span class="chip ${r.move > 0 ? "good" : "bad"}">${sg(r.move)}</span></li>`).join("");
+
+  $("tokens").innerHTML = b.rows.map((r) => `<option value="${esc(r.display)}"></option>`).join("");
+}
+
+function pickFrom(e) {
+  const el = e.target.closest("[data-sym]");
+  if (!el) return;
+  state.picked = true;
+  load(el.dataset.sym);
+  $("tonight").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+$("grid").addEventListener("click", pickFrom);
+$("hot").addEventListener("click", pickFrom);
+$("more").addEventListener("click", () => { state.showAll = true; renderBoard(state.board); });
+$("hidesmall").addEventListener("change", (e) => { state.hideSmall = e.target.checked; if (state.board) renderBoard(state.board); });
+
+$("searchform").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const want = $("search").value.trim().toUpperCase().replace(/^R(?=[A-Z])/, "");
+  const row = state.board?.rows?.find((r) => bare(r.display).toUpperCase() === want);
+  if (row) { state.picked = true; load(row.symbol); $("search").value = ""; }
+  else { $("q").value = $("search").value; ask($("search").value); }
+});
+
+/* ---------- clock ---------- */
 let ticker = null;
-
 function clock(d) {
   const el = $("clock");
-  if (!d || d.error) {
-    el.innerHTML = `<span class="dot" style="background: var(--crit)"></span><span class="mono">exchange unreachable</span>`;
-    if (ticker) { clearInterval(ticker); ticker = null; }
-    return;
-  }
-
-  const c = d.clock;
-  const skew = c ? c.now - Date.now() : 0;
-  const open = () => {
-    const now = Date.now() + skew;
-    return c ? now >= c.bellAt && now < c.nextCloseAt : d.marketOpen;
-  };
-
+  const c = d?.clock;
+  if (!c) return;
+  const skew = c.now - Date.now();
   const spell = (ms) => {
-    const s = Math.max(0, Math.floor(ms / 1000));
-    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
-    return h ? `${h}h ${String(m).padStart(2, "0")}m ${String(sec).padStart(2, "0")}s`
-             : `${m}m ${String(sec).padStart(2, "0")}s`;
+    const m = Math.max(0, Math.floor(ms / 60000));
+    return m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, "0")}m` : `${m}m`;
   };
-
   const tick = () => {
-    if (!c) return;
     const now = Date.now() + skew;
-    const isOpen = open();
-    const target = isOpen ? c.nextCloseAt : c.bellAt;
-    // Past the moment we were given, stop counting and let the next refresh
-    // bring fresh timestamps rather than counting into a stale one.
-    const left = target - now;
-    el.innerHTML = `<span class="dot" style="background: ${isOpen ? "var(--good)" : "var(--warn)"}"></span>
-      <span class="mono">${isOpen ? "US MARKET OPEN" : "US MARKET SHUT"}</span>
-      <span class="faint">·</span>
-      <span class="mono count ${isOpen ? "" : "teal"}">${left > 0
-        ? `${isOpen ? "CLOSES" : "OPENS"} IN ${spell(left)}`
-        : "WAITING FOR THE NEXT BELL"}</span>`;
+    const open = now >= c.bellAt && now < c.nextCloseAt;
+    const left = (open ? c.nextCloseAt : c.bellAt) - now;
+    el.textContent = left > 0
+      ? `New York ${open ? "open" : "shut"} · ${open ? "closes" : "opens"} in ${spell(left)}`
+      : "Waiting for the next bell";
+    el.style.color = open ? "var(--good)" : "var(--warn)";
   };
-
   tick();
-  if (ticker) clearInterval(ticker);
-  ticker = setInterval(tick, 1000);
+  clearInterval(ticker);
+  ticker = setInterval(tick, 20_000);
 }
 
-/**
- * The live record. Hidden until there is one, because an empty panel promising
- * live calls is worse than no panel at all.
- */
+/* ---------- live record ---------- */
 async function loadLive() {
   let d;
   try { d = await fetch(`/api/live?market=${state.market}`).then((x) => x.json()); } catch { return; }
   const panel = $("live");
-  if (!d.nights?.length) { panel.hidden = true; return; }
+  if (!d.totals) { panel.hidden = true; return; }
   panel.hidden = false;
-
-  const head = `<div class="thead mono"><div>BELL</div><div class="r">CALLS</div>
-    <div class="pl">LOCKED</div><div class="r">IT SAID</div><div class="r">IT HAPPENED</div></div>`;
-
-  const rows = d.nights.map((n) => {
-    const s = n.settled;
-    return `<div class="row">
-      <div class="num">${n.reopens}</div>
-      <div class="num r">${n.calls}</div>
-      <div class="pl muted" style="font-size:12px">${n.lockedAtNewYork || "—"} · ${n.minutesBeforeBell}m before</div>
-      <div class="num r">${s ? pc(s.itSaid) : "—"}</div>
-      <div class="num r" style="color:${s ? "var(--ink)" : "var(--muted)"}">${s ? `${pc(s.itHappened)} (${s.undone}/${s.judged})` : "waiting for the bell"}</div>
-    </div>`;
-  }).join("");
-
   const t = d.totals;
-  const total = t
-    ? `<p class="note">Across ${t.nights} settled night${t.nights === 1 ? "" : "s"} and ${t.calls} calls: it said <strong style="color:var(--ink)">${pc(t.itSaid)}</strong> would be undone, <strong style="color:var(--ink)">${pc(t.itHappened)}</strong> were. ${d.note}</p>`
-    : `<p class="note">${d.note}</p>`;
-
-  $("livebody").innerHTML = head + rows + total;
+  const latest = d.nights[0];
+  $("livebody").innerHTML = `<p class="small">${esc(d.note)}</p><div class="lr">
+    <div><b>${t.nights}</b><span>nights settled</span></div>
+    <div><b>${t.calls}</b><span>calls locked before the bell</span></div>
+    <div><b>${pc(t.itSaid)}</b><span>it said would be undone</span></div>
+    <div><b>${pc(t.itHappened)}</b><span>were undone</span></div>
+    <div><b>${esc(latest?.reopens || "—")}</b><span>latest bell${latest?.settled ? "" : ", waiting to settle"}</span></div></div>`;
 }
 
-/**
- * The company behind the token. Its own request, so a slow data server delays
- * nothing, and it stays visibly separate from the measured reading.
- */
-async function loadCompany(symbol) {
-  const el = $("company");
-  const mine = symbol;
-  let d;
-  try { d = await fetch(`/api/company?symbol=${encodeURIComponent(symbol)}&market=${state.market}`).then((x) => x.json()); }
-  catch { el.hidden = true; return; }
-  if (mine !== state.symbol) return;
-
-  const c = d.company;
-  if (!c || (!c.quote && !c.events)) { el.hidden = true; return; }
-
-  const bits = [];
-  if (c.quote && c.quote.last != null) {
-    const ch = c.quote.changePct;
-    bits.push(`<span class="ev"><b>${c.ticker}</b> ${c.quote.last} ${ch == null ? "" :
-      `<span style="color:${ch < 0 ? "var(--crit)" : "var(--good)"}">${sg(ch)}</span>`} in its own session</span>`);
-  }
-  const e = c.events || {};
-  if (e.earnings) {
-    const d0 = e.earnings.days;
-    const when = d0 === 0 ? "today" : d0 > 0 ? `in ${d0} day${d0 === 1 ? "" : "s"}` : `${-d0} day${d0 === -1 ? "" : "s"} ago`;
-    bits.push(`<span class="ev${Math.abs(d0) <= 2 ? " soon" : ""}"><b>${e.earnings.period || "results"}</b> ${e.earnings.expected ? "due" : "reported"} ${when}</span>`);
-  }
-  if (e.exDividend) {
-    const d0 = e.exDividend.days;
-    bits.push(`<span class="ev${Math.abs(d0) <= 2 ? " soon" : ""}"><b>ex-dividend</b> ${d0 === 0 ? "today" : d0 > 0 ? `in ${d0}d` : `${-d0}d ago`}${e.exDividend.amount ? ` · $${e.exDividend.amount}` : ""}</span>`);
-  }
-  if (e.split) bits.push(`<span class="ev soon"><b>split</b> ${e.split.ratio || ""} ${e.split.date}</span>`);
-
-  if (!bits.length) { el.hidden = true; return; }
-  el.hidden = false;
-  el.innerHTML = `<span class="src">the company behind it</span>${bits.join("")}` +
-    `<span class="src">context only · not part of the measurement</span>`;
-}
-
-/* ---------- wiring ---------- */
-
-async function load(symbol, { thenAsk = false } = {}) {
-  state.symbol = symbol;
-  const r = await fetch(`/api/reading?symbol=${encodeURIComponent(symbol)}&market=${state.market}`).then((x) => x.json());
-  state.reading = r;
-  renderReading(r);
-  clock(r);
-  if (state.board) renderBoard(state.board);
-  loadCompany(symbol);
-  if (thenAsk) ask(`Is ${r.display || clean(r.symbol)} really moving tonight?`, { quiet: true });
-}
-
-async function loadBoard() {
-  const b = await fetch(`/api/board?market=${state.market}`).then((x) => x.json());
-  renderMarkets(b.markets, state.market);
-  state.board = b;
-  renderBoard(b);
-  loadLive();
-  // Land on whatever actually moved most for itself tonight, rather than a
-  // name hard-coded months ago that may be sitting perfectly still.
-  if (!state.picked && b.rows?.length) {
-    state.picked = true;
-    load(b.rows[0].symbol, { thenAsk: true });
-  }
-}
-
-$("rows").addEventListener("click", (e) => {
-  const row = e.target.closest(".row");
-  if (row) { state.picked = true; load(row.dataset.sym); }
-});
-$("rows").addEventListener("keydown", (e) => {
-  if (e.key !== "Enter" && e.key !== " ") return;
-  const row = e.target.closest(".row");
-  if (row) { e.preventDefault(); load(row.dataset.sym); }
-});
-
-$("hidesmall").addEventListener("change", (e) => {
-  state.hideSmall = e.target.checked;
-  if (state.board) renderBoard(state.board);
-});
-
-/**
- * Ask the desk. Whoever ends up writing the answer is named on it — the model
- * when it answered in time and kept to the figures, the desk itself when it did
- * not. That label is the point, not decoration.
- */
-async function ask(question, { quiet = false } = {}) {
-  const out = $("answer");
-  out.hidden = false;
-  out.innerHTML = `<span class="muted">Reading the market…</span>`;
+/* ---------- ask ---------- */
+let askSeq = 0;
+async function ask(question) {
+  const box = $("answer");
+  box.hidden = false;
+  $("a-src").textContent = "Reading the market…";
+  $("a-text").textContent = "";
   const mine = ++askSeq;
-
-  // The desk answers first so there is something true on screen within a
-  // second; the model is then asked the same question and swapped in if it
-  // arrives, still checked, still labelled.
-  const render = (r, pending) => {
-    if (mine !== askSeq) return;
-    const model = r.wrote && r.wrote !== "the desk";
-    const badge = r.wrote
-      ? `<span class="who ${model ? "model" : "fallback"}">${model ? "✦ written by " + r.wrote : "written by the desk"}</span>`
-      : "";
-    out.innerHTML = `${badge}${pending ? `<span class="who pending">asking qwen…</span>` : ""}` +
-      `<span class="said">${r.answer || r.error || "No answer."}</span>` +
-      (r.note && !pending ? `<span class="mono muted why">${r.note}</span>` : "");
-  };
-
   const post = async (body) => {
-    const raw = await fetch("/api/ask", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(body),
-    }).then((x) => x.text());
-    try { return JSON.parse(raw); }
-    catch { return null; }
+    try {
+      const raw = await fetch("/api/ask", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }).then((x) => x.text());
+      return JSON.parse(raw);
+    } catch { return null; }
   };
-
+  const show = (r, pending) => {
+    if (mine !== askSeq || !r) return;
+    const model = r.wrote && r.wrote !== "the desk";
+    $("a-src").textContent = pending ? "Almanac's own answer · asking Qwen on Bitget's endpoint…"
+      : model ? `Qwen (${r.wrote}) on Bitget's endpoint · every number checked against the desk` : `Almanac's own answer${r.note ? ` · ${r.note}` : ""}`;
+    $("a-text").textContent = r.answer || r.error || "No answer.";
+  };
+  // The desk answers in about a second; the model is asked the same question
+  // and swapped in only if it arrives and its numbers match.
   const base = { question, symbol: state.symbol, market: state.market };
-  const quick = await post({ ...base, fast: true });
-  if (quick) render(quick, true);
+  show(await post({ ...base, fast: true }), true);
   const full = await post(base);
-  if (full) render(full, false);
-  else if (!quick) render({ wrote: "the desk", answer: "The question box did not come back in time. Everything below is unaffected — it comes from a different request." }, false);
+  if (full) show(full, false);
+  else if (mine === askSeq) $("a-src").textContent = "Almanac's own answer · Qwen did not come back in time";
 }
-
 $("askform").addEventListener("submit", (e) => {
   e.preventDefault();
   const q = $("q").value.trim();
-  $("q").dataset.touched = "1";
   if (q) ask(q);
 });
 
-/* The board sweeps forty names and takes several seconds. The reading takes one
-   and carries the bands, the record and the baseline with it — so it paints the
-   charts first and the rail fills in behind it. Waiting for the sweep before
-   drawing anything made a working page look like a dead one. */
-load(asked.symbol || FIRST);
+/* ---------- agents ---------- */
+$("mcpcmd").textContent = `claude mcp add --transport http almanac ${location.origin}/api/mcp`;
+$("copymcp").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText($("mcpcmd").textContent); $("copymcp").textContent = "Copied"; }
+  catch { $("copymcp").textContent = "Select and copy the line above"; }
+  setTimeout(() => { $("copymcp").textContent = "Copy command"; }, 2000);
+});
+
+/* ---------- load ---------- */
+async function load(symbol) {
+  state.symbol = symbol;
+  let r;
+  try { r = await fetch(`/api/reading?symbol=${encodeURIComponent(symbol)}&market=${state.market}`).then((x) => x.json()); }
+  catch { $("f-title").textContent = "The reading did not come back. Refresh to try again."; return; }
+  if (symbol !== state.symbol) return;
+  state.reading = r;
+  state.symbol = r.symbol || symbol;
+  renderReading(r);
+  loadCompany(state.symbol);
+  if (state.board) renderBoard(state.board);
+}
+
+async function loadBoard() {
+  let b;
+  try { b = await fetch(`/api/board?market=${state.market}`).then((x) => x.json()); }
+  catch { $("grid").innerHTML = `<div class="card empty">Bitget did not answer. Refresh to try again.</div>`; return; }
+  renderMarkets(b.markets);
+  state.board = b;
+  renderBoard(b);
+  // Open on the most unusual move of the night, unless the reader chose one.
+  if (!state.picked && !asked.symbol && b.rows?.length) {
+    state.picked = true;
+    if (b.rows[0].symbol !== state.symbol) load(b.rows[0].symbol);
+  }
+}
+
+$("foot").innerHTML = `<span>Almanac counts nights; it does not predict direction, and it is not advice.</span>
+  <a href="/method.html">How it works</a><a href="/api/mcp">MCP server</a><a href="https://github.com/imprint-hash/almanac">Source</a>
+  <span>Data: Bitget public market data · Bitget MCP · bitget-signal · Qwen on Bitget's endpoint</span>`;
+
+load(asked.symbol || FIRST[state.market]);
 loadBoard();
+loadMood();
+loadLive();
 setInterval(() => { if (state.symbol) load(state.symbol); }, 60_000);
 setInterval(loadBoard, 180_000);
