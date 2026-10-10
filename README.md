@@ -4,6 +4,7 @@
 how often moves like it were undone, on Bitget's own data.**
 
 - **Live:** https://almanac-pearl.vercel.app
+- **Demo video (82 s):** https://x.com/imprint_0x/status/2108943147644428520
 - **For agents:** `claude mcp add --transport http almanac https://almanac-pearl.vercel.app/api/mcp`
 - Built for the [Bitget AI Base Camp Hackathon S2](https://bitget-ai.gitbook.io/bitgetai_hackathons2) ·
   Track 3, **AI Trading Desk** · sub-themes **Review & Self-Evolution** and **Personalized Research Workbench**
