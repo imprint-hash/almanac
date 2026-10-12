@@ -1,0 +1,12 @@
+{
+ "market": "rtoken",
+ "session": "2026-10-12",
+ "reopens": "2026-10-13",
+ "lockedAt": "2026-10-12T20:01:14.014Z",
+ "lockedAtNewYork": "2026-10-12 16:01 ET",
+ "minutesBeforeBell": 1049,
+ "namesAsked": 40,
+ "namesAnswered": 32,
+ "calls": [],
+ "settled": null
+}
