@@ -31,15 +31,16 @@ const NIGHT_PAGES = 2;
  * the normal day is computed from candles fetched here, which costs more
  * requests but keeps a one-off lookup honest.
  */
-export async function reading(symbol, normals, index, { marketId = DEFAULT_MARKET } = {}) {
-  const w = currentDarkHours();
+export async function reading(symbol, normals, index, { marketId = DEFAULT_MARKET, at = null } = {}) {
+  const now = at ?? Date.now();
+  const w = currentDarkHours(now);
   const stored = normals?.[symbol];
-  const rows = await candles(symbol, { pages: stored ? NIGHT_PAGES : 12, marketId });
+  const rows = await candles(symbol, { endTime: now, pages: stored ? NIGHT_PAGES : 12, marketId });
 
   let normal = stored?.normalDay ?? null;
   let source = "stored";
   if (stored) {
-    const ageDays = (Date.now() - new Date(stored.asOf).getTime()) / 86400000;
+    const ageDays = (Date.now() - new Date(stored.asOf).getTime()) / 86400000; // staleness is about the file, so real time
     if (ageDays > STALE_DAYS) {
       normal = null;
       source = "stale";
@@ -49,29 +50,33 @@ export async function reading(symbol, normals, index, { marketId = DEFAULT_MARKE
     source = "computed";
   }
 
-  const night = nightSoFar(rows);
+  const night = nightSoFar(rows, now);
   const ratio = night.move != null && normal ? Math.abs(night.move) / normal : null;
   const read = lookup(index, { symbol, move: night.move, normalDay: normal });
 
   // What was happening to the company while the token drifted. Never allowed
   // to hold up or break a reading — the measurement stands without it.
+  // Skipped on a replay: today's headlines would be read as if they were then's.
   let company = null;
-  try {
-    company = await context(symbol, stored?.display ?? symbol, w.reopens);
-  } catch {
-    company = null;
+  if (at == null) {
+    try {
+      company = await context(symbol, stored?.display ?? symbol, w.reopens);
+    } catch {
+      company = null;
+    }
   }
 
   return {
     symbol,
     display: stored?.display ?? symbol,
     market: marketId,
-    at: Date.now(),
-    marketOpen: marketOpen(),
+    at: now,
+    replay: at != null,
+    marketOpen: marketOpen(now),
     night: { ...night, normalDay: normal, ratio },
     // The exact moments, so the page can count down without re-deriving the
     // New York calendar in the browser.
-    clock: { closeAt: w.close, bellAt: w.bell, nextCloseAt: w.nextClose, now: Date.now() },
+    clock: { closeAt: w.close, bellAt: w.bell, nextCloseAt: w.nextClose, now },
     normalDaySource: source,
     sessionsBehindNormalDay: stored?.sessions ?? null,
     reading: read,
@@ -85,7 +90,8 @@ export async function reading(symbol, normals, index, { marketId = DEFAULT_MARKE
  * how far the price moved. That ordering is the whole argument, so it belongs
  * in the data and not in the page.
  */
-export async function board(symbols, normals, index, { concurrency = 6, marketId = DEFAULT_MARKET } = {}) {
+export async function board(symbols, normals, index, { concurrency = 8, marketId = DEFAULT_MARKET, at = null } = {}) {
+  const now = at ?? Date.now();
   const out = [];
   const queue = [...symbols];
 
@@ -95,8 +101,8 @@ export async function board(symbols, normals, index, { concurrency = 6, marketId
       const stored = normals?.[symbol];
       if (!stored) continue; // never guess a normal day on the rail
       try {
-        const rows = await candles(symbol, { pages: NIGHT_PAGES, marketId });
-        const night = nightSoFar(rows);
+        const rows = await candles(symbol, { endTime: now, pages: NIGHT_PAGES, marketId });
+        const night = nightSoFar(rows, now);
         if (night.move == null) continue;
         const ratio = Math.abs(night.move) / stored.normalDay;
         out.push({

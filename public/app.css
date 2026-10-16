@@ -213,3 +213,9 @@ h1 span { color: var(--accent); }
   .chart { height: 210px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+/* replay: a past moment, said plainly */
+.replay { margin: 0 auto; padding: 10px 18px; font: 500 14px var(--f); background: var(--warn-bg); color: var(--warn); border-bottom: 1px solid color-mix(in srgb, var(--warn) 30%, transparent); text-align: center; }
+.replay b { font-weight: 700; }
+.replay a { color: inherit; font-weight: 700; margin-left: 6px; }
+.replay[data-state="refused"] { background: var(--bad-bg); color: var(--bad); }

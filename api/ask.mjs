@@ -11,6 +11,7 @@
 import { reading } from "../src/desk.js";
 import { facts, compose, prompt, symbolIn, numbersAreOurs } from "../src/answer.js";
 import { pick } from "./_data.mjs";
+import { replayAt } from "../src/clock.js";
 
 const KEY = process.env.QWEN_API_KEY || process.env.DASHSCOPE_API_KEY || "";
 const MODEL = process.env.QWEN_MODEL || "qwen3.8-max";
@@ -68,6 +69,7 @@ export default async function handler(req, res) {
   const deadline = Date.now() + BUDGET_MS;
   const question = String(req.body?.question || "").slice(0, 300).trim();
   const m = pick({ market: req.body?.market });
+  const { at } = replayAt({ at: req.body?.at });
   const known = Object.keys(m.normals);
   const asked = symbolIn(question, known, m.normals);
   const fallback = String(req.body?.symbol || "").toUpperCase();
@@ -81,7 +83,7 @@ export default async function handler(req, res) {
   const fast = req.body?.fast === true;
 
   try {
-    const r = await reading(symbol, m.normals, m.index, { marketId: m.id });
+    const r = await reading(symbol, m.normals, m.index, { marketId: m.id, at });
     const f = facts({ ...r, baseline: m.index.all.undonePct, record: m.index.record });
     const ours = compose(f);
 
