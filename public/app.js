@@ -23,7 +23,7 @@ const FIRST = { rtoken: "RNVDAUSDT", perp: "NVDAUSDT" };
 // ?at=2026-10-14T07:00:00Z reads the desk as it stood then, from the prices that
 // existed then. The server decides whether the time is allowed; the page only
 // passes it on and says plainly that this is not tonight.
-const AT = asked.at || "";
+const AT = asked.at || asked.replay || "";
 const atq = AT ? `&at=${encodeURIComponent(AT)}` : "";
 const query = () => {
   const p = new URLSearchParams();
@@ -32,19 +32,44 @@ const query = () => {
   const s = p.toString();
   return s ? `?${s}` : "/";
 };
+// The picker speaks New York wall-clock time, because that is the clock the
+// whole page is about; the link carries UTC so it means the same thing anywhere.
+const NY = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+const nyParts = (ms) => Object.fromEntries(NY.formatToParts(ms).map((p) => [p.type, p.value]));
+const nyOffset = (ms) => { const p = nyParts(ms); return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute) - Math.floor(ms / 60000) * 60000; };
+const nyLocal = (ms) => { const p = nyParts(ms); return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`; };
+const nyToUtc = (local) => { const wall = Date.parse(local + ":00Z"); return wall - nyOffset(wall - nyOffset(wall)); };
+(function replayPicker() {
+  const form = $("replaypick"), input = $("replay-at");
+  if (!form) return;
+  const now = Date.now();
+  input.max = nyLocal(now);
+  input.min = nyLocal(now - 120 * 86400000);
+  const current = AT && (/^\d{10,13}$/.test(AT) ? Number(AT.length === 10 ? AT + "000" : AT) : Date.parse(AT));
+  input.value = Number.isFinite(current) ? nyLocal(current) : nyLocal(now - 12 * 3600000);
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!input.value) return;
+    const p = new URLSearchParams();
+    if (state.market === "perp") p.set("market", "perp");
+    p.set("at", new Date(nyToUtc(input.value)).toISOString());
+    location.search = p.toString();
+  });
+})();
+
 function replayBanner(d) {
   const el = $("replay");
   if (!el || !AT) return;
   el.hidden = false;
   if (d?.replayError) {
     el.dataset.state = "refused";
-    el.innerHTML = `${esc(d.replayError)} Showing tonight instead. <a href="/">Back to live</a>`;
+    el.innerHTML = `${esc(d.replayError)} Showing tonight instead. <a href="/" id="back-live">Back to live</a>`;
     return;
   }
   if (!d?.replay) return;
   const when = new Date(d.at).toLocaleString("en-US", { timeZone: "America/New_York", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
   el.dataset.state = "on";
-  el.innerHTML = `Replay: the desk as it stood at <b>${esc(when)} New York</b>, from the prices that existed then. Nothing here is tonight. <a href="/">Back to live</a>`;
+  el.innerHTML = `Replay: the desk as it stood at <b>${esc(when)} New York</b>, from the prices that existed then. Nothing here is tonight. <a href="/" id="back-live">Back to live</a>`;
 }
 const SHOWN = 9;
 

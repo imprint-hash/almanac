@@ -9,17 +9,21 @@
  * calls locked before each bell stay exactly as committed.
  */
 
-/** How far back a replay may reach. History beyond this is thin for some names. */
-export const REPLAY_DAYS = 30;
+/**
+ * How far back a replay may reach. Bitget's 15-minute history goes back further,
+ * but the stored record starts in July; 120 days covers every night it was
+ * built from, including the July 3 and Labor Day holidays.
+ */
+export const REPLAY_DAYS = 120;
 
 export function replayAt(query, now = Date.now()) {
-  const raw = query?.at;
+  const raw = query?.at ?? query?.replay;
   if (raw == null || raw === "") return { at: null };
   const s = String(raw).trim();
   const ms = /^\d{10,13}$/.test(s) ? Number(s.length === 10 ? s + "000" : s) : Date.parse(s);
   if (!Number.isFinite(ms)) return { at: null, error: `Could not read the replay time "${s.slice(0, 40)}".` };
-  if (ms > now) return { at: null, error: "A replay can only look back, not forward." };
-  if (now - ms > REPLAY_DAYS * 86400000) return { at: null, error: `A replay can reach back ${REPLAY_DAYS} days at most.` };
+  if (ms > now) return { at: null, error: "That time is in the future. A replay can only look back, not forward." };
+  if (now - ms > REPLAY_DAYS * 86400000) return { at: null, error: `That time is more than ${REPLAY_DAYS} days ago. A replay can reach back ${REPLAY_DAYS} days at most.` };
   // Round to the minute so near-identical requests share a cache entry.
   return { at: Math.floor(ms / 60000) * 60000 };
 }

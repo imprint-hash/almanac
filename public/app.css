@@ -219,3 +219,9 @@ h1 span { color: var(--accent); }
 .replay b { font-weight: 700; }
 .replay a { color: inherit; font-weight: 700; margin-left: 6px; }
 .replay[data-state="refused"] { background: var(--bad-bg); color: var(--bad); }
+.replaypick { margin-left: auto; display: flex; align-items: center; gap: 8px; padding: 6px 0; white-space: nowrap; }
+.replaypick label { font: 600 13px var(--f); color: var(--ink-2); }
+.replaypick .muted { font-weight: 500; color: var(--ink-3, var(--ink-2)); opacity: .75; }
+.replaypick input { font: 500 13px var(--f); color: var(--ink); background: var(--bg-2, transparent); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; color-scheme: light dark; }
+.replaypick button { font: 600 13px var(--f); color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 5px 12px; cursor: pointer; }
+.replaypick button:hover, .replaypick input:focus-visible, .replaypick button:focus-visible { border-color: var(--ink); outline: none; }
