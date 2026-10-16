@@ -18,6 +18,59 @@ const state = {
   showAll: false,
 };
 const FIRST = { rtoken: "RNVDAUSDT", perp: "NVDAUSDT" };
+
+/* ---------- replay ---------- */
+// ?at=2026-10-14T07:00:00Z reads the desk as it stood then, from the prices that
+// existed then. The server decides whether the time is allowed; the page only
+// passes it on and says plainly that this is not tonight.
+const AT = asked.at || asked.replay || "";
+const atq = AT ? `&at=${encodeURIComponent(AT)}` : "";
+const query = () => {
+  const p = new URLSearchParams();
+  if (state.market === "perp") p.set("market", "perp");
+  if (AT) p.set("at", AT);
+  const s = p.toString();
+  return s ? `?${s}` : "/";
+};
+// The picker speaks New York wall-clock time, because that is the clock the
+// whole page is about; the link carries UTC so it means the same thing anywhere.
+const NY = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+const nyParts = (ms) => Object.fromEntries(NY.formatToParts(ms).map((p) => [p.type, p.value]));
+const nyOffset = (ms) => { const p = nyParts(ms); return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute) - Math.floor(ms / 60000) * 60000; };
+const nyLocal = (ms) => { const p = nyParts(ms); return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`; };
+const nyToUtc = (local) => { const wall = Date.parse(local + ":00Z"); return wall - nyOffset(wall - nyOffset(wall)); };
+(function replayPicker() {
+  const form = $("replaypick"), input = $("replay-at");
+  if (!form) return;
+  const now = Date.now();
+  input.max = nyLocal(now);
+  input.min = nyLocal(now - 120 * 86400000);
+  const current = AT && (/^\d{10,13}$/.test(AT) ? Number(AT.length === 10 ? AT + "000" : AT) : Date.parse(AT));
+  input.value = Number.isFinite(current) ? nyLocal(current) : nyLocal(now - 12 * 3600000);
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!input.value) return;
+    const p = new URLSearchParams();
+    if (state.market === "perp") p.set("market", "perp");
+    p.set("at", new Date(nyToUtc(input.value)).toISOString());
+    location.search = p.toString();
+  });
+})();
+
+function replayBanner(d) {
+  const el = $("replay");
+  if (!el || !AT) return;
+  el.hidden = false;
+  if (d?.replayError) {
+    el.dataset.state = "refused";
+    el.innerHTML = `${esc(d.replayError)} Showing tonight instead. <a href="/" id="back-live">Back to live</a>`;
+    return;
+  }
+  if (!d?.replay) return;
+  const when = new Date(d.at).toLocaleString("en-US", { timeZone: "America/New_York", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  el.dataset.state = "on";
+  el.innerHTML = `Replay: the desk as it stood at <b>${esc(when)} New York</b>, from the prices that existed then. Nothing here is tonight. <a href="/" id="back-live">Back to live</a>`;
+}
 const SHOWN = 9;
 
 /* ---------- theme ---------- */
@@ -67,7 +120,7 @@ function renderMarkets(list) {
       x.classList.toggle("on", on);
       x.setAttribute("aria-pressed", String(on));
     });
-    history.replaceState(null, "", state.market === "perp" ? "?market=perp" : "/");
+    history.replaceState(null, "", query());
     load(FIRST[state.market]);
     loadBoard();
     loadLive();
@@ -205,7 +258,7 @@ async function loadMood() {
   try { d = await fetch("/api/mood").then((x) => x.json()); } catch { d = null; }
   const m = d?.mood;
   if (!m) { el.textContent = "bitget-signal did not answer just now."; return; }
-  el.textContent = `Bitcoin is ${m.words} on the 4-hour chart` +
+  el.textContent = (AT ? "Right now, not then: " : "") + `Bitcoin is ${m.words} on the 4-hour chart` +
     `${m.rsiSignal && m.rsiSignal !== "neutral" ? `, and ${m.rsiSignal} (RSI ${Math.round(m.rsi)})` : ""}. ` +
     `Context only: crypto's mood does not change the odds above.`;
 }
@@ -280,13 +333,14 @@ function clock(d) {
   const el = $("clock");
   const c = d?.clock;
   if (!c) return;
+  const frozen = Boolean(d?.replay);
   const skew = c.now - Date.now();
   const spell = (ms) => {
     const m = Math.max(0, Math.floor(ms / 60000));
     return m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, "0")}m` : `${m}m`;
   };
   const tick = () => {
-    const now = Date.now() + skew;
+    const now = frozen ? c.now : Date.now() + skew;
     const open = now >= c.bellAt && now < c.nextCloseAt;
     const left = (open ? c.nextCloseAt : c.bellAt) - now;
     el.textContent = left > 0
@@ -339,7 +393,7 @@ async function ask(question) {
   };
   // The desk answers in about a second; the model is asked the same question
   // and swapped in only if it arrives and its numbers match.
-  const base = { question, symbol: state.symbol, market: state.market };
+  const base = { question, symbol: state.symbol, market: state.market, ...(AT ? { at: AT } : {}) };
   show(await post({ ...base, fast: true }), true);
   const full = await post(base);
   if (full) show(full, false);
@@ -363,21 +417,24 @@ $("copymcp").addEventListener("click", async () => {
 async function load(symbol) {
   state.symbol = symbol;
   let r;
-  try { r = await fetch(`/api/reading?symbol=${encodeURIComponent(symbol)}&market=${state.market}`).then((x) => x.json()); }
+  try { r = await fetch(`/api/reading?symbol=${encodeURIComponent(symbol)}&market=${state.market}${atq}`).then((x) => x.json()); }
   catch { $("f-title").textContent = "The reading did not come back. Refresh to try again."; return; }
   if (symbol !== state.symbol) return;
   state.reading = r;
   state.symbol = r.symbol || symbol;
   renderReading(r);
-  loadCompany(state.symbol);
+  if (!r.replay) loadCompany(state.symbol);
+  else $("w-company").querySelector(".wt").textContent = "Company news is left out of a replay: today's headlines were not known then.";
   if (state.board) renderBoard(state.board);
 }
 
 async function loadBoard() {
   let b;
-  try { b = await fetch(`/api/board?market=${state.market}`).then((x) => x.json()); }
+  try { b = await fetch(`/api/board?market=${state.market}${atq}`).then((x) => x.json()); }
   catch { $("grid").innerHTML = `<div class="card empty">Bitget did not answer. Refresh to try again.</div>`; return; }
   renderMarkets(b.markets);
+  replayBanner(b);
+  if (b.replay) $("hot-title").textContent = "Biggest moves that night";
   state.board = b;
   renderBoard(b);
   // Open on the most unusual move of the night, unless the reader chose one.

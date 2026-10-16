@@ -10,18 +10,22 @@
 
 import { board } from "../src/desk.js";
 import { pick, markets } from "./_data.mjs";
+import { replayAt } from "../src/clock.js";
 
 const TTL = 3 * 60_000;
 const cache = new Map();
 
 export default async function handler(req, res) {
   const m = pick(req.query);
+  const { at, error: replayError } = replayAt(req.query);
+  const key = `${m.id}:${at ?? "now"}`;
   try {
-    let hit = cache.get(m.id);
-    if (!hit || Date.now() - hit.at > TTL) {
-      const result = await board(Object.keys(m.normals), m.normals, m.index, { marketId: m.id });
+    let hit = cache.get(key);
+    // A replay of the past never changes, so it is kept; the live board expires.
+    if (!hit || (at == null && Date.now() - hit.at > TTL)) {
+      const result = await board(Object.keys(m.normals), m.normals, m.index, { marketId: m.id, at });
       hit = { at: Date.now(), result };
-      cache.set(m.id, hit);
+      cache.set(key, hit);
     }
     // s-maxage lets Vercel's edge hold the sweep, so a visitor almost never waits
     // for forty names to be asked; a slightly old board is served while a new
@@ -29,7 +33,8 @@ export default async function handler(req, res) {
     res.setHeader("cache-control", "public, max-age=60, s-maxage=120, stale-while-revalidate=900");
     res.status(200).json({
       market: m.id, label: m.label, markets,
-      at: hit.at, asked: hit.result.asked, answered: hit.result.answered, rows: hit.result.rows,
+      at: at ?? hit.at, replay: at != null, replayError,
+      asked: hit.result.asked, answered: hit.result.answered, rows: hit.result.rows,
       bands: m.index.bands, baseline: m.index.all.undonePct, meta: m.index.meta, cuts: m.index.cuts,
     });
   } catch (err) {
