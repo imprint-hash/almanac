@@ -55,6 +55,17 @@ That last row is why, on this site, **code sets every number and the model only 
 4. **The report card.** What Almanac said before each bell against what happened, on the front page.
 5. **Light and dark**, and it works on a phone.
 
+## Replay: the desk at any past moment
+
+Add `?at=` to any link, or use **Replay a moment** in the tab bar, and the page reads the market as it stood then, from Bitget's real candles of that time:
+
+- [3:00 AM New York, Wed 14 Oct](https://almanac-pearl.vercel.app/?at=2026-10-14T07:00:00Z): market shut, the night's moves in progress.
+- [3:00 PM, Fri 3 Jul](https://almanac-pearl.vercel.app/?at=2026-07-03T19:00:00Z): a market holiday.
+
+A yellow banner says it is a replay and the New York clock freezes at that moment. It only looks back, up to 120 days; a future time is refused. Company news is left out (today's headlines were not known then), and the live record of calls locked before each bell is never touched.
+
+It exists so the page can be checked at the moments that matter, not only at whatever time someone happens to open it: before the bell, after it, on a weekend, on a holiday.
+
 ## A research task, from question to decision
 
 Asked on the live site on **8 Oct 2026**, the day chip stocks fell:

@@ -18,6 +18,71 @@ const state = {
   showAll: false,
 };
 const FIRST = { rtoken: "RNVDAUSDT", perp: "NVDAUSDT" };
+
+/* ---------- replay ---------- */
+// ?at=2026-10-14T07:00:00Z reads the desk as it stood then, from the prices that
+// existed then. The server decides whether the time is allowed; the page only
+// passes it on and says plainly that this is not tonight.
+const AT = asked.at || asked.replay || "";
+const atq = AT ? `&at=${encodeURIComponent(AT)}` : "";
+const query = () => {
+  const p = new URLSearchParams();
+  if (state.market === "perp") p.set("market", "perp");
+  if (AT) p.set("at", AT);
+  const s = p.toString();
+  return s ? `?${s}` : "/";
+};
+// The picker speaks New York wall-clock time, because that is the clock the
+// whole page is about; the link carries UTC so it means the same thing anywhere.
+const NY = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+const nyParts = (ms) => Object.fromEntries(NY.formatToParts(ms).map((p) => [p.type, p.value]));
+const nyOffset = (ms) => { const p = nyParts(ms); return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute) - Math.floor(ms / 60000) * 60000; };
+const nyLocal = (ms) => { const p = nyParts(ms); return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`; };
+const nyToUtc = (local) => { const wall = Date.parse(local + ":00Z"); return wall - nyOffset(wall - nyOffset(wall)); };
+// Say it is a replay the moment the page opens; the board for a past moment can
+// take several seconds, and the reader should never see it mistaken for tonight.
+if (AT) {
+  const el = $("replay");
+  el.hidden = false;
+  el.dataset.state = "on";
+  el.textContent = "Replay: loading the desk as it stood at that moment…";
+}
+
+(function replayPicker() {
+  const form = $("replaypick"), input = $("replay-at");
+  if (!form) return;
+  const now = Date.now();
+  input.max = nyLocal(now);
+  input.min = nyLocal(now - 120 * 86400000);
+  const current = AT && (/^\d{10,13}$/.test(AT) ? Number(AT.length === 10 ? AT + "000" : AT) : Date.parse(AT));
+  input.value = Number.isFinite(current) ? nyLocal(current) : nyLocal(now - 12 * 3600000);
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!input.value) return;
+    const p = new URLSearchParams();
+    if (state.market === "perp") p.set("market", "perp");
+    p.set("at", new Date(nyToUtc(input.value)).toISOString());
+    location.search = p.toString();
+  });
+})();
+
+function replayBanner(d) {
+  const el = $("replay");
+  if (!el || !AT) return;
+  el.hidden = false;
+  if (d?.replayError) {
+    el.dataset.state = "refused";
+    // Don't leave the refused time sitting in the picker as if it were valid.
+    const input = $("replay-at");
+    if (input) input.value = nyLocal(Date.now() - 12 * 3600000);
+    el.innerHTML = `${esc(d.replayError)} Showing tonight instead. <a href="/" id="back-live">Back to live</a>`;
+    return;
+  }
+  if (!d?.replay) return;
+  const when = new Date(d.at).toLocaleString("en-US", { timeZone: "America/New_York", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  el.dataset.state = "on";
+  el.innerHTML = `Replay: the desk as it stood at <b>${esc(when)} New York</b>, from the prices that existed then. Nothing here is tonight. <a href="/" id="back-live">Back to live</a>`;
+}
 const SHOWN = 9;
 
 /* ---------- theme ---------- */
@@ -67,7 +132,12 @@ function renderMarkets(list) {
       x.classList.toggle("on", on);
       x.setAttribute("aria-pressed", String(on));
     });
-    history.replaceState(null, "", state.market === "perp" ? "?market=perp" : "/");
+    history.replaceState(null, "", query());
+    // Clear the card straight away: the other market's numbers must not sit
+    // under the new market's button while the new reading is fetched.
+    $("f-title").textContent = state.market === "perp" ? "Reading the perpetual…" : "Reading the token…";
+    $("f-meta").textContent = state.market === "perp" ? "Bitget stock perpetual" : "Bitget stock token";
+    $("f-verdict").textContent = "";
     load(FIRST[state.market]);
     loadBoard();
     loadLive();
@@ -90,7 +160,7 @@ function renderLead(record, meta) {
   }
   $("eyebrow").textContent = `What ${record.quoted.toLocaleString()} calls made before the bell taught us`;
   $("leadsub").textContent =
-    `Every night from ${record.from} to ${record.to}, Almanac gave its odds for each Bitget stock token before New York opened, ` +
+    `Every night from ${record.from} to ${record.to}, Almanac gave its odds for each Bitget ${state.market === "perp" ? "stock perpetual" : "stock token"} before New York opened, ` +
     `then checked itself at the bell. The size of the move, for that particular stock, told us more than anything else.`;
   void meta;
 }
@@ -175,7 +245,7 @@ function renderReading(d) {
 
   $("c-name").textContent = name;
   chart($("chart"), d.path, n.closePrice);
-  $("c-right").textContent = d.marketOpen ? "New York is open: the token now follows the real market" : "Odds called before the bell, checked at 10:30";
+  $("c-right").textContent = d.marketOpen ? `New York is open: the ${state.market === "perp" ? "perpetual" : "token"} now follows the real market` : "Odds called before the bell, checked at 10:30";
   document.title = n.move == null ? "Almanac" : `${name} ${sg(n.move, 1)} · Almanac`;
 }
 
@@ -205,7 +275,7 @@ async function loadMood() {
   try { d = await fetch("/api/mood").then((x) => x.json()); } catch { d = null; }
   const m = d?.mood;
   if (!m) { el.textContent = "bitget-signal did not answer just now."; return; }
-  el.textContent = `Bitcoin is ${m.words} on the 4-hour chart` +
+  el.textContent = (AT ? "Right now, not then: " : "") + `Bitcoin is ${m.words} on the 4-hour chart` +
     `${m.rsiSignal && m.rsiSignal !== "neutral" ? `, and ${m.rsiSignal} (RSI ${Math.round(m.rsi)})` : ""}. ` +
     `Context only: crypto's mood does not change the odds above.`;
 }
@@ -225,7 +295,7 @@ function renderRecord(rec) {
 function renderBoard(b) {
   const grid = $("grid");
   if (b.error || !b.rows?.length) {
-    grid.innerHTML = `<div class="card empty">${esc(b.error || "No stock token has moved enough to read yet.")}</div>`;
+    grid.innerHTML = `<div class="card empty">${esc(b.error || (state.market === "perp" ? "No stock perpetual has moved enough to read yet." : "No stock token has moved enough to read yet."))}</div>`;
     return;
   }
   const rows = b.rows.filter((r) => !state.hideSmall || Math.abs(r.move) >= 0.005);
@@ -244,8 +314,9 @@ function renderBoard(b) {
     </button>`;
   }).join("") || `<div class="card empty">Every move tonight is under 0.5%. Untick the box to see them.</div>`;
   $("more").hidden = state.showAll || rows.length <= SHOWN;
-  $("more").textContent = `Show all ${rows.length} tokens`;
-  $("sorted").textContent = `${b.answered} of ${b.asked} tokens answered. Sorted by how unusual the move is for that stock, not by its size.`;
+  const noun = state.market === "perp" ? "perpetuals" : "tokens";
+  $("more").textContent = `Show all ${rows.length} ${noun}`;
+  $("sorted").textContent = `${b.answered} of ${b.asked} ${noun} answered. Sorted by how unusual the move is for that stock, not by its size.`;
 
   const hot = [...b.rows].sort((a, c) => Math.abs(c.move) - Math.abs(a.move)).slice(0, 5);
   $("hot").innerHTML = hot.map((r, i) =>
@@ -270,8 +341,21 @@ $("searchform").addEventListener("submit", (e) => {
   e.preventDefault();
   const want = $("search").value.trim().toUpperCase().replace(/^R(?=[A-Z])/, "");
   const row = state.board?.rows?.find((r) => bare(r.display).toUpperCase() === want);
-  if (row) { state.picked = true; load(row.symbol); $("search").value = ""; }
-  else { $("q").value = $("search").value; ask($("search").value); }
+  if (row) { state.picked = true; load(row.symbol); $("search").value = ""; return; }
+  // Not on tonight's board (too small a move, or no answer yet) is not the same
+  // as unknown: try the name itself, and only fall back to a question if the
+  // desk does not carry it. The reading endpoint substitutes a default name for
+  // an unknown one, so the symbol it returns is checked, not trusted.
+  const guess = /^[A-Z0-9]{1,10}$/.test(want) ? (state.market === "perp" ? `${want}USDT` : `R${want}USDT`) : null;
+  const typed = $("search").value;
+  (async () => {
+    let r = null;
+    if (guess) {
+      try { r = await fetch(`/api/reading?symbol=${encodeURIComponent(guess)}&market=${state.market}${atq}`).then((x) => x.json()); } catch { r = null; }
+    }
+    if (r?.symbol === guess && !r.error) { state.picked = true; load(guess); $("search").value = ""; }
+    else { $("q").value = typed; ask(typed); }
+  })();
 });
 
 /* ---------- clock ---------- */
@@ -280,13 +364,16 @@ function clock(d) {
   const el = $("clock");
   const c = d?.clock;
   if (!c) return;
-  const skew = c.now - Date.now();
+  // A live reading may come from a cache, so its "now" can be minutes old; the
+  // device clock is the right one for a countdown. A replay freezes at its moment.
+  const frozen = Boolean(d?.replay);
+  const skew = 0;
   const spell = (ms) => {
     const m = Math.max(0, Math.floor(ms / 60000));
     return m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, "0")}m` : `${m}m`;
   };
   const tick = () => {
-    const now = Date.now() + skew;
+    const now = frozen ? c.now : Date.now() + skew;
     const open = now >= c.bellAt && now < c.nextCloseAt;
     const left = (open ? c.nextCloseAt : c.bellAt) - now;
     el.textContent = left > 0
@@ -317,6 +404,24 @@ async function loadLive() {
 }
 
 /* ---------- ask ---------- */
+// Every figure an answer may use, laid out where the reader can check it. The
+// model is only allowed numbers from this list; if it uses another, its answer
+// is thrown away and the desk's own wording is shown instead.
+function figures(f) {
+  if (!f) return "";
+  const p = (v, d = 1) => (v == null ? null : `${(100 * v).toFixed(d)}%`);
+  const out = [];
+  if (f.move != null) out.push(`move since the close ${f.move < 0 ? "−" : "+"}${p(Math.abs(f.move), 2)}`);
+  if (f.normalDay != null) out.push(`normal day ${p(f.normalDay, 2)}`);
+  if (f.ratio != null) out.push(`${f.ratio.toFixed(2)}× a normal day`);
+  if (f.nightsInBand != null && f.undoneInBand != null) out.push(`${Math.round(f.undoneInBand * f.nightsInBand)} of ${f.nightsInBand} similar nights undone (${p(f.undoneInBand)})`);
+  if (f.undoneAtRandom != null) out.push(`any night ${p(f.undoneAtRandom)}`);
+  if (f.statedBefore != null) out.push(`desk expected ${p(f.statedBefore)}, ${p(f.happenedBefore)} happened`);
+  if (f.hoursSinceClose != null && !f.marketOpen) out.push(`market shut for ${f.hoursSinceClose} hours`);
+  if (f.hoursToBell != null && !f.marketOpen) out.push(`${f.hoursToBell} hours to the bell`);
+  return out.length ? `Every figure the model was allowed to use: ${out.join(" · ")}` : "";
+}
+
 let askSeq = 0;
 async function ask(question) {
   const box = $("answer");
@@ -336,10 +441,11 @@ async function ask(question) {
     $("a-src").textContent = pending ? "Almanac's own answer · asking Qwen on Bitget's endpoint…"
       : model ? `Qwen (${r.wrote}) on Bitget's endpoint · every number checked against the desk` : `Almanac's own answer${r.note ? ` · ${r.note}` : ""}`;
     $("a-text").textContent = r.answer || r.error || "No answer.";
+    $("a-facts").textContent = figures(r.facts);
   };
   // The desk answers in about a second; the model is asked the same question
   // and swapped in only if it arrives and its numbers match.
-  const base = { question, symbol: state.symbol, market: state.market };
+  const base = { question, symbol: state.symbol, market: state.market, ...(AT ? { at: AT } : {}) };
   show(await post({ ...base, fast: true }), true);
   const full = await post(base);
   if (full) show(full, false);
@@ -353,31 +459,46 @@ $("askform").addEventListener("submit", (e) => {
 
 /* ---------- agents ---------- */
 $("mcpcmd").textContent = `claude mcp add --transport http almanac ${location.origin}/api/mcp`;
+// The clipboard API is refused in some browsers and embedded views; the old
+// select-and-copy route still works there. Either way the reader is told.
 $("copymcp").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText($("mcpcmd").textContent); $("copymcp").textContent = "Copied"; }
-  catch { $("copymcp").textContent = "Select and copy the line above"; }
-  setTimeout(() => { $("copymcp").textContent = "Copy command"; }, 2000);
+  const text = $("mcpcmd").textContent;
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; }
+  catch {
+    const range = document.createRange();
+    range.selectNodeContents($("mcpcmd"));
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+    try { ok = document.execCommand("copy"); } catch { ok = false; }
+  }
+  $("copymcp").textContent = ok ? "Copied ✓" : "Selected: press Ctrl+C";
+  $("copied").textContent = ok ? "Command copied to your clipboard." : "The command is selected above. Press Ctrl+C (Cmd+C on a Mac) to copy it.";
+  clearTimeout($("copymcp")._t);
+  $("copymcp")._t = setTimeout(() => { $("copymcp").textContent = "Copy command"; }, 5000);
 });
 
 /* ---------- load ---------- */
 async function load(symbol) {
   state.symbol = symbol;
   let r;
-  try { r = await fetch(`/api/reading?symbol=${encodeURIComponent(symbol)}&market=${state.market}`).then((x) => x.json()); }
+  try { r = await fetch(`/api/reading?symbol=${encodeURIComponent(symbol)}&market=${state.market}${atq}`).then((x) => x.json()); }
   catch { $("f-title").textContent = "The reading did not come back. Refresh to try again."; return; }
   if (symbol !== state.symbol) return;
   state.reading = r;
   state.symbol = r.symbol || symbol;
   renderReading(r);
-  loadCompany(state.symbol);
+  if (!r.replay) loadCompany(state.symbol);
+  else $("w-company").querySelector(".wt").textContent = "Company news is left out of a replay: today's headlines were not known then.";
   if (state.board) renderBoard(state.board);
 }
 
 async function loadBoard() {
   let b;
-  try { b = await fetch(`/api/board?market=${state.market}`).then((x) => x.json()); }
+  try { b = await fetch(`/api/board?market=${state.market}${atq}`).then((x) => x.json()); }
   catch { $("grid").innerHTML = `<div class="card empty">Bitget did not answer. Refresh to try again.</div>`; return; }
   renderMarkets(b.markets);
+  replayBanner(b);
+  if (b.replay) $("hot-title").textContent = "Biggest moves that night";
   state.board = b;
   renderBoard(b);
   // Open on the most unusual move of the night, unless the reader chose one.

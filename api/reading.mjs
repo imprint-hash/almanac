@@ -5,6 +5,7 @@
 
 import { reading } from "../src/desk.js";
 import { pick, markets } from "./_data.mjs";
+import { replayAt } from "../src/clock.js";
 
 const TTL = 60_000;
 const cache = new Map();
@@ -14,17 +15,19 @@ export default async function handler(req, res) {
   const raw = String(req.query?.symbol || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
   const known = Object.keys(m.normals);
   const symbol = known.includes(raw) ? raw : known.includes(raw + "USDT") ? raw + "USDT" : known[0];
-  const key = `${m.id}:${symbol}`;
+  const { at, error: replayError } = replayAt(req.query);
+  const key = `${m.id}:${symbol}:${at ?? "now"}`;
 
   try {
     let hit = cache.get(key);
-    if (!hit || Date.now() - hit.at > TTL) {
-      hit = { at: Date.now(), result: await reading(symbol, m.normals, m.index, { marketId: m.id }) };
+    if (!hit || (at == null && Date.now() - hit.at > TTL)) {
+      hit = { at: Date.now(), result: await reading(symbol, m.normals, m.index, { marketId: m.id, at }) };
       cache.set(key, hit);
     }
     res.setHeader("cache-control", "public, max-age=30, stale-while-revalidate=120");
     res.status(200).json({
       ...hit.result,
+      replayError,
       label: m.label, markets,
       bands: m.index.bands, baseline: m.index.all.undonePct, meta: m.index.meta, cuts: m.index.cuts,
       // The desk's own record travels with every reading: a number is not worth

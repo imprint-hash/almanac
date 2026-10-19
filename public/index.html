@@ -38,6 +38,7 @@
     </button>
   </div>
 </header>
+<div class="replay" id="replay" role="status" hidden></div>
 
 <nav class="tabs" aria-label="Sections">
   <a href="#tonight" class="on">Tonight</a>
@@ -45,6 +46,11 @@
   <a href="#record">Report card</a>
   <a href="#agents">For agents</a>
   <a href="/method.html">How it works</a>
+  <form class="replaypick" id="replaypick" autocomplete="off">
+    <label for="replay-at">Replay a moment <span class="muted">New York time</span></label>
+    <input type="datetime-local" id="replay-at" required>
+    <button type="submit">Replay</button>
+  </form>
 </nav>
 
 <main>
@@ -110,13 +116,14 @@
         <div class="answer" id="answer" hidden>
           <p class="src" id="a-src"></p>
           <p id="a-text"></p>
+          <p class="facts" id="a-facts"></p>
         </div>
       </article>
 
       <section id="moves">
         <div class="sechead">
           <h2>Tonight's moves</h2>
-          <label class="toggle"><input type="checkbox" id="hidesmall" checked><span>Hide moves under 0.5%</span></label>
+          <label class="toggle"><input type="checkbox" id="hidesmall" checked><span>Hide price moves under 0.5%</span></label>
         </div>
         <p class="sorted" id="sorted">Sorted by how unusual the move is for that stock, not by its size.</p>
         <div class="grid" id="grid"><div class="card empty">Asking Bitget for every stock token…</div></div>
@@ -135,11 +142,12 @@
         <p>Almanac is an MCP server. Add it beside Bitget's Agent Hub tools and your agent can ask what a night move is worth.</p>
         <div class="code" id="mcpcmd">claude mcp add --transport http almanac https://almanac-pearl.vercel.app/api/mcp</div>
         <button class="copy" id="copymcp" type="button">Copy command</button>
+        <p class="copied" id="copied" role="status" aria-live="polite"></p>
         <p class="tools">Tools: <code>tonight_moves</code> · <code>move_odds</code> · <code>report_card</code></p>
       </section>
 
       <section class="card">
-        <h3>Biggest moves tonight</h3>
+        <h3 id="hot-title">Biggest moves tonight</h3>
         <ol class="hot" id="hot"><li class="muted">Waiting for Bitget…</li></ol>
       </section>
 

@@ -143,6 +143,7 @@ function plainRatio(r) {
   if (r >= 2) return `much bigger than usual — over ${Math.floor(r)} times what it normally covers in a whole day`;
   if (r >= 1.3) return "bigger than a whole ordinary day of movement for it";
   if (r >= 0.8) return "about as much as it normally covers in a whole day";
+  if (r >= 0.65) return "about three quarters of what it normally covers in a day";
   if (r >= 0.5) return "about half of what it normally covers in a day";
   if (r >= 0.3) return "a third or so of a normal day for it — fairly small";
   return "small for this name — well under a third of what it normally covers in a day";
