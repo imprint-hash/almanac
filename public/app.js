@@ -155,7 +155,7 @@ function renderLead(record, meta) {
   }
   $("eyebrow").textContent = `What ${record.quoted.toLocaleString()} calls made before the bell taught us`;
   $("leadsub").textContent =
-    `Every night from ${record.from} to ${record.to}, Almanac gave its odds for each Bitget stock token before New York opened, ` +
+    `Every night from ${record.from} to ${record.to}, Almanac gave its odds for each Bitget ${state.market === "perp" ? "stock perpetual" : "stock token"} before New York opened, ` +
     `then checked itself at the bell. The size of the move, for that particular stock, told us more than anything else.`;
   void meta;
 }
@@ -240,7 +240,7 @@ function renderReading(d) {
 
   $("c-name").textContent = name;
   chart($("chart"), d.path, n.closePrice);
-  $("c-right").textContent = d.marketOpen ? "New York is open: the token now follows the real market" : "Odds called before the bell, checked at 10:30";
+  $("c-right").textContent = d.marketOpen ? `New York is open: the ${state.market === "perp" ? "perpetual" : "token"} now follows the real market` : "Odds called before the bell, checked at 10:30";
   document.title = n.move == null ? "Almanac" : `${name} ${sg(n.move, 1)} · Almanac`;
 }
 
@@ -290,7 +290,7 @@ function renderRecord(rec) {
 function renderBoard(b) {
   const grid = $("grid");
   if (b.error || !b.rows?.length) {
-    grid.innerHTML = `<div class="card empty">${esc(b.error || "No stock token has moved enough to read yet.")}</div>`;
+    grid.innerHTML = `<div class="card empty">${esc(b.error || state.market === "perp" ? "No stock perpetual has moved enough to read yet." : "No stock token has moved enough to read yet.")}</div>`;
     return;
   }
   const rows = b.rows.filter((r) => !state.hideSmall || Math.abs(r.move) >= 0.005);
@@ -309,8 +309,9 @@ function renderBoard(b) {
     </button>`;
   }).join("") || `<div class="card empty">Every move tonight is under 0.5%. Untick the box to see them.</div>`;
   $("more").hidden = state.showAll || rows.length <= SHOWN;
-  $("more").textContent = `Show all ${rows.length} tokens`;
-  $("sorted").textContent = `${b.answered} of ${b.asked} tokens answered. Sorted by how unusual the move is for that stock, not by its size.`;
+  const noun = state.market === "perp" ? "perpetuals" : "tokens";
+  $("more").textContent = `Show all ${rows.length} ${noun}`;
+  $("sorted").textContent = `${b.answered} of ${b.asked} ${noun} answered. Sorted by how unusual the move is for that stock, not by its size.`;
 
   const hot = [...b.rows].sort((a, c) => Math.abs(c.move) - Math.abs(a.move)).slice(0, 5);
   $("hot").innerHTML = hot.map((r, i) =>
@@ -345,8 +346,10 @@ function clock(d) {
   const el = $("clock");
   const c = d?.clock;
   if (!c) return;
+  // A live reading may come from a cache, so its "now" can be minutes old; the
+  // device clock is the right one for a countdown. A replay freezes at its moment.
   const frozen = Boolean(d?.replay);
-  const skew = c.now - Date.now();
+  const skew = 0;
   const spell = (ms) => {
     const m = Math.max(0, Math.floor(ms / 60000));
     return m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, "0")}m` : `${m}m`;
