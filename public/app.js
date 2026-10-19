@@ -133,6 +133,11 @@ function renderMarkets(list) {
       x.setAttribute("aria-pressed", String(on));
     });
     history.replaceState(null, "", query());
+    // Clear the card straight away: the other market's numbers must not sit
+    // under the new market's button while the new reading is fetched.
+    $("f-title").textContent = state.market === "perp" ? "Reading the perpetual…" : "Reading the token…";
+    $("f-meta").textContent = state.market === "perp" ? "Bitget stock perpetual" : "Bitget stock token";
+    $("f-verdict").textContent = "";
     load(FIRST[state.market]);
     loadBoard();
     loadLive();
@@ -412,7 +417,9 @@ function figures(f) {
   if (f.nightsInBand != null && f.undoneInBand != null) out.push(`${Math.round(f.undoneInBand * f.nightsInBand)} of ${f.nightsInBand} similar nights undone (${p(f.undoneInBand)})`);
   if (f.undoneAtRandom != null) out.push(`any night ${p(f.undoneAtRandom)}`);
   if (f.statedBefore != null) out.push(`desk expected ${p(f.statedBefore)}, ${p(f.happenedBefore)} happened`);
-  return out.length ? `Figures the desk gave: ${out.join(" · ")}` : "";
+  if (f.hoursSinceClose != null && !f.marketOpen) out.push(`market shut for ${f.hoursSinceClose} hours`);
+  if (f.hoursToBell != null && !f.marketOpen) out.push(`${f.hoursToBell} hours to the bell`);
+  return out.length ? `Every figure the model was allowed to use: ${out.join(" · ")}` : "";
 }
 
 let askSeq = 0;
