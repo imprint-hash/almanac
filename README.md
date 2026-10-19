@@ -7,7 +7,11 @@ how often moves like it were undone, on Bitget's own data.**
 - **Demo video (82 s):** https://x.com/imprint_0x/status/2108943147644428520
 - **For agents:** `claude mcp add --transport http almanac https://almanac-pearl.vercel.app/api/mcp`
 - Built for the [Bitget AI Base Camp Hackathon S2](https://bitget-ai.gitbook.io/bitgetai_hackathons2) ·
-  Track 3, **AI Trading Desk** · sub-themes **Review & Self-Evolution** and **Personalized Research Workbench**
+  Track 3, **AI Trading Desk** · sub-themes **Review & Self-Evolution** and **Personalized Research Workbench**.
+  The version submitted there on 10 Oct is commit [`b8eb897`](https://github.com/imprint-hash/almanac/tree/b8eb897).
+- **TestSprite Hackathon Season 4** (16–22 Oct): everything added since 16 Oct (replay, the fixes the tests found,
+  [TESTING.md](TESTING.md)) is that work, tested on every pull request ([PR #1](https://github.com/imprint-hash/almanac/pull/1)).
+  The daily "Live record" commits are the desk's own scheduled job, unchanged since before either deadline.
 
 ---
 
