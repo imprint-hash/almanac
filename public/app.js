@@ -383,7 +383,11 @@ function clock(d) {
   };
   tick();
   clearInterval(ticker);
-  ticker = setInterval(tick, 20_000);
+  // Every second, and again whenever the tab comes back into view: a browser
+  // may slow or pause timers for a page it is not showing, and a countdown that
+  // sits still for a minute reads as a broken clock.
+  ticker = setInterval(tick, 1000);
+  document.onvisibilitychange = () => { if (!document.hidden) tick(); };
 }
 
 /* ---------- live record ---------- */
