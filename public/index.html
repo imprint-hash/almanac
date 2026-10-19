@@ -116,6 +116,7 @@
         <div class="answer" id="answer" hidden>
           <p class="src" id="a-src"></p>
           <p id="a-text"></p>
+          <p class="facts" id="a-facts"></p>
         </div>
       </article>
 
@@ -141,6 +142,7 @@
         <p>Almanac is an MCP server. Add it beside Bitget's Agent Hub tools and your agent can ask what a night move is worth.</p>
         <div class="code" id="mcpcmd">claude mcp add --transport http almanac https://almanac-pearl.vercel.app/api/mcp</div>
         <button class="copy" id="copymcp" type="button">Copy command</button>
+        <p class="copied" id="copied" role="status" aria-live="polite"></p>
         <p class="tools">Tools: <code>tonight_moves</code> · <code>move_odds</code> · <code>report_card</code></p>
       </section>
 

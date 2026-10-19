@@ -225,3 +225,6 @@ h1 span { color: var(--accent); }
 .replaypick input { font: 500 13px var(--f); color: var(--ink); background: var(--bg-2, transparent); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; color-scheme: light dark; }
 .replaypick button { font: 600 13px var(--f); color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 5px 12px; cursor: pointer; }
 .replaypick button:hover, .replaypick input:focus-visible, .replaypick button:focus-visible { border-color: var(--ink); outline: none; }
+.facts { margin-top: 10px; font: 500 12.5px/1.5 var(--f); color: var(--muted); }
+.facts:empty, .copied:empty { display: none; }
+.copied { margin-top: 8px; font: 600 13px var(--f); color: var(--good); }

@@ -39,6 +39,15 @@ const nyParts = (ms) => Object.fromEntries(NY.formatToParts(ms).map((p) => [p.ty
 const nyOffset = (ms) => { const p = nyParts(ms); return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute) - Math.floor(ms / 60000) * 60000; };
 const nyLocal = (ms) => { const p = nyParts(ms); return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`; };
 const nyToUtc = (local) => { const wall = Date.parse(local + ":00Z"); return wall - nyOffset(wall - nyOffset(wall)); };
+// Say it is a replay the moment the page opens; the board for a past moment can
+// take several seconds, and the reader should never see it mistaken for tonight.
+if (AT) {
+  const el = $("replay");
+  el.hidden = false;
+  el.dataset.state = "on";
+  el.textContent = "Replay: loading the desk as it stood at that moment…";
+}
+
 (function replayPicker() {
   const form = $("replaypick"), input = $("replay-at");
   if (!form) return;
@@ -374,6 +383,22 @@ async function loadLive() {
 }
 
 /* ---------- ask ---------- */
+// Every figure an answer may use, laid out where the reader can check it. The
+// model is only allowed numbers from this list; if it uses another, its answer
+// is thrown away and the desk's own wording is shown instead.
+function figures(f) {
+  if (!f) return "";
+  const p = (v, d = 1) => (v == null ? null : `${(100 * v).toFixed(d)}%`);
+  const out = [];
+  if (f.move != null) out.push(`move since the close ${f.move < 0 ? "−" : "+"}${p(Math.abs(f.move), 2)}`);
+  if (f.normalDay != null) out.push(`normal day ${p(f.normalDay, 2)}`);
+  if (f.ratio != null) out.push(`${f.ratio.toFixed(2)}× a normal day`);
+  if (f.nightsInBand != null && f.undoneInBand != null) out.push(`${Math.round(f.undoneInBand * f.nightsInBand)} of ${f.nightsInBand} similar nights undone (${p(f.undoneInBand)})`);
+  if (f.undoneAtRandom != null) out.push(`any night ${p(f.undoneAtRandom)}`);
+  if (f.statedBefore != null) out.push(`desk expected ${p(f.statedBefore)}, ${p(f.happenedBefore)} happened`);
+  return out.length ? `Figures the desk gave: ${out.join(" · ")}` : "";
+}
+
 let askSeq = 0;
 async function ask(question) {
   const box = $("answer");
@@ -393,6 +418,7 @@ async function ask(question) {
     $("a-src").textContent = pending ? "Almanac's own answer · asking Qwen on Bitget's endpoint…"
       : model ? `Qwen (${r.wrote}) on Bitget's endpoint · every number checked against the desk` : `Almanac's own answer${r.note ? ` · ${r.note}` : ""}`;
     $("a-text").textContent = r.answer || r.error || "No answer.";
+    $("a-facts").textContent = figures(r.facts);
   };
   // The desk answers in about a second; the model is asked the same question
   // and swapped in only if it arrives and its numbers match.
@@ -410,10 +436,22 @@ $("askform").addEventListener("submit", (e) => {
 
 /* ---------- agents ---------- */
 $("mcpcmd").textContent = `claude mcp add --transport http almanac ${location.origin}/api/mcp`;
+// The clipboard API is refused in some browsers and embedded views; the old
+// select-and-copy route still works there. Either way the reader is told.
 $("copymcp").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText($("mcpcmd").textContent); $("copymcp").textContent = "Copied"; }
-  catch { $("copymcp").textContent = "Select and copy the line above"; }
-  setTimeout(() => { $("copymcp").textContent = "Copy command"; }, 2000);
+  const text = $("mcpcmd").textContent;
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; }
+  catch {
+    const range = document.createRange();
+    range.selectNodeContents($("mcpcmd"));
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+    try { ok = document.execCommand("copy"); } catch { ok = false; }
+  }
+  $("copymcp").textContent = ok ? "Copied ✓" : "Selected: press Ctrl+C";
+  $("copied").textContent = ok ? "Command copied to your clipboard." : "The command is selected above. Press Ctrl+C (Cmd+C on a Mac) to copy it.";
+  clearTimeout($("copymcp")._t);
+  $("copymcp")._t = setTimeout(() => { $("copymcp").textContent = "Copy command"; }, 5000);
 });
 
 /* ---------- load ---------- */
