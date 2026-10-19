@@ -63,6 +63,9 @@ function replayBanner(d) {
   el.hidden = false;
   if (d?.replayError) {
     el.dataset.state = "refused";
+    // Don't leave the refused time sitting in the picker as if it were valid.
+    const input = $("replay-at");
+    if (input) input.value = nyLocal(Date.now() - 12 * 3600000);
     el.innerHTML = `${esc(d.replayError)} Showing tonight instead. <a href="/" id="back-live">Back to live</a>`;
     return;
   }
