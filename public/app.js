@@ -290,7 +290,7 @@ function renderRecord(rec) {
 function renderBoard(b) {
   const grid = $("grid");
   if (b.error || !b.rows?.length) {
-    grid.innerHTML = `<div class="card empty">${esc(b.error || state.market === "perp" ? "No stock perpetual has moved enough to read yet." : "No stock token has moved enough to read yet.")}</div>`;
+    grid.innerHTML = `<div class="card empty">${esc(b.error || (state.market === "perp" ? "No stock perpetual has moved enough to read yet." : "No stock token has moved enough to read yet."))}</div>`;
     return;
   }
   const rows = b.rows.filter((r) => !state.hideSmall || Math.abs(r.move) >= 0.005);
@@ -336,8 +336,21 @@ $("searchform").addEventListener("submit", (e) => {
   e.preventDefault();
   const want = $("search").value.trim().toUpperCase().replace(/^R(?=[A-Z])/, "");
   const row = state.board?.rows?.find((r) => bare(r.display).toUpperCase() === want);
-  if (row) { state.picked = true; load(row.symbol); $("search").value = ""; }
-  else { $("q").value = $("search").value; ask($("search").value); }
+  if (row) { state.picked = true; load(row.symbol); $("search").value = ""; return; }
+  // Not on tonight's board (too small a move, or no answer yet) is not the same
+  // as unknown: try the name itself, and only fall back to a question if the
+  // desk does not carry it. The reading endpoint substitutes a default name for
+  // an unknown one, so the symbol it returns is checked, not trusted.
+  const guess = /^[A-Z0-9]{1,10}$/.test(want) ? (state.market === "perp" ? `${want}USDT` : `R${want}USDT`) : null;
+  const typed = $("search").value;
+  (async () => {
+    let r = null;
+    if (guess) {
+      try { r = await fetch(`/api/reading?symbol=${encodeURIComponent(guess)}&market=${state.market}${atq}`).then((x) => x.json()); } catch { r = null; }
+    }
+    if (r?.symbol === guess && !r.error) { state.picked = true; load(guess); $("search").value = ""; }
+    else { $("q").value = typed; ask(typed); }
+  })();
 });
 
 /* ---------- clock ---------- */
