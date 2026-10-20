@@ -160,7 +160,7 @@ function renderLead(record, meta) {
   }
   $("eyebrow").textContent = `What ${record.quoted.toLocaleString()} calls made before the bell taught us`;
   $("leadsub").textContent =
-    `Every night from ${record.from} to ${record.to}, Almanac gave its odds for each Bitget ${state.market === "perp" ? "stock perpetual" : "stock token"} before New York opened, ` +
+    `Every night from ${day(record.from)} to ${day(record.to)}, Almanac gave its odds for each Bitget ${state.market === "perp" ? "stock perpetual" : "stock token"} before New York opened, ` +
     `then checked itself at the bell. The size of the move, for that particular stock, told us more than anything else.`;
   void meta;
 }
@@ -215,7 +215,7 @@ function renderReading(d) {
   const name = d.display || d.symbol;
   const up = (n.move ?? 0) > 0;
   $("f-tk").outerHTML = face(name).replace('class="tk"', 'class="tk" id="f-tk"');
-  $("f-meta").textContent = `Bitget ${state.market === "perp" ? "stock perpetual" : "stock token"} · since the ${n.session || ""} close` +
+  $("f-meta").textContent = `Bitget ${state.market === "perp" ? "stock perpetual" : "stock token"} · since ${closeDay(n.session)} close` +
     (d.marketOpen ? (d.replay ? " · New York was open at that moment" : " · New York is open now") : ` · ${n.isWeekend ? "weekend" : "overnight"} move`);
   // While New York is open the token tracks the real market, so the move since
   // the close is no longer a night move and is not titled as one.
@@ -368,6 +368,16 @@ $("searchform").addEventListener("submit", (e) => {
     else { $("q").value = typed; ask(typed); }
   })();
 });
+
+/** "2026-07-21" → "21 July 2026": dates as a reader writes them, not as a database does. */
+function day(iso, opts = { day: "numeric", month: "long", year: "numeric" }) {
+  const t = Date.parse(`${iso}T12:00:00Z`);
+  return Number.isFinite(t) ? new Date(t).toLocaleDateString("en-GB", { ...opts, timeZone: "UTC" }) : iso;
+}
+/** "2026-10-16" → "Friday 16 Oct's" close. */
+function closeDay(iso) {
+  return Number.isFinite(Date.parse(`${iso}T12:00:00Z`)) ? `${day(iso, { weekday: "long", day: "numeric", month: "short" }).replace(",", "")}'s` : "the last";
+}
 
 /* ---------- clock ---------- */
 let ticker = null;
