@@ -201,6 +201,15 @@
    "run": 11,
    "caught": "The card said −0.40% and \"too small to call\"; the answer said −0.53% and gave odds",
    "fixed": "The answer is worked out from the same moment as the card"
+  },
+  {
+   "at": [
+    1219,
+    473
+   ],
+   "run": 12,
+   "caught": "Asked about rNVDA with rSKHY open: the answer and the card were about different tokens",
+   "fixed": "The card switches to the token you asked about, and the answer uses that card's moment"
   }
  ],
  "runs": [
@@ -300,6 +309,15 @@
    "passed": 44,
    "failed": 1,
    "blocked": 1,
+   "pr": 2
+  },
+  {
+   "run": 12,
+   "date": "20 Oct",
+   "against": "PR #2",
+   "passed": 44,
+   "failed": 2,
+   "blocked": 0,
    "pr": 2
   }
  ]

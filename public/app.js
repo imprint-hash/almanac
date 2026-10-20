@@ -456,6 +456,16 @@ async function ask(question) {
   };
   const show = (r, pending) => {
     if (mine !== askSeq || !r) return;
+    // A question that names another token is answered about that token, so the
+    // card switches to it first, then the question is asked again against the
+    // card's own moment: the reader never sees one token's card beside
+    // another's answer, or two readings seconds apart.
+    if (r.symbol && r.symbol !== state.symbol && !r.error) {
+      askSeq++;
+      state.picked = true;
+      load(r.symbol).then(() => ask(question));
+      return;
+    }
     const model = r.wrote && r.wrote !== "the desk";
     $("a-src").textContent = pending ? "Almanac's own answer · asking Qwen on Bitget's endpoint…"
       : model ? `Qwen (${r.wrote}) on Bitget's endpoint · every number checked against the desk` : `Almanac's own answer${r.note ? ` · ${r.note}` : ""}`;
@@ -507,6 +517,7 @@ async function load(symbol) {
   state.reading = r;
   state.symbol = r.symbol || symbol;
   renderReading(r);
+  $("q").placeholder = `Ask in plain words: is ${r.display || state.symbol}'s move real?`;
   if (!r.replay) loadCompany(state.symbol);
   else $("w-company").querySelector(".wt").textContent = "Company news is left out of a replay: today's headlines were not known then.";
   if (state.board) renderBoard(state.board);
