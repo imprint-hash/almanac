@@ -25,12 +25,16 @@ export default async function handler(req, res) {
     if (!hit || (at == null && Date.now() - hit.at > TTL)) {
       const result = await board(Object.keys(m.normals), m.normals, m.index, { marketId: m.id, at });
       hit = { at: Date.now(), result };
-      cache.set(key, hit);
+      // A sweep where no name answered is a Bitget hiccup, not a quiet night:
+      // keeping it would show an empty board to everyone until it expired.
+      if (result.answered > 0) cache.set(key, hit);
     }
     // s-maxage lets Vercel's edge hold the sweep, so a visitor almost never waits
     // for forty names to be asked; a slightly old board is served while a new
-    // one is fetched behind it.
-    res.setHeader("cache-control", "public, max-age=60, s-maxage=120, stale-while-revalidate=900");
+    // one is fetched behind it. An empty sweep is never held.
+    res.setHeader("cache-control", hit.result.answered > 0
+      ? "public, max-age=60, s-maxage=120, stale-while-revalidate=900"
+      : "no-store");
     res.status(200).json({
       market: m.id, label: m.label, markets,
       at: at ?? hit.at, replay: at != null, replayError,

@@ -306,7 +306,11 @@ function renderRecord(rec) {
 function renderBoard(b) {
   const grid = $("grid");
   if (b.error || !b.rows?.length) {
-    grid.innerHTML = `<div class="card empty">${esc(b.error || (state.market === "perp" ? "No stock perpetual has moved enough to read yet." : "No stock token has moved enough to read yet."))}</div>`;
+    // None answered is Bitget not replying, not a quiet night: say so, and ask again shortly.
+    const silent = !b.error && b.asked > 0 && b.answered === 0;
+    if (silent) { clearTimeout(loadBoard._retry); loadBoard._retry = setTimeout(loadBoard, 15_000); }
+    grid.innerHTML = `<div class="card empty">${esc(b.error || (silent ? "Bitget did not answer for any name just now. Asking again in a few seconds…"
+      : state.market === "perp" ? "No stock perpetual has moved enough to read yet." : "No stock token has moved enough to read yet."))}</div>`;
     return;
   }
   const rows = b.rows.filter((r) => !state.hideSmall || Math.abs(r.move) >= 0.005);
