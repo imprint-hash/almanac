@@ -372,7 +372,9 @@ function clock(d) {
   const skew = 0;
   const spell = (ms) => {
     const m = Math.max(0, Math.floor(ms / 60000));
-    return m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, "0")}m` : `${m}m`;
+    // Seconds too, so the reader can see at a glance that the clock is running.
+    const sec = String(Math.max(0, Math.floor(ms / 1000)) % 60).padStart(2, "0");
+    return m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, "0")}m ${sec}s` : `${m}m ${sec}s`;
   };
   const tick = () => {
     const now = frozen ? c.now : Date.now() + skew;

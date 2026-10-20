@@ -71,8 +71,8 @@ export default async function handler(req, res) {
   const m = pick({ market: req.body?.market });
   const { at } = replayAt({ at: req.body?.at });
   const known = Object.keys(m.normals);
-  const asked = symbolIn(question, known, m.normals);
   const fallback = String(req.body?.symbol || "").toUpperCase();
+  const asked = symbolIn(question, known, m.normals, { strict: known.includes(fallback) });
   const symbol = asked || (known.includes(fallback) ? fallback : known[0]);
 
   // Two ways to ask. `fast` skips the model entirely and returns the desk's own

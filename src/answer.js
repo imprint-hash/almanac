@@ -22,8 +22,13 @@ const clean = (s) => s.replace(/USDT$/, "");
  * NVDAUSDT or RNVDAUSDT, so the display names are checked too rather than
  * assuming one spelling and silently answering about the wrong thing.
  */
-export function symbolIn(question, known, normals = {}) {
-  const words = question.toUpperCase().match(/[A-Z]{2,12}/g) || [];
+export function symbolIn(question, known, normals = {}, { strict = false } = {}) {
+  // Strict, when the reader already has a token open: only a name written the
+  // way tickers are written (NVDA, rNVDA) moves the answer to another token, so
+  // an everyday word that happens to be a ticker cannot.
+  let words = question.match(/[A-Za-z]{2,12}/g) || [];
+  if (strict) words = words.filter((w) => /^r?[A-Z]{2,11}$/.test(w));
+  words = words.map((w) => w.toUpperCase());
   const byDisplay = new Map();
   for (const [sym, v] of Object.entries(normals)) {
     if (v?.display) byDisplay.set(String(v.display).toUpperCase(), sym);
