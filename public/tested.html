@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Almanac — how it is tested</title>
+<meta name="description" content="Every change to Almanac is tested by TestSprite before it reaches the live site. The web of what it checks, what it caught and what was fixed, run by run.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/app.css">
+<style>
+  .tp { max-width: 1180px; margin: 0 auto; padding: 28px clamp(16px, 4.5vw, 48px) 60px; display: flex; flex-direction: column; gap: 26px; }
+  .tp h1 { font-size: clamp(30px, 4vw, 44px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; text-wrap: balance; margin: 0; }
+  .tp .sub { color: var(--ink-2); font-size: 17px; max-width: 72ch; line-height: 1.55; margin: 0; }
+  .now { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; font: 600 14px var(--f); }
+  .now a { color: var(--accent); }
+  .pill { display: inline-flex; gap: 8px; align-items: center; padding: 8px 14px; border-radius: 999px; background: var(--accent-bg, #e3f5f2); color: var(--accent); font-weight: 700; }
+  .pill.bad { background: var(--bad-bg); color: var(--bad); }
+  .stage { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 30px 70px #0b2a3a22; background: #0b0f10; }
+  .stage img { display: block; width: 100%; height: auto; opacity: .55; }
+  .stage svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .wl { stroke: #3ee0b4; stroke-width: 2.4; fill: none; stroke-linecap: round; filter: drop-shadow(0 0 4px #3ee0b4); }
+  .wx { stroke: #3ee0b4; stroke-width: 1.4; opacity: .45; fill: none; }
+  .wn { fill: #0d2b33; stroke: #57e6c4; stroke-width: 2.5; }
+  .cl { stroke: #ff4d5a; stroke-width: 3.5; fill: none; stroke-linecap: round; }
+  .cn { fill: #16a35c; stroke: #fff; stroke-width: 3; cursor: pointer; }
+  .cn:focus-visible, .cn:hover { stroke: #ffd166; stroke-width: 5; outline: none; }
+  .hub { fill: #0b8f80; stroke: #fff; stroke-width: 4; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; font: 500 14px var(--f); color: var(--ink-2); }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 7px; vertical-align: -1px; }
+  .detail { min-height: 64px; padding: 14px 18px; border-radius: 12px; background: var(--card, transparent); border: 1px solid var(--line); font: 500 15px/1.5 var(--f); }
+  .detail b { color: var(--bad); } .detail strong { color: var(--good); }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+  .runs { width: 100%; border-collapse: collapse; font: 500 14.5px var(--f); }
+  .runs th { text-align: left; font: 600 12px var(--f); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  .runs td { padding: 10px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; vertical-align: top; }
+  .bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; min-width: 120px; }
+  .bar span { display: block; height: 100%; background: var(--good); }
+  .catch { padding: 12px 0; border-bottom: 1px solid var(--line); font: 500 15px/1.5 var(--f); }
+  .catch .run { font: 600 12px "IBM Plex Mono", monospace; color: var(--muted); }
+  .wrap { overflow-x: auto; }
+  @media (prefers-reduced-motion: reduce) { .wl, .cl { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="/" aria-label="Almanac home">
+    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--accent)"/><path d="M9 23 L16 8 L23 23" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 18h8" stroke="#fff" stroke-width="3"/></svg>
+    <span>Almanac</span>
+  </a>
+</header>
+
+<main class="tp">
+  <div>
+    <p class="eyebrow">How it is tested</p>
+    <h1>Every number checked, before it reaches you.</h1>
+  </div>
+  <p class="sub">Almanac gives odds about money, so every change goes through <a href="https://www.testsprite.com">TestSprite</a> first: 46 browser tests, run on every pull request against that change's own preview, with a merge gate that marks a failing change unsafe to merge. The web below is where its agents crawl the app. Each green node is something the tests caught and we fixed; click one.</p>
+
+  <div class="now" id="now"><span class="pill" id="latest">Reading the latest result from GitHub…</span></div>
+
+  <figure class="stage" style="margin:0">
+    <img src="/img/almanac-desk.jpg" alt="The Almanac page as the tests see it: the odds board, a token reading, the ask box and the report card." width="1920" height="1080">
+    <svg id="web" viewBox="0 0 1920 1080" role="group" aria-label="What TestSprite checks on this page"></svg>
+  </figure>
+  <div class="legend"><span><i style="background:#3ee0b4"></i>checked by the tests</span><span><i style="background:#ff4d5a"></i>where a bug was caught</span><span><i style="background:#16a35c"></i>fixed, and checked again</span></div>
+  <div class="detail" id="detail" aria-live="polite">Click a green node to see what the tests caught there, and how it was fixed.</div>
+
+  <div class="grid2">
+    <section>
+      <h2 style="font-size:22px;margin:0 0 10px">Every run</h2>
+      <div class="wrap"><table class="runs"><thead><tr><th>Run</th><th>Against</th><th>Passed</th><th></th></tr></thead><tbody id="runs"></tbody></table></div>
+    </section>
+    <section>
+      <h2 style="font-size:22px;margin:0 0 10px">What it caught</h2>
+      <div id="catches"></div>
+    </section>
+  </div>
+  <p class="sub">The full record, including the one bug we found ourselves and the test that had to be rewritten when the replay limit changed, is in <a href="https://github.com/imprint-hash/almanac/blob/master/TESTING.md">TESTING.md</a>.</p>
+</main>
+
+<script type="module" src="/tested.js"></script>
+</body>
+</html>

@@ -216,17 +216,21 @@ function renderReading(d) {
   const up = (n.move ?? 0) > 0;
   $("f-tk").outerHTML = face(name).replace('class="tk"', 'class="tk" id="f-tk"');
   $("f-meta").textContent = `Bitget ${state.market === "perp" ? "stock perpetual" : "stock token"} · since the ${n.session || ""} close` +
-    (d.marketOpen ? " · New York is open now" : ` · ${n.isWeekend ? "weekend" : "overnight"} move`);
+    (d.marketOpen ? (d.replay ? " · New York was open at that moment" : " · New York is open now") : ` · ${n.isWeekend ? "weekend" : "overnight"} move`);
   // While New York is open the token tracks the real market, so the move since
   // the close is no longer a night move and is not titled as one.
   $("f-title").innerHTML = n.move == null
     ? `${esc(name)}: no move measured yet`
     : d.marketOpen
       ? `${esc(name)} <span class="${up ? "up" : "dn"}">${sg(n.move)}</span> since the last close.`
-      : `${esc(name)} <span class="${up ? "up" : "dn"}">${sg(n.move)}</span> while New York sleeps. Still there at 10:30?`;
-  const openNote = d.marketOpen
-    ? "New York is open, so this price is the real market. The odds are for moves made while it is shut; tonight's start at the 16:00 close. "
-    : "";
+      : d.replay
+        ? `${esc(name)} <span class="${up ? "up" : "dn"}">${sg(n.move)}</span> while New York slept. The odds as they stood then.`
+        : `${esc(name)} <span class="${up ? "up" : "dn"}">${sg(n.move)}</span> while New York sleeps. Still there at 10:30?`;
+  // A replay is told in the past tense: it is a moment that has gone.
+  const openNote = !d.marketOpen ? ""
+    : d.replay
+      ? "New York was open at that moment, so the price then was the real market. The odds are for moves made while it is shut; that night's started at the 16:00 close. "
+      : "New York is open, so this price is the real market. The odds are for moves made while it is shut; tonight's start at the 16:00 close. ";
 
   if (s?.n) {
     const undoneN = Math.round(s.undonePct * s.n);
@@ -239,13 +243,18 @@ function renderReading(d) {
       `${r.verdict?.label || ""}. A night picked at random is undone ${pc(d.baseline)} of the time. Almanac never says which way it goes next.`;
   } else {
     $("o-stand").textContent = $("o-undo").textContent = "—";
-    $("o-stand-c").textContent = $("o-undo-c").textContent = "no odds";
+    // No odds is an answer, not a gap: say why in the place the odds would be.
+    const small = n.move != null && Math.abs(n.move) < 0.005;
+    $("o-stand-c").textContent = $("o-undo-c").textContent = small ? "too small to call" : "no odds yet";
     $("f-verdict").textContent = `${openNote}${r.verdict?.label || "Not enough measured nights to give odds"}.`;
   }
 
   $("c-name").textContent = name;
   chart($("chart"), d.path, n.closePrice);
-  $("c-right").textContent = d.marketOpen ? `New York is open: the ${state.market === "perp" ? "perpetual" : "token"} now follows the real market` : "Odds called before the bell, checked at 10:30";
+  const kind = state.market === "perp" ? "perpetual" : "token";
+  $("c-right").textContent = d.marketOpen
+    ? (d.replay ? `New York was open then: the ${kind} followed the real market` : `New York is open: the ${kind} now follows the real market`)
+    : "Odds called before the bell, checked at 10:30";
   document.title = n.move == null ? "Almanac" : `${name} ${sg(n.move, 1)} · Almanac`;
 }
 
@@ -271,11 +280,13 @@ async function loadCompany(symbol) {
 
 async function loadMood() {
   const el = $("w-mood").querySelector(".wt");
+  // A replay shows only what was known then; today's crypto mood was not.
+  if (AT) { el.textContent = "Crypto mood is left out of a replay: it can only be read as it is now, not as it was then."; return; }
   let d;
   try { d = await fetch("/api/mood").then((x) => x.json()); } catch { d = null; }
   const m = d?.mood;
   if (!m) { el.textContent = "bitget-signal did not answer just now."; return; }
-  el.textContent = (AT ? "Right now, not then: " : "") + `Bitcoin is ${m.words} on the 4-hour chart` +
+  el.textContent = `Bitcoin is ${m.words} on the 4-hour chart` +
     `${m.rsiSignal && m.rsiSignal !== "neutral" ? `, and ${m.rsiSignal} (RSI ${Math.round(m.rsi)})` : ""}. ` +
     `Context only: crypto's mood does not change the odds above.`;
 }
@@ -370,15 +381,19 @@ function clock(d) {
   const skew = 0;
   const spell = (ms) => {
     const m = Math.max(0, Math.floor(ms / 60000));
-    return m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, "0")}m` : `${m}m`;
+    // Seconds too, so the reader can see at a glance that the clock is running.
+    const sec = String(Math.max(0, Math.floor(ms / 1000)) % 60).padStart(2, "0");
+    return m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, "0")}m ${sec}s` : `${m}m ${sec}s`;
   };
   const tick = () => {
     const now = frozen ? c.now : Date.now() + skew;
     const open = now >= c.bellAt && now < c.nextCloseAt;
     const left = (open ? c.nextCloseAt : c.bellAt) - now;
-    el.textContent = left > 0
-      ? `New York ${open ? "open" : "shut"} · ${open ? "closes" : "opens"} in ${spell(left)}`
-      : "Waiting for the next bell";
+    // A replay's clock is stopped at its moment and says so, in the past tense.
+    const then = frozen ? new Date(now).toLocaleString("en-US", { timeZone: "America/New_York", weekday: "short", hour: "numeric", minute: "2-digit" }) : "";
+    el.textContent = left <= 0 ? "Waiting for the next bell"
+      : frozen ? `Stopped at ${then} New York · it was ${open ? "open" : "shut"}, ${open ? "closing" : "opening"} ${spell(left).replace(/ \d+s$/, "")} later`
+      : `New York ${open ? "open" : "shut"} · ${open ? "closes" : "opens"} in ${spell(left)}`;
     el.style.color = open ? "var(--good)" : "var(--warn)";
   };
   tick();
@@ -441,6 +456,16 @@ async function ask(question) {
   };
   const show = (r, pending) => {
     if (mine !== askSeq || !r) return;
+    // A question that names another token is answered about that token, so the
+    // card switches to it first, then the question is asked again against the
+    // card's own moment: the reader never sees one token's card beside
+    // another's answer, or two readings seconds apart.
+    if (r.symbol && r.symbol !== state.symbol && !r.error) {
+      askSeq++;
+      state.picked = true;
+      load(r.symbol).then(() => ask(question));
+      return;
+    }
     const model = r.wrote && r.wrote !== "the desk";
     $("a-src").textContent = pending ? "Almanac's own answer · asking Qwen on Bitget's endpoint…"
       : model ? `Qwen (${r.wrote}) on Bitget's endpoint · every number checked against the desk` : `Almanac's own answer${r.note ? ` · ${r.note}` : ""}`;
@@ -449,7 +474,8 @@ async function ask(question) {
   };
   // The desk answers in about a second; the model is asked the same question
   // and swapped in only if it arrives and its numbers match.
-  const base = { question, symbol: state.symbol, market: state.market, ...(AT ? { at: AT } : {}) };
+  const asOf = !AT && state.reading?.symbol === state.symbol ? state.reading?.clock?.now : null;
+  const base = { question, symbol: state.symbol, market: state.market, ...(AT ? { at: AT } : asOf ? { asOf } : {}) };
   show(await post({ ...base, fast: true }), true);
   const full = await post(base);
   if (full) show(full, false);
@@ -491,6 +517,7 @@ async function load(symbol) {
   state.reading = r;
   state.symbol = r.symbol || symbol;
   renderReading(r);
+  $("q").placeholder = `Ask in plain words: is ${r.display || state.symbol}'s move real?`;
   if (!r.replay) loadCompany(state.symbol);
   else $("w-company").querySelector(".wt").textContent = "Company news is left out of a replay: today's headlines were not known then.";
   if (state.board) renderBoard(state.board);
@@ -522,3 +549,13 @@ loadMood();
 loadLive();
 setInterval(() => { if (state.symbol) load(state.symbol); }, 60_000);
 setInterval(loadBoard, 180_000);
+
+/* ---------- tested ---------- */
+// The latest real TestSprite result, read from GitHub by /api/tested. If it
+// cannot be read, the badge just links to the record and claims nothing.
+fetch("/api/tested").then((x) => x.json()).then((r) => {
+  const l = r?.latest;
+  if (!l) return;
+  $("testedres").textContent = ` · last run ${l.result}`;
+  if (l.state !== "success") $("testedbadge").classList.add("bad");
+}).catch(() => {});

@@ -76,7 +76,7 @@ Every change to Almanac goes through [TestSprite](https://www.testsprite.com) be
 
 They test what matters for a page that gives odds about money: every percentage between 0 and 100 and adding up, the AI's answer using only figures the desk gave it (they are listed under every answer), and the page at the moments that matter, through replay: 3 a.m., the bell, a weekend, a market holiday.
 
-Six runs took the suite from 35 to 45 of 46 passing, and caught real bugs on the way: a move 0.77× a normal day described as "about half", a countdown frozen by a cached server time, a search that ignored names not on tonight's board. Every run and every catch is in [TESTING.md](TESTING.md).
+Six runs took the suite from 35 to 45 of 46 passing, and caught real bugs on the way: a move 0.77× a normal day described as "about half", a countdown frozen by a cached server time, a search that ignored names not on tonight's board. Every run and every catch is in [TESTING.md](TESTING.md), and drawn as a web over the app at [almanac-pearl.vercel.app/tested.html](https://almanac-pearl.vercel.app/tested.html).
 
 ## A research task, from question to decision
 
