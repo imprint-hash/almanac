@@ -160,7 +160,7 @@ function renderLead(record, meta) {
   }
   $("eyebrow").textContent = `What ${record.quoted.toLocaleString()} calls made before the bell taught us`;
   $("leadsub").textContent =
-    `Every night from ${record.from} to ${record.to}, Almanac gave its odds for each Bitget ${state.market === "perp" ? "stock perpetual" : "stock token"} before New York opened, ` +
+    `Every night from ${day(record.from)} to ${day(record.to)}, Almanac gave its odds for each Bitget ${state.market === "perp" ? "stock perpetual" : "stock token"} before New York opened, ` +
     `then checked itself at the bell. The size of the move, for that particular stock, told us more than anything else.`;
   void meta;
 }
@@ -369,12 +369,14 @@ $("searchform").addEventListener("submit", (e) => {
   })();
 });
 
-/** "2026-10-16" → "Friday 16 Oct's": the day a reader would name, not a database date. */
-function closeDay(iso) {
+/** "2026-07-21" → "21 July 2026": dates as a reader writes them, not as a database does. */
+function day(iso, opts = { day: "numeric", month: "long", year: "numeric" }) {
   const t = Date.parse(`${iso}T12:00:00Z`);
-  if (!Number.isFinite(t)) return "the last";
-  const d = new Date(t);
-  return `${d.toLocaleDateString("en-GB", { weekday: "long", timeZone: "UTC" })} ${d.getUTCDate()} ${d.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" })}'s`;
+  return Number.isFinite(t) ? new Date(t).toLocaleDateString("en-GB", { ...opts, timeZone: "UTC" }) : iso;
+}
+/** "2026-10-16" → "Friday 16 Oct's" close. */
+function closeDay(iso) {
+  return Number.isFinite(Date.parse(`${iso}T12:00:00Z`)) ? `${day(iso, { weekday: "long", day: "numeric", month: "short" }).replace(",", "")}'s` : "the last";
 }
 
 /* ---------- clock ---------- */
