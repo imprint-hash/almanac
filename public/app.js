@@ -234,8 +234,8 @@ function renderReading(d) {
 
   if (s?.n) {
     const undoneN = Math.round(s.undonePct * s.n);
-    $("o-stand").textContent = pc(1 - s.undonePct);
-    $("o-undo").textContent = pc(s.undonePct);
+    $("o-stand").textContent = pc(s.undonePct);
+    $("o-undo").textContent = pc(1 - s.undonePct);
     $("o-stand-c").textContent = `${s.n - undoneN} of ${s.n} stood`;
     $("o-undo-c").textContent = `${undoneN} of ${s.n} undone`;
     $("f-verdict").textContent = openNote +
