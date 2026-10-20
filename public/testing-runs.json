@@ -183,6 +183,15 @@
    "run": 8,
    "caught": "Asked on rTQQQ's page, the answer was about rNVDA: an everyday word was read as a ticker",
    "fixed": "With a token open, only a name written like a ticker switches tokens"
+  },
+  {
+   "at": [
+    900,
+    180
+   ],
+   "run": 9,
+   "caught": "A replay of a moment when New York was open still spoke as if it were live",
+   "fixed": "Replays are worded in the past tense; the clock says when it stopped"
   }
  ],
  "runs": [
@@ -254,6 +263,15 @@
    "against": "PR #2",
    "passed": 44,
    "failed": 2,
+   "blocked": 0,
+   "pr": 2
+  },
+  {
+   "run": 9,
+   "date": "20 Oct",
+   "against": "PR #2",
+   "passed": 45,
+   "failed": 1,
    "blocked": 0,
    "pr": 2
   }

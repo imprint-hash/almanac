@@ -216,17 +216,21 @@ function renderReading(d) {
   const up = (n.move ?? 0) > 0;
   $("f-tk").outerHTML = face(name).replace('class="tk"', 'class="tk" id="f-tk"');
   $("f-meta").textContent = `Bitget ${state.market === "perp" ? "stock perpetual" : "stock token"} · since the ${n.session || ""} close` +
-    (d.marketOpen ? " · New York is open now" : ` · ${n.isWeekend ? "weekend" : "overnight"} move`);
+    (d.marketOpen ? (d.replay ? " · New York was open at that moment" : " · New York is open now") : ` · ${n.isWeekend ? "weekend" : "overnight"} move`);
   // While New York is open the token tracks the real market, so the move since
   // the close is no longer a night move and is not titled as one.
   $("f-title").innerHTML = n.move == null
     ? `${esc(name)}: no move measured yet`
     : d.marketOpen
       ? `${esc(name)} <span class="${up ? "up" : "dn"}">${sg(n.move)}</span> since the last close.`
-      : `${esc(name)} <span class="${up ? "up" : "dn"}">${sg(n.move)}</span> while New York sleeps. Still there at 10:30?`;
-  const openNote = d.marketOpen
-    ? "New York is open, so this price is the real market. The odds are for moves made while it is shut; tonight's start at the 16:00 close. "
-    : "";
+      : d.replay
+        ? `${esc(name)} <span class="${up ? "up" : "dn"}">${sg(n.move)}</span> while New York slept. The odds as they stood then.`
+        : `${esc(name)} <span class="${up ? "up" : "dn"}">${sg(n.move)}</span> while New York sleeps. Still there at 10:30?`;
+  // A replay is told in the past tense: it is a moment that has gone.
+  const openNote = !d.marketOpen ? ""
+    : d.replay
+      ? "New York was open at that moment, so the price then was the real market. The odds are for moves made while it is shut; that night's started at the 16:00 close. "
+      : "New York is open, so this price is the real market. The odds are for moves made while it is shut; tonight's start at the 16:00 close. ";
 
   if (s?.n) {
     const undoneN = Math.round(s.undonePct * s.n);
@@ -245,7 +249,10 @@ function renderReading(d) {
 
   $("c-name").textContent = name;
   chart($("chart"), d.path, n.closePrice);
-  $("c-right").textContent = d.marketOpen ? `New York is open: the ${state.market === "perp" ? "perpetual" : "token"} now follows the real market` : "Odds called before the bell, checked at 10:30";
+  const kind = state.market === "perp" ? "perpetual" : "token";
+  $("c-right").textContent = d.marketOpen
+    ? (d.replay ? `New York was open then: the ${kind} followed the real market` : `New York is open: the ${kind} now follows the real market`)
+    : "Odds called before the bell, checked at 10:30";
   document.title = n.move == null ? "Almanac" : `${name} ${sg(n.move, 1)} · Almanac`;
 }
 
@@ -380,9 +387,11 @@ function clock(d) {
     const now = frozen ? c.now : Date.now() + skew;
     const open = now >= c.bellAt && now < c.nextCloseAt;
     const left = (open ? c.nextCloseAt : c.bellAt) - now;
-    el.textContent = left > 0
-      ? `New York ${open ? "open" : "shut"} · ${open ? "closes" : "opens"} in ${spell(left)}`
-      : "Waiting for the next bell";
+    // A replay's clock is stopped at its moment and says so, in the past tense.
+    const then = frozen ? new Date(now).toLocaleString("en-US", { timeZone: "America/New_York", weekday: "short", hour: "numeric", minute: "2-digit" }) : "";
+    el.textContent = left <= 0 ? "Waiting for the next bell"
+      : frozen ? `Stopped at ${then} New York · it was ${open ? "open" : "shut"}, ${open ? "closing" : "opening"} ${spell(left).replace(/ \d+s$/, "")} later`
+      : `New York ${open ? "open" : "shut"} · ${open ? "closes" : "opens"} in ${spell(left)}`;
     el.style.color = open ? "var(--good)" : "var(--warn)";
   };
   tick();
