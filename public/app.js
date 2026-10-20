@@ -243,7 +243,9 @@ function renderReading(d) {
       `${r.verdict?.label || ""}. A night picked at random is undone ${pc(d.baseline)} of the time. Almanac never says which way it goes next.`;
   } else {
     $("o-stand").textContent = $("o-undo").textContent = "—";
-    $("o-stand-c").textContent = $("o-undo-c").textContent = "no odds";
+    // No odds is an answer, not a gap: say why in the place the odds would be.
+    const small = n.move != null && Math.abs(n.move) < 0.005;
+    $("o-stand-c").textContent = $("o-undo-c").textContent = small ? "too small to call" : "no odds yet";
     $("f-verdict").textContent = `${openNote}${r.verdict?.label || "Not enough measured nights to give odds"}.`;
   }
 

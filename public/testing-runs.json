@@ -274,6 +274,15 @@
    "failed": 1,
    "blocked": 0,
    "pr": 2
+  },
+  {
+   "run": 10,
+   "date": "20 Oct",
+   "against": "PR #2",
+   "passed": 45,
+   "failed": 1,
+   "blocked": 0,
+   "pr": 2
   }
  ]
 }
