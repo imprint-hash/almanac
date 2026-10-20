@@ -271,11 +271,13 @@ async function loadCompany(symbol) {
 
 async function loadMood() {
   const el = $("w-mood").querySelector(".wt");
+  // A replay shows only what was known then; today's crypto mood was not.
+  if (AT) { el.textContent = "Crypto mood is left out of a replay: it can only be read as it is now, not as it was then."; return; }
   let d;
   try { d = await fetch("/api/mood").then((x) => x.json()); } catch { d = null; }
   const m = d?.mood;
   if (!m) { el.textContent = "bitget-signal did not answer just now."; return; }
-  el.textContent = (AT ? "Right now, not then: " : "") + `Bitcoin is ${m.words} on the 4-hour chart` +
+  el.textContent = `Bitcoin is ${m.words} on the 4-hour chart` +
     `${m.rsiSignal && m.rsiSignal !== "neutral" ? `, and ${m.rsiSignal} (RSI ${Math.round(m.rsi)})` : ""}. ` +
     `Context only: crypto's mood does not change the odds above.`;
 }
