@@ -69,7 +69,12 @@ export default async function handler(req, res) {
   const deadline = Date.now() + BUDGET_MS;
   const question = String(req.body?.question || "").slice(0, 300).trim();
   const m = pick({ market: req.body?.market });
-  const { at } = replayAt({ at: req.body?.at });
+  const { at: replay } = replayAt({ at: req.body?.at });
+  // The page sends the moment its card was read, so the answer quotes the same
+  // prices the reader is looking at, not ones a few seconds newer. Only a recent
+  // moment is honoured; anything else is read fresh.
+  const asOf = Number(req.body?.asOf);
+  const at = replay ?? (Number.isFinite(asOf) && asOf <= Date.now() && Date.now() - asOf < 15 * 60_000 ? asOf : null);
   const known = Object.keys(m.normals);
   const fallback = String(req.body?.symbol || "").toUpperCase();
   const asked = symbolIn(question, known, m.normals, { strict: known.includes(fallback) });

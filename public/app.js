@@ -464,7 +464,8 @@ async function ask(question) {
   };
   // The desk answers in about a second; the model is asked the same question
   // and swapped in only if it arrives and its numbers match.
-  const base = { question, symbol: state.symbol, market: state.market, ...(AT ? { at: AT } : {}) };
+  const asOf = !AT && state.reading?.symbol === state.symbol ? state.reading?.clock?.now : null;
+  const base = { question, symbol: state.symbol, market: state.market, ...(AT ? { at: AT } : asOf ? { asOf } : {}) };
   show(await post({ ...base, fast: true }), true);
   const full = await post(base);
   if (full) show(full, false);

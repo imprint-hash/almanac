@@ -192,6 +192,15 @@
    "run": 9,
    "caught": "A replay of a moment when New York was open still spoke as if it were live",
    "fixed": "Replays are worded in the past tense; the clock says when it stopped"
+  },
+  {
+   "at": [
+    420,
+    473
+   ],
+   "run": 11,
+   "caught": "The card said −0.40% and \"too small to call\"; the answer said −0.53% and gave odds",
+   "fixed": "The answer is worked out from the same moment as the card"
   }
  ],
  "runs": [
@@ -282,6 +291,15 @@
    "passed": 45,
    "failed": 1,
    "blocked": 0,
+   "pr": 2
+  },
+  {
+   "run": 11,
+   "date": "20 Oct",
+   "against": "PR #2",
+   "passed": 44,
+   "failed": 1,
+   "blocked": 1,
    "pr": 2
   }
  ]
