@@ -215,7 +215,7 @@ function renderReading(d) {
   const name = d.display || d.symbol;
   const up = (n.move ?? 0) > 0;
   $("f-tk").outerHTML = face(name).replace('class="tk"', 'class="tk" id="f-tk"');
-  $("f-meta").textContent = `Bitget ${state.market === "perp" ? "stock perpetual" : "stock token"} · since the ${n.session || ""} close` +
+  $("f-meta").textContent = `Bitget ${state.market === "perp" ? "stock perpetual" : "stock token"} · since ${closeDay(n.session)} close` +
     (d.marketOpen ? (d.replay ? " · New York was open at that moment" : " · New York is open now") : ` · ${n.isWeekend ? "weekend" : "overnight"} move`);
   // While New York is open the token tracks the real market, so the move since
   // the close is no longer a night move and is not titled as one.
@@ -368,6 +368,14 @@ $("searchform").addEventListener("submit", (e) => {
     else { $("q").value = typed; ask(typed); }
   })();
 });
+
+/** "2026-10-16" → "Friday 16 Oct's": the day a reader would name, not a database date. */
+function closeDay(iso) {
+  const t = Date.parse(`${iso}T12:00:00Z`);
+  if (!Number.isFinite(t)) return "the last";
+  const d = new Date(t);
+  return `${d.toLocaleDateString("en-GB", { weekday: "long", timeZone: "UTC" })} ${d.getUTCDate()} ${d.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" })}'s`;
+}
 
 /* ---------- clock ---------- */
 let ticker = null;
