@@ -522,3 +522,13 @@ loadMood();
 loadLive();
 setInterval(() => { if (state.symbol) load(state.symbol); }, 60_000);
 setInterval(loadBoard, 180_000);
+
+/* ---------- tested ---------- */
+// The latest real TestSprite result, read from GitHub by /api/tested. If it
+// cannot be read, the badge just links to the record and claims nothing.
+fetch("/api/tested").then((x) => x.json()).then((r) => {
+  const l = r?.latest;
+  if (!l) return;
+  $("testedres").textContent = ` · last run ${l.result}`;
+  if (l.state !== "success") $("testedbadge").classList.add("bad");
+}).catch(() => {});

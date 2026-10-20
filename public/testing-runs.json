@@ -1,0 +1,38 @@
+{
+  "screenshot": "/img/almanac-desk.jpg",
+  "size": [1920, 1080],
+  "hub": [1010, 300],
+  "suite": 46,
+  "checked": [
+    { "at": [560, 42], "what": "Search for a token" },
+    { "at": [1268, 42], "what": "New York clock" },
+    { "at": [1750, 42], "what": "rTokens / Perps switch" },
+    { "at": [1408, 129], "what": "Copy the MCP command" },
+    { "at": [1530, 300], "what": "Biggest moves tonight" },
+    { "at": [1530, 640], "what": "Report card" },
+    { "at": [1160, 792], "what": "Hide price moves under 0.5%" },
+    { "at": [700, 940], "what": "Tonight's moves board" },
+    { "at": [353, 900], "what": "Open a token from the board" },
+    { "at": [420, 473], "what": "Ask in plain words" },
+    { "at": [1219, 473], "what": "Ask button" },
+    { "at": [330, 180], "what": "Token reading: stands and undone" },
+    { "at": [900, 180], "what": "Price since the close" }
+  ],
+  "catches": [
+    { "at": [520, 565], "run": 2, "caught": "A move 0.77× a normal day was described as \"about half\"", "fixed": "0.65–0.8× now reads \"about three quarters\"; every figure the model may use is listed under its answer" },
+    { "at": [1408, 129], "run": 2, "caught": "No confirmation after \"Copy command\" when the browser blocks the clipboard", "fixed": "Falls back to selecting the command, with a message that stays" },
+    { "at": [1268, 42], "run": 3, "caught": "The New York countdown froze: a cached server time kept resetting it", "fixed": "Runs on the device clock; ticks every second" },
+    { "at": [1750, 42], "run": 3, "caught": "The Perps board still said \"tokens\"", "fixed": "Wording follows the market" },
+    { "at": [560, 42], "run": 4, "caught": "Searching a token not on tonight's board did nothing", "fixed": "Search opens any name the desk carries" },
+    { "at": [1160, 792], "run": 4, "caught": "\"Hide moves under 0.5%\" read as hiding small ratios", "fixed": "Label says \"price moves\"" },
+    { "at": [330, 180], "run": 5, "caught": "After switching to Perps, the card kept the rTokens numbers for a few seconds", "fixed": "The card clears the moment the market changes" }
+  ],
+  "runs": [
+    { "run": 1, "date": "16 Oct", "against": "live site, before replay existed", "passed": 35, "failed": 8, "blocked": 3 },
+    { "run": 2, "date": "19 Oct", "against": "PR #1", "passed": 41, "failed": 4, "blocked": 1, "pr": 1 },
+    { "run": 3, "date": "19 Oct", "against": "PR #1", "passed": 43, "failed": 3, "blocked": 0, "pr": 1 },
+    { "run": 4, "date": "19 Oct", "against": "PR #1", "passed": 43, "failed": 3, "blocked": 0, "pr": 1 },
+    { "run": 5, "date": "19 Oct", "against": "PR #1", "passed": 43, "failed": 3, "blocked": 0, "pr": 1 },
+    { "run": 6, "date": "19 Oct", "against": "PR #1, final run", "passed": 45, "failed": 1, "blocked": 0, "pr": 1 }
+  ]
+}
