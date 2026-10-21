@@ -66,13 +66,18 @@ async function latest() {
   let r = null;
   try { r = await fetch("/api/tested").then((x) => x.json()); } catch { r = null; }
   const pill = $("latest");
-  const l = r?.latest;
+  const l = r?.live;
   if (!l) { pill.textContent = r?.error || "GitHub did not answer just now."; return; }
-  const when = new Date(l.at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  const when = (t) => new Date(t).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
   pill.className = `pill${l.state === "success" ? "" : " bad"}`;
-  pill.textContent = `Latest TestSprite run: ${l.result}`;
+  pill.textContent = `This version of the site: ${l.result}`;
+  const pr = (x) => `<a href="https://github.com/imprint-hash/almanac/pull/${x.pr}">PR #${x.pr}</a>`;
   $("now").insertAdjacentHTML("beforeend",
-    `<span>on <a href="https://github.com/imprint-hash/almanac/pull/${l.pr}">PR #${l.pr}</a> · ${esc(when)}</span><a href="${esc(l.report)}">Full report ↗</a>`);
+    `<span>merged from ${pr(l)} · ${esc(when(l.at))}</span>${l.report ? `<a href="${esc(l.report)}">Full report ↗</a>` : ""}`);
+  // A newer run on a change not yet merged is shown too, pass or fail.
+  const n = r.latest;
+  if (n && n.pr !== l.pr) $("now").insertAdjacentHTML("beforeend",
+    `<span>Newest run, on ${pr(n)} (not merged): ${esc(n.result)}</span>`);
 }
 
 fetch("/testing-runs.json").then((x) => x.json()).then((d) => { drawWeb(d); lists(d); }).catch(() => { $("detail").textContent = "The test record did not load. Refresh to try again."; });
