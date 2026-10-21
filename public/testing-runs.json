@@ -218,7 +218,7 @@
    ],
    "run": 16,
    "caught": "Bitget missed one sweep and the empty board was cached, called \"no token has moved enough\"",
-   "fixed": "An empty sweep is never cached; the page says Bitget did not answer, and asks again"
+   "fixed": "Fix waiting in PR #5: an empty sweep is never cached, and the page says Bitget did not answer"
   }
  ],
  "runs": [
