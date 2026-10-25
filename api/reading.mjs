@@ -17,8 +17,11 @@ export default async function handler(req, res) {
   // Asked for nothing: the default token. Asked for something that isn't a
   // token name at all ("$$$", "@@@"): that's an unknown token too, not a
   // request for the default.
-  const asked = String(req.query?.symbol ?? "").trim();
-  const symbol = known.includes(raw) ? raw : known.includes(raw + "USDT") ? raw + "USDT" : !asked ? known[0] : null;
+  // A request that names no symbol at all opens the default; one that sends
+  // a symbol parameter that is blank (spaces only) is asking for a token
+  // that doesn't exist, and is answered as one.
+  const asked = req.query?.symbol;
+  const symbol = known.includes(raw) ? raw : known.includes(raw + "USDT") ? raw + "USDT" : asked == null || asked === "" ? known[0] : null;
   // A name Almanac doesn't carry is said plainly, never answered with another
   // token's odds: an agent asking about "ZZZZ" must not get rQQQ back.
   if (!symbol) {
