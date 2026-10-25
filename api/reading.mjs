@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   // A name Almanac doesn't carry is said plainly, never answered with another
   // token's odds: an agent asking about "ZZZZ" must not get rQQQ back.
   if (!symbol) {
-    return res.status(200).json({
+    return res.status(404).json({
       symbol: raw, market: m.id,
       error: `Almanac does not carry ${raw.slice(0, 20)} on ${m.label}.`,
       carried: known.map((s) => m.normals[s]?.display ?? s),

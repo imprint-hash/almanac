@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Almanac desk sketch</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{--page:#08110f;--surf:#0d1a18;--surf2:#111f1c;--line:#1c2a27;--ink:#fff;--ink2:#b9c6c3;--muted:#7d8a87;--faint:#4a5956;--teal:#0eab9a;--tealup:#2dd4bf;--good:#0ca30c;--warn:#fab219;--crit:#d03b3b;--mono:"IBM Plex Mono",monospace;--sans:Sora,sans-serif}
+*{box-sizing:border-box;margin:0}
+body{background:var(--page);color:var(--ink);font:15px/1.5 var(--sans);width:1440px;padding:22px 36px 30px;position:relative}
+.label{position:absolute;top:10px;right:36px;font:600 11px var(--mono);color:#ff9a9a;letter-spacing:.1em}
+.top{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.brand{font:700 22px var(--sans);display:flex;gap:12px;align-items:baseline}.brand small{font:400 14px var(--sans);color:var(--muted)}
+.clock{font:500 13px var(--mono);color:var(--warn)}
+.hub{font:500 12px var(--mono);color:var(--tealup);border:1px solid #2dd4bf55;border-radius:6px;padding:4px 10px}
+.hero{display:grid;grid-template-columns:1fr 420px;gap:30px;align-items:end;padding:26px 0 22px}
+.eyebrow{font:600 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--teal)}
+h1{font:600 40px/1.15 var(--sans);margin-top:8px;max-width:820px;text-wrap:balance}
+h1 em{font-style:normal;color:var(--tealup)}
+.hero p{color:var(--ink2);margin-top:10px;max-width:760px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--surf);border:1px solid var(--line);border-radius:10px;padding:14px}
+.stat b{font:600 38px var(--sans);display:block}.stat small{color:var(--ink2);font-size:13px}
+.g{color:var(--good)}.r{color:var(--crit)}.w{color:var(--warn)}
+.grid{display:grid;grid-template-columns:300px 1fr 380px;gap:18px}
+.panel{background:var(--surf);border:1px solid var(--line);border-radius:12px;padding:16px}
+h4{font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.row{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:10px 12px;border-radius:8px;margin-bottom:4px}
+.row.on{background:var(--surf2);outline:1px solid var(--teal)}
+.row b{font-weight:600}.row .mv{font:500 13px var(--mono)}.row small{color:var(--muted);font-size:12px}
+.pill{font:600 11px var(--mono);padding:3px 8px;border-radius:5px;align-self:center;grid-row:span 2}
+.p-st{background:#0ca30c22;color:#5ee35e}.p-coin{background:#fab21922;color:var(--warn)}.p-mid{background:#2dd4bf1f;color:var(--tealup)}
+.main h2{font:600 30px var(--sans)}.main h2 span{color:var(--crit)}
+.main .sub{color:var(--muted);font-size:13.5px}
+.odds{display:flex;gap:22px;align-items:center;margin:18px 0;padding:18px;background:var(--surf2);border-radius:10px}
+.big{font:600 56px/1 var(--sans);color:var(--warn)}
+.odds p{color:var(--ink2)}.odds b{color:var(--ink)}
+.bar{height:12px;border-radius:6px;background:var(--line);overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:var(--warn)}
+.why{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.card{border:1px solid var(--line);border-radius:10px;padding:12px}
+.card .t{font:600 11px var(--mono);color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.card .v{font:600 18px var(--sans);margin:4px 0}.card p{font-size:13px;color:var(--ink2)}
+.src{font:500 10.5px var(--mono);color:var(--tealup);margin-top:6px}
+.note{margin-top:14px;border-left:3px solid var(--teal);background:var(--surf2);padding:12px 14px;border-radius:0 8px 8px 0;color:var(--ink2);font-size:14px}
+.note .t{font:600 11px var(--mono);color:var(--teal);letter-spacing:.08em;margin-bottom:4px}
+.rc{display:grid;grid-template-columns:96px 1fr 1fr;gap:6px 10px;font-size:13px;align-items:center}
+.rc .h{font:600 10.5px var(--mono);color:var(--muted)}
+.rc .n{font:500 12.5px var(--mono);font-variant-numeric:tabular-nums}
+.two{display:flex;gap:3px;align-items:center}.two i{height:8px;border-radius:4px;display:block}
+.code{font:500 12px/1.6 var(--mono);background:#050b0a;border:1px solid var(--line);border-radius:8px;padding:12px;color:var(--ink2);margin-top:8px;white-space:pre}
+.code .c{color:var(--faint)}.code .k{color:var(--tealup)}
+.foot{margin-top:6px;color:var(--muted);font-size:12px}
+.ph{outline:1px dashed #ff9a9a88;outline-offset:3px}
+</style></head><body>
+<div class="label">SKETCH · layout and wording · dashed = placeholder text, not real yet</div>
+
+<div class="top">
+ <div class="brand">Almanac <small>will tonight's move survive the bell?</small></div>
+ <div style="display:flex;gap:14px;align-items:center"><span class="hub">● Running on Bitget Agent Hub</span><span class="clock">NEW YORK SHUT · OPENS IN 6h 12m</span></div>
+</div>
+
+<div class="hero">
+ <div>
+  <div class="eyebrow">What 937 real nights taught us</div>
+  <h1>Big overnight moves almost always stand. <em>Small ones are a coin flip.</em></h1>
+  <p>Every night for two months, Almanac called each Bitget stock token before New York opened, then checked itself at the bell. The size of the move, for that particular stock, told us more than anything else, including the AI.</p>
+ </div>
+ <div class="split">
+  <div class="stat"><b class="g">2 of 68</b><small>huge moves (over 1.3× a normal day) were undone by the bell</small></div>
+  <div class="stat"><b class="w">54%</b><small>of tiny moves were undone: a coin flip</small></div>
+ </div>
+</div>
+
+<div class="grid">
+ <div class="panel"><h4>Tonight · 9 tokens moving</h4>
+  <div class="row on"><b>rNVDA <span class="mv r">−3.40%</span></b><span class="pill p-st">LIKELY STANDS</span><small>1.4× a normal day</small></div>
+  <div class="row"><b>rSMH <span class="mv r">−2.05%</span></b><span class="pill p-mid">SHAKY</span><small>0.67× a normal day</small></div>
+  <div class="row"><b>rMSTR <span class="mv g">+4.80%</span></b><span class="pill p-mid">SHAKY</span><small>0.94× a normal day</small></div>
+  <div class="row"><b>rTSLA <span class="mv g">+1.10%</span></b><span class="pill p-coin">COIN FLIP</span><small>0.31× a normal day</small></div>
+  <div class="row"><b>rAAPL <span class="mv r">−0.60%</span></b><span class="pill p-coin">COIN FLIP</span><small>0.28× a normal day</small></div>
+  <p class="foot">Sorted by how unusual the move is for that stock, not by its size. Example rows.</p>
+ </div>
+
+ <div class="panel main">
+  <h2>rNVDA <span>−3.40%</span> while New York sleeps</h2>
+  <div class="sub">Live Bitget price vs last real close · 02:40 New York</div>
+  <div class="odds">
+   <div class="big">3%</div>
+   <div style="flex:1"><p>Moves over 1.3× a normal day were <b>undone by the bell 2 times in 68</b>. It will very likely still be there at 10:30.</p><div class="bar"><i style="width:3%"></i></div><p class="foot">Almanac does not say which way it goes next. Nobody's data does.</p></div>
+  </div>
+  <div class="why">
+   <div class="card"><div class="t">News tonight</div><div class="v ph">Export rule report</div><p class="ph">One story in the last 6 hours names Nvidia directly.</p><div class="src">bitget-signal · news-briefing</div></div>
+   <div class="card"><div class="t">Market mood</div><div class="v ph">Fearful</div><p class="ph">Crypto and stock tokens are falling together tonight.</p><div class="src">bitget-signal · sentiment-analyst</div></div>
+   <div class="card"><div class="t">Cost to act now</div><div class="v ph">0.12% spread</div><p class="ph">Thin overnight trading: leaving now costs more than at 10:30.</p><div class="src">Bitget market data</div></div>
+  </div>
+  <div class="note"><div class="t">QWEN · ON BITGET'S ENDPOINT</div><span class="ph">This is a big move for Nvidia and there is real news behind it, so history says it will probably hold. Selling now costs extra because the night market is thin.</span></div>
+ </div>
+
+ <div class="panel">
+  <h4>Report card · it graded itself</h4>
+  <div class="rc">
+   <span class="h">MOVE SIZE</span><span class="h">ALMANAC SAID</span><span class="h">WHAT HAPPENED</span>
+   <span>Tiny</span><span class="n">49% undone</span><span class="n">54% undone</span>
+   <span>Small</span><span class="n">41%</span><span class="n">42%</span>
+   <span>Medium</span><span class="n">28%</span><span class="n">30%</span>
+   <span>Large</span><span class="n">27%</span><span class="n">18%</span>
+   <span>Huge</span><span class="n">11%</span><span class="n">3%</span>
+  </div>
+  <p class="foot" style="margin-top:8px">937 calls made before the bell, 21 Jul to 21 Sep. Within 2 points on 2 bands, within 9 on all five.</p>
+
+  <h4 style="margin-top:20px">Rule vs AI · 120 balanced nights</h4>
+  <div class="rc" style="grid-template-columns:110px 1fr 40px">
+   <span>Size rule</span><span class="two"><i style="width:69%;background:var(--tealup)"></i></span><span class="n">69%</span>
+   <span>Qwen, guessing</span><span class="two"><i style="width:53%;background:var(--muted)"></i></span><span class="n">53%</span>
+   <span>Coin</span><span class="two"><i style="width:50%;background:var(--faint)"></i></span><span class="n">50%</span>
+  </div>
+
+  <h4 style="margin-top:20px">Ask from any agent</h4>
+  <div class="code"><span class="c"># Almanac as an Agent Hub skill</span>
+<span class="k">you:</span> rNVDA is down 3.4%, will it hold?
+<span class="k">agent:</span> uses almanac + bitget-signal
+→ 2 of 68 undone · news: yes · cost: 0.12%</div>
+ </div>
+</div>
+</body></html>
