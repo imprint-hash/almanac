@@ -76,7 +76,9 @@ Every change to Almanac goes through [TestSprite](https://www.testsprite.com) be
 
 They test what matters for a page that gives odds about money: every percentage between 0 and 100 and adding up, the AI's answer using only figures the desk gave it (they are listed under every answer), and the page at the moments that matter, through replay: 3 a.m., the bell, a weekend, a market holiday.
 
-Six runs took the suite from 35 to 45 of 46 passing, and caught real bugs on the way: a move 0.77× a normal day described as "about half", a countdown frozen by a cached server time, a search that ignored names not on tonight's board. Every run and every catch is in [TESTING.md](TESTING.md), and drawn as a web over the app at [almanac-pearl.vercel.app/tested.html](https://almanac-pearl.vercel.app/tested.html).
+Twenty-two runs took the suite from 35 to 46 of 46 passing, and caught 13 real bugs on the way: a move 0.77× a normal day described as "about half", a countdown frozen by a cached server time, a search that ignored names not on tonight's board. PRs #2, #4, #5, #6, #7, #8 and #10 all passed 46 of 46. Every run and every catch is in [TESTING.md](TESTING.md), including the five times the test was wrong rather than the app, and drawn as a web over the app at [almanac-pearl.vercel.app/tested.html](https://almanac-pearl.vercel.app/tested.html).
+
+**The API, tested on its own.** AI agents call Almanac directly, so a second TestSprite project ("Almanac API") checks the endpoints without a browser: 71 tests across the odds board, single readings, the plain-English answer, the MCP tool, and the live record, planned in [docs/testsprite-api-plan.md](docs/testsprite-api-plan.md). The first run passed 68 of 71 and caught `/api/reading` answering about a different token when asked about one Almanac does not carry, so an agent could be handed the wrong odds without knowing. [PR #7](https://github.com/imprint-hash/almanac/pull/7) made it a clear 404 that lists what is carried; later runs caught symbols-only input and blank spaces slipping through, fixed in PRs #8 and #9. The API suite now passes 71 of 71.
 
 ## A research task, from question to decision
 
