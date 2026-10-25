@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Almanac odds sketch</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{--bg:#fff;--soft:#f4f6f7;--line:#e6eaec;--ink:#14191c;--ink2:#4c565b;--muted:#7f8a90;--teal:#0b8f80;--tealbg:#e3f5f2;--green:#1a9a4b;--greenbg:#e5f6ea;--red:#d9363e;--redbg:#fdeaea;--amber:#b77900;--amberbg:#fff4dc;--f:Figtree,system-ui,sans-serif;--m:"IBM Plex Mono",monospace}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--f);width:1440px;position:relative}
+.label{position:absolute;top:6px;right:24px;font:500 11px var(--m);color:var(--red)}
+header{display:flex;align-items:center;gap:28px;padding:18px 70px;border-bottom:1px solid var(--line)}
+.logo{display:flex;align-items:center;gap:9px;font:800 22px var(--f)}
+.mark{width:28px;height:28px;border-radius:7px;background:var(--teal);display:grid;place-items:center;color:#fff;font:800 15px var(--f)}
+.search{flex:1;max-width:560px;background:var(--soft);border-radius:10px;padding:10px 14px;color:var(--muted)}
+.hub{margin-left:auto;font:600 13px var(--f);color:var(--teal);background:var(--tealbg);padding:7px 12px;border-radius:8px}
+.clock{font:600 13px var(--f);color:var(--amber)}
+.tabs{display:flex;gap:26px;padding:12px 70px;border-bottom:1px solid var(--line);color:var(--ink2);font-weight:600}
+.tabs .on{color:var(--ink);box-shadow:inset 0 -2px 0 var(--ink);padding-bottom:10px;margin-bottom:-13px}
+main{padding:24px 70px;display:grid;grid-template-columns:1fr 362px;gap:28px}
+.card{border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 1px 2px #0000000a}
+.feat{padding:22px;display:grid;grid-template-columns:380px 1fr;gap:26px}
+.fh{grid-column:1/-1;display:flex;gap:14px;align-items:center}
+.tk{width:52px;height:52px;border-radius:12px;background:#111;color:#76b900;display:grid;place-items:center;font:800 16px var(--f)}
+.fh small{color:var(--muted);font-weight:500}.fh h1{font:700 26px var(--f)}
+.fh h1 .r{color:var(--red)}
+.out{display:flex;align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid var(--line)}
+.out b{flex:1;font:600 17px var(--f)}.out .pc{font:800 30px var(--f)}
+.chip{font:700 13px var(--f);padding:6px 11px;border-radius:7px}
+.g{background:var(--greenbg);color:var(--green)}.rd{background:var(--redbg);color:var(--red)}.am{background:var(--amberbg);color:var(--amber)}.tl{background:var(--tealbg);color:var(--teal)}
+.why{margin-top:14px;display:grid;gap:12px}
+.why .src{font:500 11px var(--m);color:var(--teal)}
+.why p{font-size:14px;color:var(--ink)}
+.ph{outline:1px dashed #d9363e88;outline-offset:2px}
+.chart .legend{display:flex;gap:16px;font-size:13px;color:var(--ink2);margin-bottom:6px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.foot{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-top:8px}
+.side h3{font:700 19px var(--f);margin:2px 0 10px}
+.hot{display:grid;grid-template-columns:18px 1fr auto;gap:4px 10px;align-items:center;padding:9px 0;font-size:15px}
+.hot .n{color:var(--muted)}.hot b{font-weight:600}
+.promo{padding:16px;background:linear-gradient(135deg,#e3f5f2,#f1f8ff)}
+.promo h4{font:700 16px var(--f)}.promo p{color:var(--ink2);font-size:14px;margin:4px 0 10px}
+.code{font:500 12px/1.6 var(--m);background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px;color:var(--ink2);white-space:pre}
+h2{font:700 21px var(--f);margin:6px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.m{padding:16px}
+.mh{display:flex;gap:10px;align-items:center}.mh .tk{width:38px;height:38px;border-radius:9px;font-size:12px}
+.mh b{flex:1;font-weight:600;font-size:15px;line-height:1.3}
+.gauge{text-align:center;font:800 18px var(--f);line-height:1}.gauge small{display:block;font:500 11px var(--f);color:var(--muted)}
+.mrow{display:flex;gap:8px;margin-top:14px}.mrow span{flex:1;text-align:center;padding:10px;border-radius:9px;font-weight:700}
+.mfoot{display:flex;justify-content:space-between;color:var(--muted);font-size:12.5px;margin-top:12px}
+.rc{display:grid;grid-template-columns:auto 1fr 1fr;gap:7px 14px;font-size:14px}
+.rc .h{font-size:12px;color:var(--muted);font-weight:600}
+.rc .n{font-weight:700;font-variant-numeric:tabular-nums}
+.bars{display:grid;grid-template-columns:100px 1fr 40px;gap:8px;align-items:center;font-size:14px}
+.bars i{display:block;height:8px;border-radius:4px}
+.head{grid-column:1/-1;display:grid;grid-template-columns:1.25fr 1fr;gap:24px;align-items:center;padding:4px 0 6px}
+.head h1{font:800 34px/1.12 var(--f);text-wrap:balance}.head h1 span{color:var(--teal)}
+.head p{color:var(--ink2);margin-top:8px}
+.big2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.big2 div{background:var(--soft);border-radius:14px;padding:14px 16px}
+.big2 b{font:800 36px var(--f);display:block}.big2 small{color:var(--ink2)}
+</style></head><body>
+<div class="label">SKETCH · Polymarket-style layout, our own name and colours · dashed = placeholder text</div>
+<header>
+ <div class="logo"><span class="mark">A</span>Almanac</div>
+ <div class="search">Search a stock token… rNVDA, rTSLA</div>
+ <span class="clock">New York shut · opens in 6h 12m</span>
+ <span class="hub">● Live on Bitget Agent Hub</span>
+</header>
+<nav class="tabs"><span class="on">Tonight</span><span>Biggest moves</span><span>Coin flips</span><span>Earnings nights</span><span>Weekends</span><span>Report card</span><span>How it works</span></nav>
+
+<main>
+ <section class="head">
+  <div><h1>Big overnight moves almost always stand. <span>Small ones are a coin flip.</span></h1>
+  <p>Every night for two months Almanac called each Bitget stock token before New York opened, then checked itself at the bell. 937 calls, all on the record.</p></div>
+  <div class="big2"><div><b style="color:var(--green)">2 of 68</b><small>huge moves were undone by the bell</small></div><div><b style="color:var(--amber)">54%</b><small>of tiny moves were undone</small></div></div>
+ </section>
+
+ <div style="display:grid;gap:22px">
+  <article class="card feat">
+   <div class="fh"><span class="tk">NVDA</span><div><small>Stock token · Chips</small><h1>rNVDA <span class="r">−3.40%</span> overnight. Still there at 10:30?</h1></div></div>
+   <div>
+    <div class="out"><b>Stands</b><span class="pc">97%</span><span class="chip g">2 of 68 undone</span></div>
+    <div class="out"><b>Undone</b><span class="pc" style="color:var(--muted)">3%</span><span class="chip rd">fade risk</span></div>
+    <div class="why">
+     <div><div class="src">bitget-signal · news-briefing</div><p class="ph">Export-rule report names Nvidia directly (3h ago)</p></div>
+     <div><div class="src">bitget-signal · sentiment-analyst</div><p class="ph">Mood: fearful. Crypto and stock tokens falling together</p></div>
+     <div><div class="src">Qwen on Bitget's endpoint</div><p class="ph">A big move for Nvidia, with real news behind it. History says it holds; selling now costs extra on a thin night.</p></div>
+    </div>
+   </div>
+   <div class="chart">
+    <div class="legend"><span><i class="dot" style="background:var(--teal)"></i>rNVDA tonight</span><span><i class="dot" style="background:#b8c2c7"></i>last real close</span></div>
+    <svg viewBox="0 0 500 250" width="100%" height="250">
+     <g stroke="#eef1f2"><line x1="0" y1="40" x2="460" y2="40"/><line x1="0" y1="100" x2="460" y2="100"/><line x1="0" y1="160" x2="460" y2="160"/><line x1="0" y1="220" x2="460" y2="220"/></g>
+     <line x1="0" y1="60" x2="460" y2="60" stroke="#b8c2c7" stroke-dasharray="5 5"/>
+     <path d="M0 60 L30 62 L55 58 L80 70 L105 66 L130 85 L150 80 L170 104 L195 98 L220 120 L245 112 L270 140 L295 133 L320 150 L345 146 L370 162 L395 156 L420 170 L445 166" fill="none" stroke="#0b8f80" stroke-width="2.5"/>
+     <circle cx="445" cy="166" r="9" fill="#0b8f8033"/><circle cx="445" cy="166" r="4.5" fill="#0b8f80"/>
+     <g fill="#7f8a90" font-size="12" font-family="Figtree"><text x="466" y="64">close</text><text x="466" y="170">−3.4%</text><text x="0" y="245">20:00</text><text x="150" y="245">22:00</text><text x="300" y="245">00:00</text><text x="420" y="245">02:40</text></g>
+    </svg>
+    <div class="foot"><span>Bitget price, live · example line</span><span>Called before the bell · checked at 10:30</span></div>
+   </div>
+  </article>
+
+  <div><h2>Tonight's moves</h2>
+  <div class="grid">
+   <div class="card m"><div class="mh"><span class="tk" style="background:#0f3d8c;color:#fff">SMH</span><b>rSMH −2.05%<br><small style="color:var(--muted);font-weight:500">0.67× a normal day</small></b><div class="gauge" style="color:var(--teal)">70%<small>stands</small></div></div><div class="mrow"><span class="tl">Shaky</span></div><div class="mfoot"><span>233 nights like it</span><span>Chips ETF</span></div></div>
+   <div class="card m"><div class="mh"><span class="tk" style="background:#e31937;color:#fff">TSLA</span><b>rTSLA +1.10%<br><small style="color:var(--muted);font-weight:500">0.31× a normal day</small></b><div class="gauge" style="color:var(--amber)">58%<small>stands</small></div></div><div class="mrow"><span class="am">Coin flip</span></div><div class="mfoot"><span>260 nights like it</span><span>Autos</span></div></div>
+   <div class="card m"><div class="mh"><span class="tk" style="background:#f7931a;color:#fff">MSTR</span><b>rMSTR +4.80%<br><small style="color:var(--muted);font-weight:500">0.94× a normal day</small></b><div class="gauge" style="color:var(--green)">82%<small>stands</small></div></div><div class="mrow"><span class="g">Likely stands</span></div><div class="mfoot"><span>148 nights like it</span><span>Bitcoin proxy</span></div></div>
+  </div>
+  <p style="color:var(--muted);font-size:12.5px;margin-top:8px">Example cards. Live numbers come from Almanac's measured nights.</p></div>
+ </div>
+
+ <aside style="display:grid;gap:18px;align-content:start">
+  <div class="card promo"><h4>Ask Almanac from any agent</h4><p>An Agent Hub skill: your agent gets our measured odds plus Bitget's own news and mood.</p>
+   <div class="code">you: rNVDA −3.4%, will it hold?
+agent: almanac + bitget-signal
+→ 2 of 68 undone · news: yes</div></div>
+
+  <div class="card" style="padding:16px" ><h3>Biggest moves tonight</h3>
+   <div class="hot"><span class="n">1</span><b>rMSTR</b><span class="chip g">+4.80%</span></div>
+   <div class="hot"><span class="n">2</span><b>rNVDA</b><span class="chip rd">−3.40%</span></div>
+   <div class="hot"><span class="n">3</span><b>rSMH</b><span class="chip rd">−2.05%</span></div>
+   <div class="hot"><span class="n">4</span><b>rTSLA</b><span class="chip g">+1.10%</span></div>
+  </div>
+
+  <div class="card" style="padding:16px"><h3>Report card</h3>
+   <div class="rc"><span class="h">Move size</span><span class="h">We said undone</span><span class="h">Really undone</span>
+    <span>Tiny</span><span class="n">49%</span><span class="n">54%</span>
+    <span>Small</span><span class="n">41%</span><span class="n">42%</span>
+    <span>Medium</span><span class="n">28%</span><span class="n">30%</span>
+    <span>Large</span><span class="n">27%</span><span class="n">18%</span>
+    <span>Huge</span><span class="n">11%</span><span class="n">3%</span></div>
+   <p style="color:var(--muted);font-size:12.5px;margin-top:8px">937 calls, 21 Jul – 21 Sep, made before the bell.</p>
+  </div>
+
+  <div class="card" style="padding:16px"><h3>Simple rule vs AI</h3>
+   <div class="bars"><span>Size rule</span><i style="width:69%;background:var(--teal)"></i><b>69%</b>
+   <span>Qwen</span><i style="width:53%;background:#b8c2c7"></i><b>53%</b>
+   <span>Coin flip</span><i style="width:50%;background:#dfe4e6"></i><b>50%</b></div>
+   <p style="color:var(--muted);font-size:12.5px;margin-top:8px">120 nights, half real moves and half fake-outs.</p>
+  </div>
+ </aside>
+</main>
+</body></html>

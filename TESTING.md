@@ -39,3 +39,11 @@ Each line is a real run. "Caught" means TestSprite found something wrong that wa
 | 17 · 21 Oct | PR #6 | **46 / 46 passed** | The badge now shows the result for the code the site is running (the last merged PR), and a newer unmerged run beside it. Merged. | — |
 
 Found by us, not by the tests: while fixing run 3, a missing bracket made the board drop Bitget's own error message and show "nothing has moved" instead. Fixed in the same commit as run 4's findings.
+
+## Backend API suite (TestSprite, from 25 Oct)
+
+A second TestSprite project tests the API directly: 71 tests across 7 use cases, planned from [docs/testsprite-api-plan.md](docs/testsprite-api-plan.md) (board, reading, ask, MCP, live record, tested badge, mood, company).
+
+| Run | Against | Result | What it caught | Fixed by |
+|---|---|---|---|---|
+| A1 · 25 Oct | live site | 68 / 71 passed (3 failed) | **`/api/reading?symbol=ZZZZ` answered about rSPY**, with a full reading, instead of saying the token isn't carried: an agent asking about an unknown token got another token's odds. Two more failures were the tests' assumption, not a bug: they expected the reading and live-record endpoints to demand a login, but the API is public by design (public market data, read by the page and by agents). | Unknown tokens now get a 404 that says so and lists what is carried. The two login tests were reworded to expect public access. |

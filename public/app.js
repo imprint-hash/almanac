@@ -528,6 +528,11 @@ async function load(symbol) {
   try { r = await fetch(`/api/reading?symbol=${encodeURIComponent(symbol)}&market=${state.market}${atq}`).then((x) => x.json()); }
   catch { $("f-title").textContent = "The reading did not come back. Refresh to try again."; return; }
   if (symbol !== state.symbol) return;
+  // A token the desk doesn't carry (an old link, a typo): open the default instead.
+  if (r.carried) {
+    const first = FIRST[state.market];
+    if (symbol !== first) return load(first);
+  }
   state.reading = r;
   state.symbol = r.symbol || symbol;
   renderReading(r);
