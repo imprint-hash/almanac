@@ -202,8 +202,13 @@ h1 span { color: var(--accent); }
 @media (max-width: 860px) {
   .lead { grid-template-columns: minmax(0, 1fr); }
   .fbody { grid-template-columns: minmax(0, 1fr); }
-  .search { display: none; }
-  .clock { display: none; }
+  /* Phones keep the search and the New York clock: the header wraps to a
+     second row instead of dropping them, and scrolls away rather than sticking. */
+  .top { flex-wrap: wrap; row-gap: 10px; position: static; }
+  .topright { display: contents; }
+  .seg { margin-left: auto; }
+  .clock { order: 3; flex-basis: 100%; }
+  .search { order: 4; flex-basis: 100%; max-width: none; }
 }
 @media (max-width: 520px) {
   .top { gap: 10px; }
