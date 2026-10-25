@@ -373,6 +373,42 @@
    "failed": 0,
    "blocked": 0,
    "pr": 6
+  },
+  {
+   "run": 18,
+   "date": "25 Oct",
+   "against": "PR #5, merged",
+   "passed": 46,
+   "failed": 0,
+   "blocked": 0,
+   "pr": 5
+  },
+  {
+   "run": 19,
+   "date": "25 Oct",
+   "against": "PR #7, merged",
+   "passed": 46,
+   "failed": 0,
+   "blocked": 0,
+   "pr": 7
+  },
+  {
+   "run": 20,
+   "date": "25 Oct",
+   "against": "PR #8, merged",
+   "passed": 46,
+   "failed": 0,
+   "blocked": 0,
+   "pr": 8
+  },
+  {
+   "run": 21,
+   "date": "25 Oct",
+   "against": "PR #9, merged before the result was read",
+   "passed": 45,
+   "failed": 1,
+   "blocked": 0,
+   "pr": 9
   }
  ]
 }

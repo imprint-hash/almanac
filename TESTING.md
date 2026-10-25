@@ -37,6 +37,10 @@ Each line is a real run. "Caught" means TestSprite found something wrong that wa
 | 15 · 20 Oct | PR #4 | **46 / 46 passed** | Readable dates. Merged. | — |
 | 16 · 20 Oct | PR #5 | 44 / 46 passed (1 failed, 1 blocked) | The phone header passed, but **the board on that preview was empty**: Bitget missed one sweep (0 of 40 answered), the empty sweep was cached for minutes, and the page called it "no token has moved enough". | An empty sweep is never cached; the page says Bitget did not answer, and asks again (PR #5) |
 | 17 · 21 Oct | PR #6 | **46 / 46 passed** | The badge now shows the result for the code the site is running (the last merged PR), and a newer unmerged run beside it. Merged. | — |
+| 18 · 25 Oct | PR #5 | **46 / 46 passed** | Phones get the search and the clock back; an empty board is never cached. Merged. | — |
+| 19 · 25 Oct | PR #7 | **46 / 46 passed** | Unknown tokens get a 404 (caught by the API suite). Merged. | — |
+| 20 · 25 Oct | PR #8 | **46 / 46 passed** | Symbols-only input is a 404 too. Merged. | — |
+| 21 · 25 Oct | PR #9 | 45 / 46 passed (1 failed) | **Merged by mistake before the result was read.** The change (a spaces-only symbol is a 404) is right, and the one failure was not caused by it: the rTokens-to-Perps check expected the odds to change, but both NVDA moves that morning were under 0.5%, so both correctly said "too small to call". Logged here rather than hidden; this PR (#10) puts a green run on the live code again. | — |
 
 Found by us, not by the tests: while fixing run 3, a missing bracket made the board drop Bitget's own error message and show "nothing has moved" instead. Fixed in the same commit as run 4's findings.
 
