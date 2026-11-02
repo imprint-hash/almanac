@@ -1,0 +1,57 @@
+{
+ "market": "rtoken",
+ "session": "2026-11-02",
+ "reopens": "2026-11-03",
+ "lockedAt": "2026-11-02T21:53:45.710Z",
+ "lockedAtNewYork": "2026-11-02 16:53 ET",
+ "minutesBeforeBell": 996,
+ "namesAsked": 40,
+ "namesAnswered": 28,
+ "calls": [
+  {
+   "symbol": "RBEUSDT",
+   "display": "rBE",
+   "moveAtLock": 0.031770885948075665,
+   "normalDay": 0.07586615097639832,
+   "ratio": 0.4187755084340508,
+   "band": "0.3-0.5",
+   "said": 0.400593471810089,
+   "baseline": 0.33872271624898953,
+   "nightsBehindIt": 337
+  },
+  {
+   "symbol": "RSNDKUSDT",
+   "display": "rSNDK",
+   "moveAtLock": 0.012585387585387534,
+   "normalDay": 0.05577580952988399,
+   "ratio": 0.2256424010958449,
+   "band": "under 0.3",
+   "said": 0.5068493150684932,
+   "baseline": 0.33872271624898953,
+   "nightsBehindIt": 292
+  },
+  {
+   "symbol": "RMUUSDT",
+   "display": "rMU",
+   "moveAtLock": 0.007180492001099166,
+   "normalDay": 0.03987258018008061,
+   "ratio": 0.18008596305203164,
+   "band": "under 0.3",
+   "said": 0.5068493150684932,
+   "baseline": 0.33872271624898953,
+   "nightsBehindIt": 292
+  },
+  {
+   "symbol": "RSOXLUSDT",
+   "display": "rSOXL",
+   "moveAtLock": 0.010995075318655697,
+   "normalDay": 0.09007168754800049,
+   "ratio": 0.1220702711137311,
+   "band": "under 0.3",
+   "said": 0.5068493150684932,
+   "baseline": 0.33872271624898953,
+   "nightsBehindIt": 292
+  }
+ ],
+ "settled": null
+}

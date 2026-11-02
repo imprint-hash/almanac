@@ -1,0 +1,145 @@
+{
+ "market": "perp",
+ "session": "2026-11-02",
+ "reopens": "2026-11-03",
+ "lockedAt": "2026-11-02T21:53:55.209Z",
+ "lockedAtNewYork": "2026-11-02 16:53 ET",
+ "minutesBeforeBell": 996,
+ "namesAsked": 40,
+ "namesAnswered": 36,
+ "calls": [
+  {
+   "symbol": "BEUSDT",
+   "display": "BE",
+   "moveAtLock": 0.033565164801935415,
+   "normalDay": 0.07523805571900515,
+   "ratio": 0.4461195133390036,
+   "band": "0.3-0.5",
+   "said": 0.35029940119760483,
+   "baseline": 0.24894514767932485,
+   "nightsBehindIt": 334
+  },
+  {
+   "symbol": "SNXXUSDT",
+   "display": "SNXX",
+   "moveAtLock": 0.022184873949579777,
+   "normalDay": 0.10859242689462587,
+   "ratio": 0.20429485355463295,
+   "band": "under 0.3",
+   "said": 0.4826589595375722,
+   "baseline": 0.24894514767932485,
+   "nightsBehindIt": 346
+  },
+  {
+   "symbol": "AAOIUSDT",
+   "display": "AAOI",
+   "moveAtLock": 0.016258879242304562,
+   "normalDay": 0.08145567347670529,
+   "ratio": 0.19960401219878537,
+   "band": "under 0.3",
+   "said": 0.4826589595375722,
+   "baseline": 0.24894514767932485,
+   "nightsBehindIt": 346
+  },
+  {
+   "symbol": "SNDKUSDT",
+   "display": "SNDK",
+   "moveAtLock": 0.010402988663054133,
+   "normalDay": 0.05524377507336095,
+   "ratio": 0.18831060421268256,
+   "band": "under 0.3",
+   "said": 0.4826589595375722,
+   "baseline": 0.24894514767932485,
+   "nightsBehindIt": 346
+  },
+  {
+   "symbol": "MUUSDT",
+   "display": "MU",
+   "moveAtLock": 0.006637510873839687,
+   "normalDay": 0.03927737473706505,
+   "ratio": 0.1689906954900435,
+   "band": "under 0.3",
+   "said": 0.4826589595375722,
+   "baseline": 0.24894514767932485,
+   "nightsBehindIt": 346
+  },
+  {
+   "symbol": "INTWUSDT",
+   "display": "INTW",
+   "moveAtLock": 0.009725765306122439,
+   "normalDay": 0.09064051596113315,
+   "ratio": 0.10730041861514632,
+   "band": "under 0.3",
+   "said": 0.4826589595375722,
+   "baseline": 0.24894514767932485,
+   "nightsBehindIt": 346
+  },
+  {
+   "symbol": "MRVLUSDT",
+   "display": "MRVL",
+   "moveAtLock": 0.005883710198430905,
+   "normalDay": 0.056750970018096016,
+   "ratio": 0.10367594063246467,
+   "band": "under 0.3",
+   "said": 0.4826589595375722,
+   "baseline": 0.24894514767932485,
+   "nightsBehindIt": 346
+  },
+  {
+   "symbol": "AXTIUSDT",
+   "display": "AXTI",
+   "moveAtLock": 0.010047160139429872,
+   "normalDay": 0.09885097435342285,
+   "ratio": 0.1016394649131951,
+   "band": "under 0.3",
+   "said": 0.4826589595375722,
+   "baseline": 0.24894514767932485,
+   "nightsBehindIt": 346
+  },
+  {
+   "symbol": "SOXLUSDT",
+   "display": "SOXL",
+   "moveAtLock": 0.00850634371395622,
+   "normalDay": 0.08939875790156634,
+   "ratio": 0.09515058054075247,
+   "band": "under 0.3",
+   "said": 0.4826589595375722,
+   "baseline": 0.24894514767932485,
+   "nightsBehindIt": 346
+  },
+  {
+   "symbol": "KORUUSDT",
+   "display": "KORU",
+   "moveAtLock": 0.007948523845571502,
+   "normalDay": 0.08486156415182886,
+   "ratio": 0.09366459274013043,
+   "band": "under 0.3",
+   "said": 0.4826589595375722,
+   "baseline": 0.24894514767932485,
+   "nightsBehindIt": 346
+  },
+  {
+   "symbol": "SOXSUSDT",
+   "display": "SOXS",
+   "moveAtLock": -0.009165502793296065,
+   "normalDay": 0.10206655733637726,
+   "ratio": 0.08979927443902738,
+   "band": "under 0.3",
+   "said": 0.4826589595375722,
+   "baseline": 0.24894514767932485,
+   "nightsBehindIt": 346
+  },
+  {
+   "symbol": "LITEUSDT",
+   "display": "LITE",
+   "moveAtLock": 0.005867475973697443,
+   "normalDay": 0.07369593294600826,
+   "ratio": 0.0796173647465203,
+   "band": "under 0.3",
+   "said": 0.4826589595375722,
+   "baseline": 0.24894514767932485,
+   "nightsBehindIt": 346
+  }
+ ],
+ "settled": null
+}
