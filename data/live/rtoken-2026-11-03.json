@@ -53,5 +53,42 @@
    "nightsBehindIt": 292
   }
  ],
- "settled": null
+ "settled": {
+  "settledAt": "2026-11-03T20:56:39.501Z",
+  "judged": 4,
+  "unsettleable": 0,
+  "undone": 0,
+  "itSaid": 0.4802853542538921,
+  "itHappened": 0
+ },
+ "outcomes": [
+  {
+   "symbol": "RBEUSDT",
+   "pre": 210.163,
+   "after": 216.98,
+   "kept": 2.0209576067790818,
+   "undone": false
+  },
+  {
+   "symbol": "RSNDKUSDT",
+   "pre": 1107.41,
+   "after": 1134.73,
+   "kept": 2.9602238063840245,
+   "undone": false
+  },
+  {
+   "symbol": "RMUUSDT",
+   "pre": 858.862,
+   "after": 861.885,
+   "kept": 1.490185608413593,
+   "undone": false
+  },
+  {
+   "symbol": "RSOXLUSDT",
+   "pre": 73.814,
+   "after": 75.5,
+   "kept": 3.077402361985156,
+   "undone": false
+  }
+ ]
 }
