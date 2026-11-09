@@ -1,0 +1,12 @@
+{
+ "market": "perp",
+ "session": "2026-11-09",
+ "reopens": "2026-11-10",
+ "lockedAt": "2026-11-09T21:04:05.954Z",
+ "lockedAtNewYork": "2026-11-09 16:04 ET",
+ "minutesBeforeBell": 1046,
+ "namesAsked": 40,
+ "namesAnswered": 36,
+ "calls": [],
+ "settled": null
+}
