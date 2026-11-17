@@ -1,282 +1,282 @@
 {
- "XAUUSDT": {
-  "normalDay": 0.01126030560783993,
-  "sessions": 18,
-  "turnover": 234004686.6453,
-  "display": "XAU",
-  "asOf": "2026-11-16T20:40:44.831Z"
+ "SNDKUSDT": {
+  "normalDay": 0.09705389452019628,
+  "sessions": 17,
+  "turnover": 193092138.79814,
+  "display": "SNDK",
+  "asOf": "2026-11-17T19:22:06.253Z"
  },
  "SOXLUSDT": {
-  "normalDay": 0.16368620701806452,
-  "sessions": 18,
-  "turnover": 808925257.468,
+  "normalDay": 0.14126958269960227,
+  "sessions": 17,
+  "turnover": 1020313652.4256,
   "display": "SOXL",
-  "asOf": "2026-11-16T20:40:45.309Z"
+  "asOf": "2026-11-17T19:22:07.091Z"
  },
  "NVDAUSDT": {
   "normalDay": 0.051709737585660574,
-  "sessions": 18,
-  "turnover": 214331822.9694,
+  "sessions": 17,
+  "turnover": 142924759.693,
   "display": "NVDA",
-  "asOf": "2026-11-16T20:40:48.111Z"
+  "asOf": "2026-11-17T19:22:09.466Z"
  },
- "SNDKUSDT": {
-  "normalDay": 0.09705389452019628,
-  "sessions": 18,
-  "turnover": 113244713.33712,
-  "display": "SNDK",
-  "asOf": "2026-11-16T20:40:49.308Z"
- },
- "XAGUSDT": {
-  "normalDay": 0.016584749708501843,
-  "sessions": 18,
-  "turnover": 92450735.9739,
-  "display": "XAG",
-  "asOf": "2026-11-16T20:40:50.434Z"
- },
- "KORUUSDT": {
-  "normalDay": 0.10516666483379891,
-  "sessions": 18,
-  "turnover": 81626367.79547,
-  "display": "KORU",
-  "asOf": "2026-11-16T20:40:52.050Z"
+ "XAUUSDT": {
+  "normalDay": 0.011716423209767894,
+  "sessions": 17,
+  "turnover": 163753793.4253,
+  "display": "XAU",
+  "asOf": "2026-11-17T19:22:10.719Z"
  },
  "SOXSUSDT": {
   "normalDay": 0.1652300860019798,
-  "sessions": 18,
-  "turnover": 77984806.85757,
+  "sessions": 17,
+  "turnover": 139155565.11312,
   "display": "SOXS",
-  "asOf": "2026-11-16T20:40:53.209Z"
+  "asOf": "2026-11-17T19:22:11.770Z"
+ },
+ "KORUUSDT": {
+  "normalDay": 0.09600041204649376,
+  "sessions": 17,
+  "turnover": 135649772.93824,
+  "display": "KORU",
+  "asOf": "2026-11-17T19:22:13.695Z"
  },
  "SNXXUSDT": {
   "normalDay": 0.1962483609998772,
-  "sessions": 18,
-  "turnover": 62755436.78,
+  "sessions": 17,
+  "turnover": 84191323.46024,
   "display": "SNXX",
-  "asOf": "2026-11-16T20:40:55.196Z"
+  "asOf": "2026-11-17T19:22:15.841Z"
+ },
+ "MUUSDT": {
+  "normalDay": 0.06621883644025692,
+  "sessions": 17,
+  "turnover": 67066450.7531,
+  "display": "MU",
+  "asOf": "2026-11-17T19:22:16.539Z"
+ },
+ "SKHYUSDT": {
+  "normalDay": 0.058506981795636744,
+  "sessions": 17,
+  "turnover": 65268775.0066,
+  "display": "SKHY",
+  "asOf": "2026-11-17T19:22:19.424Z"
+ },
+ "XAGUSDT": {
+  "normalDay": 0.017693757067197932,
+  "sessions": 17,
+  "turnover": 57807613.9215,
+  "display": "XAG",
+  "asOf": "2026-11-17T19:22:19.509Z"
+ },
+ "SKHYNIXUSDT": {
+  "normalDay": 0.05133679705754469,
+  "sessions": 17,
+  "turnover": 55863995.4059,
+  "display": "SKHYNIX",
+  "asOf": "2026-11-17T19:22:22.466Z"
  },
  "SPCXUSDT": {
   "normalDay": 0.052265161795682295,
-  "sessions": 18,
-  "turnover": 61758258.3673,
+  "sessions": 17,
+  "turnover": 50221587.3213,
   "display": "SPCX",
-  "asOf": "2026-11-16T20:40:55.533Z"
- },
- "MUUSDT": {
-  "normalDay": 0.07203932850232861,
-  "sessions": 18,
-  "turnover": 60047762.5952,
-  "display": "MU",
-  "asOf": "2026-11-16T20:40:58.058Z"
- },
- "CLUSDT": {
-  "normalDay": 0.02611335123305972,
-  "sessions": 18,
-  "turnover": 52571254.70331,
-  "display": "CL",
-  "asOf": "2026-11-16T20:40:59.020Z"
- },
- "SKHYUSDT": {
-  "normalDay": 0.06262029515793097,
-  "sessions": 18,
-  "turnover": 51359755.9736,
-  "display": "SKHY",
-  "asOf": "2026-11-16T20:41:02.035Z"
- },
- "BZUSDT": {
-  "normalDay": 0.028547689944476956,
-  "sessions": 18,
-  "turnover": 46555105.974,
-  "display": "BZ",
-  "asOf": "2026-11-16T20:41:02.079Z"
- },
- "SKHYNIXUSDT": {
-  "normalDay": 0.053994782552558164,
-  "sessions": 18,
-  "turnover": 33011843.6442,
-  "display": "SKHYNIX",
-  "asOf": "2026-11-16T20:41:04.346Z"
+  "asOf": "2026-11-17T19:22:23.063Z"
  },
  "MSTRUSDT": {
-  "normalDay": 0.05713598116781492,
-  "sessions": 18,
-  "turnover": 40892998.4216,
+  "normalDay": 0.05383716598536026,
+  "sessions": 17,
+  "turnover": 35835236.436,
   "display": "MSTR",
-  "asOf": "2026-11-16T20:41:05.751Z"
- },
- "ANTHROPICUSDT": {
-  "normalDay": 0.03445132763274454,
-  "sessions": 18,
-  "turnover": 31304573.285,
-  "display": "ANTHROPIC",
-  "asOf": "2026-11-16T20:41:07.123Z"
- },
- "QQQUSDT": {
-  "normalDay": 0.02094513809238712,
-  "sessions": 18,
-  "turnover": 26109608.613,
-  "display": "QQQ",
-  "asOf": "2026-11-16T20:41:08.655Z"
- },
- "INTCUSDT": {
-  "normalDay": 0.06201859497875005,
-  "sessions": 18,
-  "turnover": 25557584.8803,
-  "display": "INTC",
-  "asOf": "2026-11-16T20:41:09.435Z"
- },
- "TQQQUSDT": {
-  "normalDay": 0.06304506714815637,
-  "sessions": 18,
-  "turnover": 19657774.7662,
-  "display": "TQQQ",
-  "asOf": "2026-11-16T20:41:11.955Z"
- },
- "AMDUSDT": {
-  "normalDay": 0.07896231593654802,
-  "sessions": 18,
-  "turnover": 19279454.4305,
-  "display": "AMD",
-  "asOf": "2026-11-16T20:41:12.475Z"
- },
- "XAUTUSDT": {
-  "normalDay": 0.011015516809317984,
-  "sessions": 18,
-  "turnover": 19195514.7536,
-  "display": "XAUT",
-  "asOf": "2026-11-16T20:41:14.274Z"
- },
- "CRCLUSDT": {
-  "normalDay": 0.0571175306189082,
-  "sessions": 18,
-  "turnover": 18695393.413,
-  "display": "CRCL",
-  "asOf": "2026-11-16T20:41:15.575Z"
- },
- "NBISUSDT": {
-  "normalDay": 0.10574196203578146,
-  "sessions": 18,
-  "turnover": 18661572.3954,
-  "display": "NBIS",
-  "asOf": "2026-11-16T20:41:17.318Z"
- },
- "GOOGLUSDT": {
-  "normalDay": 0.028551292903802882,
-  "sessions": 18,
-  "turnover": 17229910.1378,
-  "display": "GOOGL",
-  "asOf": "2026-11-16T20:41:19.182Z"
- },
- "COINUSDT": {
-  "normalDay": 0.05823686243979314,
-  "sessions": 18,
-  "turnover": 15905075.743,
-  "display": "COIN",
-  "asOf": "2026-11-16T20:41:20.364Z"
- },
- "SQQQUSDT": {
-  "normalDay": 0.06208728378539692,
-  "sessions": 18,
-  "turnover": 13827522.9449,
-  "display": "SQQQ",
-  "asOf": "2026-11-16T20:41:23.660Z"
- },
- "NATGASUSDT": {
-  "normalDay": 0.03624222405097952,
-  "sessions": 18,
-  "turnover": 15011394.6669,
-  "display": "NATGAS",
-  "asOf": "2026-11-16T20:41:23.894Z"
- },
- "ZHONGJIUSDT": {
-  "normalDay": 0.05379266586029382,
-  "sessions": 18,
-  "turnover": 13751505.9428,
-  "display": "ZHONGJI",
-  "asOf": "2026-11-16T20:41:26.758Z"
- },
- "DRAMUSDT": {
-  "normalDay": 0.05701665915621512,
-  "sessions": 18,
-  "turnover": 13016386.7705,
-  "display": "DRAM",
-  "asOf": "2026-11-16T20:41:26.788Z"
- },
- "LITEUSDT": {
-  "normalDay": 0.08318716418676558,
-  "sessions": 18,
-  "turnover": 11425474.3505,
-  "display": "LITE",
-  "asOf": "2026-11-16T20:41:30.322Z"
- },
- "SAMSUNGUSDT": {
-  "normalDay": 0.04612581694893233,
-  "sessions": 18,
-  "turnover": 12261435.6209,
-  "display": "SAMSUNG",
-  "asOf": "2026-11-16T20:41:30.447Z"
- },
- "TSLAUSDT": {
-  "normalDay": 0.04109022144415555,
-  "sessions": 18,
-  "turnover": 10957116.5475,
-  "display": "TSLA",
-  "asOf": "2026-11-16T20:41:32.715Z"
- },
- "ZHIPUUSDT": {
-  "normalDay": 0.033006541167655015,
-  "sessions": 18,
-  "turnover": 11307994.7732,
-  "display": "ZHIPU",
-  "asOf": "2026-11-16T20:41:34.457Z"
- },
- "MINIMAXUSDT": {
-  "normalDay": 0.02278394364158295,
-  "sessions": 18,
-  "turnover": 10453702.0793,
-  "display": "MINIMAX",
-  "asOf": "2026-11-16T20:41:35.230Z"
+  "asOf": "2026-11-17T19:22:25.817Z"
  },
  "OPENAIUSDT": {
   "normalDay": 0.01781114678770329,
-  "sessions": 18,
-  "turnover": 10295413.16527,
+  "sessions": 17,
+  "turnover": 35386515.5296,
   "display": "OPENAI",
-  "asOf": "2026-11-16T20:41:38.095Z"
+  "asOf": "2026-11-17T19:22:25.955Z"
  },
- "ARMUSDT": {
-  "normalDay": 0.07354811791064331,
-  "sessions": 18,
-  "turnover": 9430386.4701,
-  "display": "ARM",
-  "asOf": "2026-11-16T20:41:38.183Z"
+ "ANTUSDT": {
+  "normalDay": 0.03445132763274454,
+  "sessions": 17,
+  "turnover": 31363499.4048,
+  "display": "ANT",
+  "asOf": "2026-11-17T19:22:28.906Z"
  },
- "MSFTUSDT": {
-  "normalDay": 0.029326653747831388,
-  "sessions": 18,
-  "turnover": 9211378.7356,
-  "display": "MSFT",
-  "asOf": "2026-11-16T20:41:40.328Z"
+ "INTCUSDT": {
+  "normalDay": 0.05674216978152899,
+  "sessions": 17,
+  "turnover": 35321719.3455,
+  "display": "INTC",
+  "asOf": "2026-11-17T19:22:29.315Z"
  },
- "AMZNUSDT": {
-  "normalDay": 0.02762308588132482,
-  "sessions": 18,
-  "turnover": 9025257.8401,
-  "display": "AMZN",
-  "asOf": "2026-11-16T20:41:41.864Z"
+ "CLUSDT": {
+  "normalDay": 0.02399156888182845,
+  "sessions": 17,
+  "turnover": 29344628.32075,
+  "display": "CL",
+  "asOf": "2026-11-17T19:22:31.799Z"
  },
- "BEUSDT": {
-  "normalDay": 0.09233971757421866,
-  "sessions": 18,
-  "turnover": 8169167.873,
-  "display": "BE",
-  "asOf": "2026-11-16T20:41:44.588Z"
+ "TQQQUSDT": {
+  "normalDay": 0.06011857680865032,
+  "sessions": 17,
+  "turnover": 30333528.8344,
+  "display": "TQQQ",
+  "asOf": "2026-11-17T19:22:32.403Z"
  },
- "PAXGUSDT": {
-  "normalDay": 0.010654532544452904,
-  "sessions": 18,
-  "turnover": 8086116.40469,
-  "display": "PAXG",
-  "asOf": "2026-11-16T20:41:44.811Z"
+ "QQQUSDT": {
+  "normalDay": 0.020052966284874095,
+  "sessions": 17,
+  "turnover": 27281044.1811,
+  "display": "QQQ",
+  "asOf": "2026-11-17T19:22:34.357Z"
+ },
+ "DRAMUSDT": {
+  "normalDay": 0.054768395415612944,
+  "sessions": 17,
+  "turnover": 22157997.6711,
+  "display": "DRAM",
+  "asOf": "2026-11-17T19:22:35.480Z"
+ },
+ "NBISUSDT": {
+  "normalDay": 0.10574196203578146,
+  "sessions": 17,
+  "turnover": 21178114.9324,
+  "display": "NBIS",
+  "asOf": "2026-11-17T19:22:38.412Z"
+ },
+ "CRCLUSDT": {
+  "normalDay": 0.05611471908795624,
+  "sessions": 17,
+  "turnover": 20361537.9568,
+  "display": "CRCL",
+  "asOf": "2026-11-17T19:22:38.622Z"
+ },
+ "XAUTUSDT": {
+  "normalDay": 0.011191506421686266,
+  "sessions": 17,
+  "turnover": 19854606.5231,
+  "display": "XAUT",
+  "asOf": "2026-11-17T19:22:40.839Z"
+ },
+ "AMDUSDT": {
+  "normalDay": 0.07636976903581502,
+  "sessions": 17,
+  "turnover": 20157525.014,
+  "display": "AMD",
+  "asOf": "2026-11-17T19:22:41.464Z"
+ },
+ "BZUSDT": {
+  "normalDay": 0.02662828413034303,
+  "sessions": 17,
+  "turnover": 19693378.5368,
+  "display": "BZ",
+  "asOf": "2026-11-17T19:22:43.531Z"
+ },
+ "ZHONGJIUSDT": {
+  "normalDay": 0.049125790746712944,
+  "sessions": 17,
+  "turnover": 17671928.1009,
+  "display": "ZHONGJI",
+  "asOf": "2026-11-17T19:22:43.803Z"
+ },
+ "GOOGLUSDT": {
+  "normalDay": 0.029128790184190893,
+  "sessions": 17,
+  "turnover": 15627880.7978,
+  "display": "GOOGL",
+  "asOf": "2026-11-17T19:22:45.854Z"
+ },
+ "MRVLUSDT": {
+  "normalDay": 0.07498631890972238,
+  "sessions": 17,
+  "turnover": 13051424.7828,
+  "display": "MRVL",
+  "asOf": "2026-11-17T19:22:48.511Z"
+ },
+ "ZHIPUUSDT": {
+  "normalDay": 0.03257196919658838,
+  "sessions": 17,
+  "turnover": 14258206.0106,
+  "display": "ZHIPU",
+  "asOf": "2026-11-17T19:22:48.971Z"
+ },
+ "COINUSDT": {
+  "normalDay": 0.05450031154205063,
+  "sessions": 17,
+  "turnover": 12724181.9081,
+  "display": "COIN",
+  "asOf": "2026-11-17T19:22:50.837Z"
+ },
+ "LITEUSDT": {
+  "normalDay": 0.07890429968423246,
+  "sessions": 17,
+  "turnover": 12614409.7175,
+  "display": "LITE",
+  "asOf": "2026-11-17T19:22:52.246Z"
+ },
+ "SQQQUSDT": {
+  "normalDay": 0.060721770337296685,
+  "sessions": 17,
+  "turnover": 12471796.1418,
+  "display": "SQQQ",
+  "asOf": "2026-11-17T19:22:53.248Z"
+ },
+ "SAMSUNGUSDT": {
+  "normalDay": 0.04506549120561779,
+  "sessions": 17,
+  "turnover": 10466066.1236,
+  "display": "SAMSUNG",
+  "asOf": "2026-11-17T19:22:55.642Z"
+ },
+ "MINIMAXUSDT": {
+  "normalDay": 0.020124407766726263,
+  "sessions": 17,
+  "turnover": 11200539.8532,
+  "display": "MINIMAX",
+  "asOf": "2026-11-17T19:22:55.839Z"
+ },
+ "UNITREEUSDT": {
+  "normalDay": 0.009451531214794282,
+  "sessions": 17,
+  "turnover": 9657472.4892,
+  "display": "UNITREE",
+  "asOf": "2026-11-17T19:22:58.197Z"
+ },
+ "TSLAUSDT": {
+  "normalDay": 0.04109022144415555,
+  "sessions": 17,
+  "turnover": 9342980.931,
+  "display": "TSLA",
+  "asOf": "2026-11-17T19:22:58.600Z"
+ },
+ "MUUUSDT": {
+  "normalDay": 0.13030759439082562,
+  "sessions": 17,
+  "turnover": 9327875.41113,
+  "display": "MUU",
+  "asOf": "2026-11-17T19:23:01.107Z"
+ },
+ "CXMTUSDT": {
+  "normalDay": 0.03351111221573645,
+  "sessions": 17,
+  "turnover": 9110141.73263,
+  "display": "CXMT",
+  "asOf": "2026-11-17T19:23:02.734Z"
+ },
+ "NATGASUSDT": {
+  "normalDay": 0.03333786247111381,
+  "sessions": 17,
+  "turnover": 8731090.4111,
+  "display": "NATGAS",
+  "asOf": "2026-11-17T19:23:04.261Z"
+ },
+ "IRENUSDT": {
+  "normalDay": 0.10185992993346493,
+  "sessions": 17,
+  "turnover": 7454610.26209,
+  "display": "IREN",
+  "asOf": "2026-11-17T19:23:05.234Z"
  }
 }
