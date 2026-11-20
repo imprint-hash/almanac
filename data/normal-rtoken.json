@@ -1,275 +1,275 @@
 {
+ "RSPYUSDT": {
+  "normalDay": 0.014095424598121544,
+  "sessions": 22,
+  "turnover": 28243581123.789536,
+  "display": "rSPY",
+  "asOf": "2026-11-20T18:47:05.885Z"
+ },
  "RQQQUSDT": {
   "normalDay": 0.02096946773780304,
   "sessions": 19,
-  "turnover": 18418467382.973602,
+  "turnover": 28978414045.06654,
   "display": "rQQQ",
-  "asOf": "2026-11-19T19:08:12.401Z"
- },
- "RSPYUSDT": {
-  "normalDay": 0.013930458185283198,
-  "sessions": 22,
-  "turnover": 20570004866.553005,
-  "display": "rSPY",
-  "asOf": "2026-11-19T19:08:12.518Z"
- },
- "RAMDUSDT": {
-  "normalDay": 0.07282055115534414,
-  "sessions": 20,
-  "turnover": 14830539611.210653,
-  "display": "rAMD",
-  "asOf": "2026-11-19T19:08:15.468Z"
+  "asOf": "2026-11-20T18:47:06.458Z"
  },
  "RNVDAUSDT": {
   "normalDay": 0.053000963695471914,
-  "sessions": 18,
-  "turnover": 16795093875.979671,
+  "sessions": 19,
+  "turnover": 18831867035.284363,
   "display": "rNVDA",
-  "asOf": "2026-11-19T19:08:15.797Z"
+  "asOf": "2026-11-20T18:47:08.456Z"
  },
  "RMUUSDT": {
   "normalDay": 0.06684951317955395,
-  "sessions": 18,
-  "turnover": 10124116095.942413,
+  "sessions": 19,
+  "turnover": 10828527831.166292,
   "display": "rMU",
-  "asOf": "2026-11-19T19:08:18.440Z"
+  "asOf": "2026-11-20T18:47:09.121Z"
  },
  "RSOXLUSDT": {
   "normalDay": 0.13887753986404386,
   "sessions": 25,
-  "turnover": 6544740952.651864,
+  "turnover": 5924109091.453033,
   "display": "rSOXL",
-  "asOf": "2026-11-19T19:08:19.190Z"
+  "asOf": "2026-11-20T18:47:11.939Z"
  },
- "RSPCXUSDT": {
-  "normalDay": 0.04866274853647279,
-  "sessions": 18,
-  "turnover": 6256406387.027985,
-  "display": "rSPCX",
-  "asOf": "2026-11-19T19:08:21.915Z"
+ "RAMDUSDT": {
+  "normalDay": 0.07282055115534414,
+  "sessions": 20,
+  "turnover": 8694779074.42338,
+  "display": "rAMD",
+  "asOf": "2026-11-20T18:47:11.974Z"
  },
- "RAMZNUSDT": {
-  "normalDay": 0.024547369367572992,
-  "sessions": 22,
-  "turnover": 4998855504.412126,
-  "display": "rAMZN",
-  "asOf": "2026-11-19T19:08:22.230Z"
- },
- "RGOOGLUSDT": {
-  "normalDay": 0.025437261667585538,
-  "sessions": 19,
-  "turnover": 4287500584.3405647,
-  "display": "rGOOGL",
-  "asOf": "2026-11-19T19:08:24.754Z"
- },
- "RSNDKUSDT": {
-  "normalDay": 0.09108269899963509,
-  "sessions": 18,
-  "turnover": 4557839248.002222,
-  "display": "rSNDK",
-  "asOf": "2026-11-19T19:08:26.593Z"
- },
- "RVOOUSDT": {
-  "normalDay": 0.014046267916124457,
-  "sessions": 22,
-  "turnover": 4181131580.703501,
-  "display": "rVOO",
-  "asOf": "2026-11-19T19:08:27.328Z"
- },
- "RMSFTUSDT": {
-  "normalDay": 0.024968870886359323,
-  "sessions": 23,
-  "turnover": 4128700726.361282,
-  "display": "rMSFT",
-  "asOf": "2026-11-19T19:08:30.281Z"
- },
- "RTQQQUSDT": {
-  "normalDay": 0.06326157440803619,
-  "sessions": 21,
-  "turnover": 3759577258.1503115,
-  "display": "rTQQQ",
-  "asOf": "2026-11-19T19:08:31.338Z"
+ "RIWMUSDT": {
+  "normalDay": 0.016378355782101985,
+  "sessions": 25,
+  "turnover": 4779941334.918344,
+  "display": "rIWM",
+  "asOf": "2026-11-20T18:47:14.625Z"
  },
  "RTSLAUSDT": {
   "normalDay": 0.038808348982837707,
   "sessions": 20,
-  "turnover": 3546803047.803083,
+  "turnover": 4800928629.369328,
   "display": "rTSLA",
-  "asOf": "2026-11-19T19:08:33.944Z"
- },
- "RAAPLUSDT": {
-  "normalDay": 0.017549091074176574,
-  "sessions": 23,
-  "turnover": 3690672214.3102727,
-  "display": "rAAPL",
-  "asOf": "2026-11-19T19:08:33.969Z"
- },
- "RIWMUSDT": {
-  "normalDay": 0.016133278199269924,
-  "sessions": 25,
-  "turnover": 2947654528.8367715,
-  "display": "rIWM",
-  "asOf": "2026-11-19T19:08:37.006Z"
- },
- "RMETAUSDT": {
-  "normalDay": 0.02834495909891506,
-  "sessions": 22,
-  "turnover": 3053358720.29231,
-  "display": "rMETA",
-  "asOf": "2026-11-19T19:08:37.598Z"
- },
- "RUNHUSDT": {
-  "normalDay": 0.021188895349200702,
-  "sessions": 25,
-  "turnover": 2706797173.795635,
-  "display": "rUNH",
-  "asOf": "2026-11-19T19:08:40.302Z"
- },
- "RINTCUSDT": {
-  "normalDay": 0.05519530577353572,
-  "sessions": 19,
-  "turnover": 2669507831.65143,
-  "display": "rINTC",
-  "asOf": "2026-11-19T19:08:42.630Z"
+  "asOf": "2026-11-20T18:47:15.006Z"
  },
  "RAVGOUSDT": {
   "normalDay": 0.050471187753406394,
   "sessions": 22,
-  "turnover": 2580018781.0538926,
+  "turnover": 4727086384.227168,
   "display": "rAVGO",
-  "asOf": "2026-11-19T19:08:43.453Z"
+  "asOf": "2026-11-20T18:47:17.660Z"
  },
- "RSOXSUSDT": {
-  "normalDay": 0.15701145248523157,
+ "RAAPLUSDT": {
+  "normalDay": 0.017549091074176574,
+  "sessions": 23,
+  "turnover": 4673945941.36404,
+  "display": "rAAPL",
+  "asOf": "2026-11-20T18:47:18.603Z"
+ },
+ "RMSFTUSDT": {
+  "normalDay": 0.024968870886359323,
+  "sessions": 23,
+  "turnover": 4459643860.36038,
+  "display": "rMSFT",
+  "asOf": "2026-11-20T18:47:20.982Z"
+ },
+ "RSPCXUSDT": {
+  "normalDay": 0.04866274853647279,
   "sessions": 19,
-  "turnover": 2323593037.839735,
-  "display": "rSOXS",
-  "asOf": "2026-11-19T19:08:45.947Z"
+  "turnover": 4447931520.366385,
+  "display": "rSPCX",
+  "asOf": "2026-11-20T18:47:21.343Z"
  },
- "RGOOGUSDT": {
-  "normalDay": 0.02558010062299436,
-  "sessions": 25,
-  "turnover": 2316671904.427245,
-  "display": "rGOOG",
-  "asOf": "2026-11-19T19:08:47.416Z"
- },
- "RSOXXUSDT": {
-  "normalDay": 0.04840284717424538,
-  "sessions": 24,
-  "turnover": 2306574771.5425506,
-  "display": "rSOXX",
-  "asOf": "2026-11-19T19:08:48.681Z"
- },
- "RPANWUSDT": {
-  "normalDay": 0.05026216658062621,
-  "sessions": 25,
-  "turnover": 2079856820.1893892,
-  "display": "rPANW",
-  "asOf": "2026-11-19T19:08:51.220Z"
+ "RAMZNUSDT": {
+  "normalDay": 0.024547369367572992,
+  "sessions": 22,
+  "turnover": 3988465576.7953296,
+  "display": "rAMZN",
+  "asOf": "2026-11-20T18:47:23.745Z"
  },
  "RTSMUSDT": {
   "normalDay": 0.03540805684605794,
   "sessions": 22,
-  "turnover": 2012428249.6846352,
+  "turnover": 3687480892.561975,
   "display": "rTSM",
-  "asOf": "2026-11-19T19:08:52.482Z"
+  "asOf": "2026-11-20T18:47:24.853Z"
  },
- "RHYGUSDT": {
-  "normalDay": 0.0028632838010096123,
-  "sessions": 57,
-  "turnover": 1937617241.7075007,
-  "display": "rHYG",
-  "asOf": "2026-11-19T19:08:55.029Z"
+ "RMETAUSDT": {
+  "normalDay": 0.02834495909891506,
+  "sessions": 22,
+  "turnover": 3651645684.104936,
+  "display": "rMETA",
+  "asOf": "2026-11-20T18:47:27.106Z"
+ },
+ "RSOXXUSDT": {
+  "normalDay": 0.04840284717424538,
+  "sessions": 24,
+  "turnover": 3554551187.7783394,
+  "display": "rSOXX",
+  "asOf": "2026-11-20T18:47:29.043Z"
+ },
+ "RVOOUSDT": {
+  "normalDay": 0.014046267916124457,
+  "sessions": 22,
+  "turnover": 3513162787.7508116,
+  "display": "rVOO",
+  "asOf": "2026-11-20T18:47:30.882Z"
+ },
+ "RGOOGLUSDT": {
+  "normalDay": 0.025437261667585538,
+  "sessions": 19,
+  "turnover": 3397849683.7980065,
+  "display": "rGOOGL",
+  "asOf": "2026-11-20T18:47:31.981Z"
+ },
+ "RTQQQUSDT": {
+  "normalDay": 0.06326157440803619,
+  "sessions": 21,
+  "turnover": 3396768426.8404136,
+  "display": "rTQQQ",
+  "asOf": "2026-11-20T18:47:35.071Z"
  },
  "RSMHUSDT": {
   "normalDay": 0.04415950113799883,
   "sessions": 23,
-  "turnover": 1901057384.9156768,
+  "turnover": 3362683110.4302287,
   "display": "rSMH",
-  "asOf": "2026-11-19T19:08:55.617Z"
+  "asOf": "2026-11-20T18:47:35.097Z"
  },
- "RTLTUSDT": {
-  "normalDay": 0.006659230964402951,
-  "sessions": 24,
-  "turnover": 1454772441.7294204,
-  "display": "rTLT",
-  "asOf": "2026-11-19T19:08:58.679Z"
+ "RSNDKUSDT": {
+  "normalDay": 0.09111292733080956,
+  "sessions": 15,
+  "turnover": 3043330911.018812,
+  "display": "rSNDK",
+  "asOf": "2026-11-20T18:47:37.438Z"
  },
- "RSQQQUSDT": {
-  "normalDay": 0.06198826771200772,
-  "sessions": 23,
-  "turnover": 1757811884.6005044,
-  "display": "rSQQQ",
-  "asOf": "2026-11-19T19:08:58.736Z"
+ "RINTCUSDT": {
+  "normalDay": 0.05519530577353572,
+  "sessions": 19,
+  "turnover": 2841938506.9258413,
+  "display": "rINTC",
+  "asOf": "2026-11-20T18:47:38.320Z"
  },
- "RMRVLUSDT": {
-  "normalDay": 0.0741745640829507,
-  "sessions": 21,
-  "turnover": 1448078808.4948244,
-  "display": "rMRVL",
-  "asOf": "2026-11-19T19:09:01.570Z"
+ "RSOXSUSDT": {
+  "normalDay": 0.15701145248523157,
+  "sessions": 20,
+  "turnover": 2752652629.245042,
+  "display": "rSOXS",
+  "asOf": "2026-11-20T18:47:40.558Z"
  },
- "RNBISUSDT": {
-  "normalDay": 0.10661087711414283,
-  "sessions": 18,
-  "turnover": 1411213302.8539155,
-  "display": "rNBIS",
-  "asOf": "2026-11-19T19:09:02.066Z"
- },
- "RCRWVUSDT": {
-  "normalDay": 0.11771194076910663,
-  "sessions": 21,
-  "turnover": 1369483105.5046885,
-  "display": "rCRWV",
-  "asOf": "2026-11-19T19:09:05.855Z"
+ "RGOOGUSDT": {
+  "normalDay": 0.02558010062299436,
+  "sessions": 25,
+  "turnover": 2509749778.0941796,
+  "display": "rGOOG",
+  "asOf": "2026-11-20T18:47:41.419Z"
  },
  "RGLDUSDT": {
   "normalDay": 0.012279804223540886,
   "sessions": 25,
-  "turnover": 1389672525.9962254,
+  "turnover": 2307432272.6171813,
   "display": "rGLD",
-  "asOf": "2026-11-19T19:09:06.606Z"
- },
- "RXLKUSDT": {
-  "normalDay": 0.032334070438905065,
-  "sessions": 28,
-  "turnover": 1332473585.8352797,
-  "display": "rXLK",
-  "asOf": "2026-11-19T19:09:08.800Z"
- },
- "RSPDNUSDT": {
-  "normalDay": 0.01412030476527885,
-  "sessions": 52,
-  "turnover": 1294324194.023972,
-  "display": "rSPDN",
-  "asOf": "2026-11-19T19:09:09.321Z"
- },
- "RXLVUSDT": {
-  "normalDay": 0.017310589925761045,
-  "sessions": 28,
-  "turnover": 1204806937.1004333,
-  "display": "rXLV",
-  "asOf": "2026-11-19T19:09:11.977Z"
- },
- "REEMUSDT": {
-  "normalDay": 0.014858287289049397,
-  "sessions": 46,
-  "turnover": 1261225729.354145,
-  "display": "rEEM",
-  "asOf": "2026-11-19T19:09:13.221Z"
- },
- "RRSPUSDT": {
-  "normalDay": 0.011733761396463841,
-  "sessions": 35,
-  "turnover": 1202464985.8732967,
-  "display": "rRSP",
-  "asOf": "2026-11-19T19:09:14.052Z"
+  "asOf": "2026-11-20T18:47:43.706Z"
  },
  "RIVVUSDT": {
   "normalDay": 0.013989361036561374,
   "sessions": 27,
-  "turnover": 1188824635.0942743,
+  "turnover": 1969103187.6160622,
   "display": "rIVV",
-  "asOf": "2026-11-19T19:09:16.267Z"
+  "asOf": "2026-11-20T18:47:44.535Z"
+ },
+ "RSQQQUSDT": {
+  "normalDay": 0.06198826771200772,
+  "sessions": 23,
+  "turnover": 1883048122.9643016,
+  "display": "rSQQQ",
+  "asOf": "2026-11-20T18:47:46.787Z"
+ },
+ "RHYGUSDT": {
+  "normalDay": 0.0028632838010096123,
+  "sessions": 57,
+  "turnover": 1790483740.237668,
+  "display": "rHYG",
+  "asOf": "2026-11-20T18:47:47.688Z"
+ },
+ "RTLTUSDT": {
+  "normalDay": 0.006659230964402951,
+  "sessions": 24,
+  "turnover": 1700913819.9785182,
+  "display": "rTLT",
+  "asOf": "2026-11-20T18:47:49.883Z"
+ },
+ "RVTIUSDT": {
+  "normalDay": 0.013860340881470097,
+  "sessions": 26,
+  "turnover": 1590876701.482128,
+  "display": "rVTI",
+  "asOf": "2026-11-20T18:47:51.195Z"
+ },
+ "RXLKUSDT": {
+  "normalDay": 0.032334070438905065,
+  "sessions": 28,
+  "turnover": 1468618156.4972005,
+  "display": "rXLK",
+  "asOf": "2026-11-20T18:47:53.141Z"
+ },
+ "RSGOVUSDT": {
+  "normalDay": 0.0000994629042741185,
+  "sessions": 25,
+  "turnover": 1455359572.2564259,
+  "display": "rSGOV",
+  "asOf": "2026-11-20T18:47:54.133Z"
+ },
+ "RASMLUSDT": {
+  "normalDay": 0.03065896202117136,
+  "sessions": 24,
+  "turnover": 1363021378.0240045,
+  "display": "rASML",
+  "asOf": "2026-11-20T18:47:56.541Z"
+ },
+ "RORCLUSDT": {
+  "normalDay": 0.0485702574072156,
+  "sessions": 22,
+  "turnover": 1336406463.5216348,
+  "display": "rORCL",
+  "asOf": "2026-11-20T18:47:57.142Z"
+ },
+ "RPLTRUSDT": {
+  "normalDay": 0.04346176466746644,
+  "sessions": 23,
+  "turnover": 1279903099.3644085,
+  "display": "rPLTR",
+  "asOf": "2026-11-20T18:47:59.403Z"
+ },
+ "RMRVLUSDT": {
+  "normalDay": 0.0741745640829507,
+  "sessions": 21,
+  "turnover": 1247371421.080691,
+  "display": "rMRVL",
+  "asOf": "2026-11-20T18:47:59.998Z"
+ },
+ "RUNHUSDT": {
+  "normalDay": 0.021188895349200702,
+  "sessions": 25,
+  "turnover": 1245198322.2228334,
+  "display": "rUNH",
+  "asOf": "2026-11-20T18:48:02.638Z"
+ },
+ "RNBISUSDT": {
+  "normalDay": 0.10661087711414283,
+  "sessions": 19,
+  "turnover": 1234585987.8539774,
+  "display": "rNBIS",
+  "asOf": "2026-11-20T18:48:03.195Z"
+ },
+ "RGEVUSDT": {
+  "normalDay": 0.06117650619547137,
+  "sessions": 25,
+  "turnover": 1189096830.0579138,
+  "display": "rGEV",
+  "asOf": "2026-11-20T18:48:05.274Z"
  }
 }
