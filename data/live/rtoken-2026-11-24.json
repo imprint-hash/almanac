@@ -1,0 +1,101 @@
+{
+ "market": "rtoken",
+ "session": "2026-11-23",
+ "reopens": "2026-11-24",
+ "lockedAt": "2026-11-23T22:14:07.961Z",
+ "lockedAtNewYork": "2026-11-23 17:14 ET",
+ "minutesBeforeBell": 976,
+ "namesAsked": 39,
+ "namesAnswered": 38,
+ "calls": [
+  {
+   "symbol": "RAVGOUSDT",
+   "display": "rAVGO",
+   "moveAtLock": -0.007124942638173554,
+   "normalDay": 0.050471187753406394,
+   "ratio": 0.14116851525240118,
+   "band": "under 0.3",
+   "said": 0.5068493150684932,
+   "baseline": 0.33872271624898953,
+   "nightsBehindIt": 292
+  },
+  {
+   "symbol": "RTSMUSDT",
+   "display": "rTSM",
+   "moveAtLock": 0.005218721823000541,
+   "normalDay": 0.0428615804085937,
+   "ratio": 0.12175756874224342,
+   "band": "under 0.3",
+   "said": 0.5068493150684932,
+   "baseline": 0.33872271624898953,
+   "nightsBehindIt": 292
+  },
+  {
+   "symbol": "RMRVLUSDT",
+   "display": "rMRVL",
+   "moveAtLock": 0.00802768166089963,
+   "normalDay": 0.07251084178873417,
+   "ratio": 0.11071008780023392,
+   "band": "under 0.3",
+   "said": 0.5068493150684932,
+   "baseline": 0.33872271624898953,
+   "nightsBehindIt": 292
+  },
+  {
+   "symbol": "RQCOMUSDT",
+   "display": "rQCOM",
+   "moveAtLock": 0.005100801554530018,
+   "normalDay": 0.05086164401811878,
+   "ratio": 0.10028778371208223,
+   "band": "under 0.3",
+   "said": 0.5068493150684932,
+   "baseline": 0.33872271624898953,
+   "nightsBehindIt": 292
+  },
+  {
+   "symbol": "RINTCUSDT",
+   "display": "rINTC",
+   "moveAtLock": -0.00520141859922556,
+   "normalDay": 0.05519530577353572,
+   "ratio": 0.09423661172504028,
+   "band": "under 0.3",
+   "said": 0.5068493150684932,
+   "baseline": 0.33872271624898953,
+   "nightsBehindIt": 292
+  },
+  {
+   "symbol": "RSNDKUSDT",
+   "display": "rSNDK",
+   "moveAtLock": 0.009122527847237988,
+   "normalDay": 0.09746950270045562,
+   "ratio": 0.09359366360238283,
+   "band": "under 0.3",
+   "said": 0.5068493150684932,
+   "baseline": 0.33872271624898953,
+   "nightsBehindIt": 292
+  },
+  {
+   "symbol": "RSOXSUSDT",
+   "display": "rSOXS",
+   "moveAtLock": -0.006772059329965319,
+   "normalDay": 0.15701145248523157,
+   "ratio": 0.0431309896365827,
+   "band": "under 0.3",
+   "said": 0.5068493150684932,
+   "baseline": 0.33872271624898953,
+   "nightsBehindIt": 292
+  },
+  {
+   "symbol": "RSOXLUSDT",
+   "display": "rSOXL",
+   "moveAtLock": 0.005921281783350808,
+   "normalDay": 0.13887753986404386,
+   "ratio": 0.0426367128129396,
+   "band": "under 0.3",
+   "said": 0.5068493150684932,
+   "baseline": 0.33872271624898953,
+   "nightsBehindIt": 292
+  }
+ ],
+ "settled": null
+}
