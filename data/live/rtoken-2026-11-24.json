@@ -97,5 +97,70 @@
    "nightsBehindIt": 292
   }
  ],
- "settled": null
+ "settled": {
+  "settledAt": "2026-11-24T23:51:57.236Z",
+  "judged": 8,
+  "unsettleable": 0,
+  "undone": 5,
+  "itSaid": 0.5068493150684931,
+  "itHappened": 0.625
+ },
+ "outcomes": [
+  {
+   "symbol": "RAVGOUSDT",
+   "pre": 300.5827,
+   "after": 300.93,
+   "kept": 0.8378341398939302,
+   "undone": false
+  },
+  {
+   "symbol": "RTSMUSDT",
+   "pre": 356.37,
+   "after": 340.94,
+   "kept": -7.2966093390496365,
+   "undone": true
+  },
+  {
+   "symbol": "RMRVLUSDT",
+   "pre": 139.75,
+   "after": 129.86,
+   "kept": -7.8156498673740185,
+   "undone": true
+  },
+  {
+   "symbol": "RQCOMUSDT",
+   "pre": 160.71,
+   "after": 161.8,
+   "kept": 2.3296739764912235,
+   "undone": false
+  },
+  {
+   "symbol": "RINTCUSDT",
+   "pre": 57.24,
+   "after": 54.52,
+   "kept": 10.135818704845867,
+   "undone": false
+  },
+  {
+   "symbol": "RSNDKUSDT",
+   "pre": 82.6,
+   "after": 75.0901,
+   "kept": -8.9664136652731,
+   "undone": true
+  },
+  {
+   "symbol": "RSOXSUSDT",
+   "pre": 55.57,
+   "after": 62.55,
+   "kept": -17.54787974689813,
+   "undone": true
+  },
+  {
+   "symbol": "RSOXLUSDT",
+   "pre": 37.47,
+   "after": 31.315,
+   "kept": -26.741416662741667,
+   "undone": true
+  }
+ ]
 }

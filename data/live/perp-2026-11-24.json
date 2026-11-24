@@ -152,5 +152,105 @@
    "nightsBehindIt": 346
   }
  ],
- "settled": null
+ "settled": {
+  "settledAt": "2026-11-24T23:52:02.418Z",
+  "judged": 13,
+  "unsettleable": 0,
+  "undone": 12,
+  "itSaid": 0.48265895953757215,
+  "itHappened": 0.9230769230769231
+ },
+ "outcomes": [
+  {
+   "symbol": "TSMUSDT",
+   "pre": 356.82,
+   "after": 341.59,
+   "kept": -4.267982702308774,
+   "undone": true
+  },
+  {
+   "symbol": "SAMSUNGUSDT",
+   "pre": 137.24,
+   "after": 131.31,
+   "kept": -6.005680199372002,
+   "undone": true
+  },
+  {
+   "symbol": "NBISUSDT",
+   "pre": 95.06,
+   "after": 85.76,
+   "kept": -5.650616307667736,
+   "undone": true
+  },
+  {
+   "symbol": "KORUUSDT",
+   "pre": 5.797,
+   "after": 5.316,
+   "kept": -7.1380325346170075,
+   "undone": true
+  },
+  {
+   "symbol": "MRVLUSDT",
+   "pre": 139.96,
+   "after": 130.11,
+   "kept": -8.337576135776635,
+   "undone": true
+  },
+  {
+   "symbol": "INTCUSDT",
+   "pre": 57.37,
+   "after": 54.62,
+   "kept": 10.223517967691475,
+   "undone": false
+  },
+  {
+   "symbol": "SNDKUSDT",
+   "pre": 82.89,
+   "after": 75.21,
+   "kept": -9.602140530479357,
+   "undone": true
+  },
+  {
+   "symbol": "SNXXUSDT",
+   "pre": 1.877,
+   "after": 1.508,
+   "kept": -10.620671283963762,
+   "undone": true
+  },
+  {
+   "symbol": "LITEUSDT",
+   "pre": 527.56,
+   "after": 485.22,
+   "kept": -12.140403021389023,
+   "undone": true
+  },
+  {
+   "symbol": "MUUSDT",
+   "pre": 670.1,
+   "after": 625.38,
+   "kept": -12.2955644627354,
+   "undone": true
+  },
+  {
+   "symbol": "CRWVUSDT",
+   "pre": 46.71,
+   "after": 42.55,
+   "kept": -9.809676728751729,
+   "undone": true
+  },
+  {
+   "symbol": "SOXSUSDT",
+   "pre": 55.593,
+   "after": 62.58,
+   "kept": -17.350951423342497,
+   "undone": true
+  },
+  {
+   "symbol": "SOXLUSDT",
+   "pre": 37.59,
+   "after": 31.39,
+   "kept": -29.929363729947116,
+   "undone": true
+  }
+ ]
 }
