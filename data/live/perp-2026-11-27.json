@@ -1,0 +1,46 @@
+{
+ "market": "perp",
+ "session": "2026-11-25",
+ "reopens": "2026-11-27",
+ "lockedAt": "2026-11-25T21:56:27.752Z",
+ "lockedAtNewYork": "2026-11-25 16:56 ET",
+ "minutesBeforeBell": 2434,
+ "namesAsked": 40,
+ "namesAnswered": 36,
+ "calls": [
+  {
+   "symbol": "ANTUSDT",
+   "display": "ANT",
+   "moveAtLock": 0.00544662309368178,
+   "normalDay": 0.040492617662799185,
+   "ratio": 0.1345090391300048,
+   "band": "under 0.3",
+   "said": 0.4826589595375722,
+   "baseline": 0.24894514767932485,
+   "nightsBehindIt": 346
+  },
+  {
+   "symbol": "COINUSDT",
+   "display": "COIN",
+   "moveAtLock": 0.005199306759098847,
+   "normalDay": 0.04896260670514193,
+   "ratio": 0.10618933731223973,
+   "band": "under 0.3",
+   "said": 0.4826589595375722,
+   "baseline": 0.24894514767932485,
+   "nightsBehindIt": 346
+  },
+  {
+   "symbol": "MSTUUSDT",
+   "display": "MSTU",
+   "moveAtLock": 0.007637155451696787,
+   "normalDay": 0.14487329716649686,
+   "ratio": 0.052716101594068934,
+   "band": "under 0.3",
+   "said": 0.4826589595375722,
+   "baseline": 0.24894514767932485,
+   "nightsBehindIt": 346
+  }
+ ],
+ "settled": null
+}

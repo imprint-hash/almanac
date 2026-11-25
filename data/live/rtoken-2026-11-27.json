@@ -1,0 +1,24 @@
+{
+ "market": "rtoken",
+ "session": "2026-11-25",
+ "reopens": "2026-11-27",
+ "lockedAt": "2026-11-25T21:56:22.028Z",
+ "lockedAtNewYork": "2026-11-25 16:56 ET",
+ "minutesBeforeBell": 2434,
+ "namesAsked": 39,
+ "namesAnswered": 38,
+ "calls": [
+  {
+   "symbol": "RGDXUSDT",
+   "display": "rGDX",
+   "moveAtLock": 0.007882288976485106,
+   "normalDay": 0.03371444899970394,
+   "ratio": 0.23379557460821393,
+   "band": "under 0.3",
+   "said": 0.5068493150684932,
+   "baseline": 0.33872271624898953,
+   "nightsBehindIt": 292
+  }
+ ],
+ "settled": null
+}
