@@ -8,5 +8,13 @@
  "namesAsked": 39,
  "namesAnswered": 38,
  "calls": [],
- "settled": null
+ "settled": {
+  "settledAt": "2026-11-25T23:35:05.248Z",
+  "judged": 0,
+  "unsettleable": 0,
+  "undone": 0,
+  "itSaid": 0,
+  "itHappened": null
+ },
+ "outcomes": []
 }
