@@ -42,5 +42,35 @@
    "nightsBehindIt": 346
   }
  ],
- "settled": null
+ "settled": {
+  "settledAt": "2026-11-27T23:23:36.581Z",
+  "judged": 3,
+  "unsettleable": 0,
+  "undone": 2,
+  "itSaid": 0.48265895953757215,
+  "itHappened": 0.6666666666666666
+ },
+ "outcomes": [
+  {
+   "symbol": "ANTUSDT",
+   "pre": 85.05,
+   "after": 89.81,
+   "kept": 11.275555555555826,
+   "undone": false
+  },
+  {
+   "symbol": "COINUSDT",
+   "pre": 108.48,
+   "after": 107.69,
+   "kept": -0.4006575712880971,
+   "undone": true
+  },
+  {
+   "symbol": "MSTUUSDT",
+   "pre": 10.3949,
+   "after": 9.9066,
+   "kept": -5.150844927953723,
+   "undone": true
+  }
+ ]
 }

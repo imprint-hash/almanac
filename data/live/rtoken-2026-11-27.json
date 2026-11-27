@@ -20,5 +20,21 @@
    "nightsBehindIt": 292
   }
  ],
- "settled": null
+ "settled": {
+  "settledAt": "2026-11-27T23:23:35.195Z",
+  "judged": 1,
+  "unsettleable": 0,
+  "undone": 0,
+  "itSaid": 0.5068493150684932,
+  "itHappened": 0
+ },
+ "outcomes": [
+  {
+   "symbol": "RGDXUSDT",
+   "pre": 77.01,
+   "after": 77.36,
+   "kept": 1.5765919413631817,
+   "undone": false
+  }
+ ]
 }
